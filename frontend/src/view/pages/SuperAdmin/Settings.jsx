@@ -65,11 +65,7 @@ const Settings = () => {
                             Privacy Policy
                         </a>
                     </div>
-                    <div className="flex justify-center">
-                        <a href="#apps" className="bg-transparent text-red-700 p-2 rounded border border-transparent hover:bg-gray-300 font-bold whitespace-nowrap">
-                            Apps
-                        </a>
-                    </div>
+   
                 </Slider>
             </div>
 
@@ -87,9 +83,6 @@ const Settings = () => {
         </a>
         <a href="#privacy-policy" className="bg-transparent text-red-700 p-2 rounded border border-transparent hover:bg-gray-300 font-bold text-left">
             Privacy Policy
-        </a>
-        <a href="#apps" className="bg-transparent text-red-700 p-2 rounded border border-transparent hover:bg-gray-300 font-bold text-left">
-            Apps
         </a>
     </div>
 

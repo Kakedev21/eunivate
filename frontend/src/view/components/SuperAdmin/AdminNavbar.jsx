@@ -3,9 +3,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 import logomobile from "../../../assets/logomobile.png"; // Correct image import
+import { searchOptions } from './Search/SearchContext'; // Import the search options
+import './Css/Search.css'
 
 const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
   const [user, setUser] = useState({ firstName: '', lastName: '', profilePicture: { url: '' } });
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredResults, setFilteredResults] = useState([]);
+  const [clickedOption, setClickedOption] = useState('');  // Track the clicked search option
   const navigate = useNavigate();
   const defaultProfilePicture = 'https://res.cloudinary.com/dzxzc7kwb/image/upload/v1725974053/DefaultProfile/qgtsyl571c1neuls9evd.png'; 
   const dropdownRef = useRef();
@@ -40,6 +45,31 @@ const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
     navigate('/superadmin/settings');
   };
 
+  const handleSearch = (event) => {
+    const query = event.target.value;
+    setSearchQuery(query);
+
+    // Filter the search options based on the query
+    if (query) {
+      const results = searchOptions.filter(option =>
+        option.name.toLowerCase().includes(query.toLowerCase())
+      );
+      setFilteredResults(results);
+    } else {
+      setFilteredResults([]);
+    }
+  };
+
+  const handleResultClick = (result) => {
+    setClickedOption(result.name);  // Set the clicked option
+    navigate(result.route);  // Navigate to the route based on the selected result
+    setSearchQuery('');
+    setFilteredResults([]);
+    
+    // Optionally stop the blinking after a period (e.g., 2 seconds)
+    setTimeout(() => setClickedOption(''), 2000);
+  };
+
   return (
     <>
       {/* Mobile Image */}
@@ -59,11 +89,31 @@ const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
             type="text"
             placeholder="Search anything..."
             className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={searchQuery}
+            onChange={handleSearch}
           />
           <FontAwesomeIcon 
             icon={faSearch} 
             className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
           />
+          
+{/* Dropdown for Search Results */}
+{filteredResults.length > 0 && (
+  <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-10 custom-scrollbar" 
+       style={{ maxHeight: '200px', overflowY: 'scroll' }}> {/* Set max height and enable scrolling */}
+    {filteredResults.map((result, index) => (
+      <div
+        key={index}
+        className={`px-4 py-2 hover:bg-gray-100 cursor-pointer ${clickedOption === result.name ? 'bg-yellow-300 animate-blink' : ''}`}
+        onClick={() => handleResultClick(result)}
+      >
+        {result.name}
+      </div>
+    ))}
+  </div>
+)}
+
+
         </div>
 
         {/* User Profile */}

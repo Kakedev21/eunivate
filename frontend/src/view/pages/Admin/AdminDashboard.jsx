@@ -10,6 +10,7 @@ const AdminDashboard = () => {
     const [stats, setStats] = useState([]);
     const [selectedIds, setSelectedIds] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
+    const [selectAll, setSelectAll] = useState(false); // New state for "Select All" checkbox
 
     useEffect(() => {
         const fetchQuotations = async () => {
@@ -46,6 +47,15 @@ const AdminDashboard = () => {
         setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
     };
 
+    const handleSelectAllChange = () => {
+        if (!selectAll) {
+            setSelectedIds(emails.map(email => email.id)); // Select all
+        } else {
+            setSelectedIds([]); // Deselect all
+        }
+        setSelectAll(!selectAll); // Toggle selectAll state
+    };
+
     const handleDelete = async () => {
         try {
             await Promise.all(selectedIds.map(id => 
@@ -56,6 +66,7 @@ const AdminDashboard = () => {
             ));
             setEmails(emails.filter(email => !selectedIds.includes(email.id)));
             setSelectedIds([]);
+            setSelectAll(false); // Deselect all after delete
         } catch (error) {
             console.error('Failed to delete quotations', error);
         }
@@ -112,41 +123,51 @@ const AdminDashboard = () => {
                 {/* Emails Section */}
                 <div className="md:col-span-2 bg-white rounded-lg shadow p-6">
                     <div className="flex items-center mb-6">
+                        {/* Select All Checkbox */}
+                        <input
+    type="checkbox"
+    className="mr-3 w-4 h-4"  // Increase the size of the checkbox
+    checked={selectAll}
+    onChange={handleSelectAllChange}
+/>
                         <input
                             type="text"
                             placeholder="Search quotation"
                             value={searchQuery}
                             onChange={handleSearchChange}
-                            className="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-200"
+                            className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-200"
                         />
                         <div className="flex ml-4 space-x-3">
-                            <FontAwesomeIcon icon={faSearch} className="text-gray-500 cursor-pointer" />
                             <FontAwesomeIcon icon={faEnvelope} className="text-gray-500 cursor-pointer" onClick={handleEmailClick} />
                             <FontAwesomeIcon icon={faTrash} className="text-gray-500 cursor-pointer" onClick={handleDelete} />
                         </div>
                     </div>
                     {filteredEmails.map((email, index) => (
-                        <div
-                            key={index}
-                            className={`flex items-center border-b border-gray-200 py-4 cursor-pointer ${selectedIds.includes(email.id) ? 'bg-gray-100' : ''}`}
-                            onClick={handleEmailClick}
-                        >
-                            <input
-                                type="checkbox"
-                                className="mr-4"
-                                checked={selectedIds.includes(email.id)}
-                                onChange={() => handleCheckboxChange(email.id)}
-                            />
-                            <p className="flex-1 truncate text-gray-700 text-sm md:text-base">{email.sender}</p>
-                            {email.status && (
-                                <span className={`px-3 py-1 rounded-full text-white mr-4 ${email.status === 'New' ? 'bg-teal-400' : 'bg-red-400'}`}>
-                                    {email.status}
-                                </span>
-                            )}
-                            <p className="flex-1 truncate text-gray-500 text-sm md:text-base">{email.subject}</p>
-                            <p className="text-gray-500 text-sm md:text-base">{email.time}</p>
-                        </div>
-                    ))}
+    <div
+        key={index}
+        className={`flex items-center border-b border-gray-200 py-4 cursor-pointer ${selectedIds.includes(email.id) ? 'bg-gray-100' : ''}`}
+        onClick={() => handleEmailClick(email.id)}  // Add onClick handler
+    >
+        <input
+            type="checkbox"
+            className="mr-4"
+            checked={selectedIds.includes(email.id)}
+            onChange={(e) => {
+                e.stopPropagation();  // Prevent triggering the row click when checking the checkbox
+                handleCheckboxChange(email.id);
+            }}
+        />
+        <p className="flex-1 truncate text-gray-700 text-sm md:text-base">{email.sender}</p>
+        {email.status && (
+            <span className={`px-3 py-1 rounded-full text-white mr-4 ${email.status === 'New' ? 'bg-teal-400' : 'bg-red-400'}`}>
+                {email.status}
+            </span>
+        )}
+        <p className="flex-1 truncate text-gray-500 text-sm md:text-base">{email.subject}</p>
+        <p className="text-gray-500 text-sm md:text-base">{email.time}</p>
+    </div>
+))}
+
                 </div>
 
                 {/* Manage Services Section */}

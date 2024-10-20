@@ -8,6 +8,10 @@ import StatusDropdown from './StatusDropdown';
 import PriorityDropdown from './PriorityDropdown';
 import AttachmentSection from './AttachmentSection';
 import Dates from './Dates';
+import BarLoading from '../Loading Style/Bar Loading/Barloader';
+import { toast, ToastContainer } from 'react-toastify'; // Importing toast and ToastContainer
+import 'react-toastify/dist/ReactToastify.css'; // Import the CSS for the toast notifications
+
 
 const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
   const [taskName, setTaskName] = useState('');
@@ -66,7 +70,18 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
 
   const fetchProjectDetails = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_REACT_APP_BACKEND_BASEURL}/api/users/sa-getnewproject/${projectId}`);
+      const user = JSON.parse(localStorage.getItem('user'));
+
+      const token = user?.accessToken;
+
+      if (!token) {
+        throw new Error('No access token found. Please log in again.');
+    }
+    const response = await axios.get(`http://localhost:5000/api/users/sa-getnewproject/${projectId}`, {
+      headers: {
+          Authorization: `Bearer ${token}`  
+      }
+  });
       setProject(response.data);
     } catch (error) {
       console.error('Error fetching project details:', error);
@@ -75,12 +90,13 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/users/members-superadmins');
-      setMembersList(response.data);
+      const response = await axios.get(`http://localhost:5000/api/users/get-assignee?projectId=${projectId}`);
+      setMembersList(response.data.invitedUsers); 
     } catch (error) {
       console.error('Error fetching users:', error);
     }
   };
+  
 
   const handleSaveattachment = async (file) => {
     const formData = new FormData();
@@ -100,87 +116,94 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
     }
   };
 
-  const handleSubmit = async () => {
-    setLoading(true);
-    if (!taskName || !startDate || !dueDate || !status || !priority || !selectedName) {
-      alert('Please fill in all fields before submitting.');
-      return;
-    }
+    const handleSubmit = async () => {
+      setLoading(true);
 
-    if (new Date(dueDate) < new Date(startDate)) {
-      alert('Due Date cannot be earlier than Start Date.');
-      return;
-    }
-
-    let uploadedImages = [];
-
-    // Upload selected files to Cloudinary
-    for (const file of selectedFiles) {
-      try {
-        const result = await handleSaveattachment(file);
-        uploadedImages.push({
-          publicId: result.publicId,
-          url: result.url
-        });
-      } catch (error) {
-        console.error('Error uploading image:', error);
-        alert('Failed to upload one or more images.');
+      // Validation checks
+      if (!taskName || !startDate || !dueDate || !status || !priority || selectedName.length === 0) {
+        toast.error('Please fill in all fields before submitting.');
+        setLoading(false);
         return;
       }
-    }
 
-    try {
-      const assigneeIds = selectedName.split(', ').map(async (name) => {
-        const userResponse = await axios.get(`http://localhost:5000/api/users/findByUsername/${name}`);
-        return userResponse.data._id;
-      });
+      if (new Date(dueDate) < new Date(startDate)) {
+        toast.error('Due Date cannot be earlier than Start Date.');
+        setLoading(false);
+        return;
+      }
 
-      const newTask = {
-        taskName,
-        objectives,
-        assignee: await Promise.all(assigneeIds),
-        status,
-        priority,
-        startDate,
-        dueDate,
-        attachment: uploadedImages,
-        description,
-        questionUpdate: question,
-        project: projectId,
-      };
+      // Upload selected files to Cloudinary
+      let uploadedImages = [];
+      for (const file of selectedFiles) {
+        try {
+          const result = await handleSaveattachment(file);
+          uploadedImages.push({
+            publicId: result.publicId,
+            url: result.url
+          });
+        } catch (error) {
+          console.error('Error uploading image:', error);
+          toast.error('Failed to upload one or more images.');
+          setLoading(false);
+          return;
+        }
+      }
 
-      const response = await axios.post('http://localhost:5000/api/users/sa-task', newTask);
-      console.log('Task created:', response.data);
-      onTaskSubmit(newTask);
+      try {
+        const assigneeIds = selectedName.map(user => user.id); // Adjusted to map over the array of objects
+        const newTask = {
+          taskName,
+          objectives, // Now passed as an array of objects
+          assignee: assigneeIds, // Corrected from using `split()`
+          status,
+          priority,
+          startDate,
+          dueDate,
+          attachment: uploadedImages,
+          description,
+          questionUpdate: question,
+          project: projectId,
+        };
 
-      // Clear the fields
-      setTaskName('');
-      setDescription('');
-      setObjectives([]);
-      setSelectedObjective(null);
-      setSelectedName('');
-      setStatus('');
-      setStartDate('');
-      setDueDate('');
-      setQuestion('');
-      setSelectedFiles([]);
-      onClose();
+        console.log("Task data being sent to the server:", newTask);
 
-    } catch (error) {
-      setLoading(false);
-      console.error('Error saving task:', error);
-      alert('Failed to save task.');
-    }
-  };
+        const response = await axios.post('http://localhost:5000/api/users/sa-task', newTask);
+        console.log('Task created successfully:', response.data);
 
+        onTaskSubmit(newTask);
+        toast.success('Task submitted successfully!');
+
+        // Clear the fields
+        setTaskName('');
+        setDescription('');
+        setObjectives([]);
+        setSelectedObjective(null);
+        setSelectedName('');
+        setStatus('');
+        setStartDate('');
+        setDueDate('');
+        setQuestion('');
+        setSelectedFiles([]);
+        onClose();
+
+      } catch (error) {
+        setLoading(false);
+        console.error('Error saving task:', error);
+        toast.error('Failed to save task.');
+      }
+    };
+
+  
+  
   const toggleUserNameVisibility = () => {
     setIsUserNameModalOpen(true);
   };
 
   const handleNameSelect = (members) => {
-    const memberNames = members.map(member => member.username).join(', ');
-    setSelectedName(memberNames);  
+    setSelectedName(members);  
   };
+  
+  
 
   const handleClickFileInput = () => {
     fileInputRef.current.click();
@@ -230,16 +253,31 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
           />
         </div>
 
-        <div className="mb-4 flex justify-start space-x-3">
-          <button
-            className="flex items-center space-x-2 bg-transparent border-none outline-none focus:outline-none"
-            onClick={toggleUserNameVisibility}
-          >
-            <span className="text-gray-700 text-sm font-semibold">Assignee</span>
-            <FaUser className="text-gray-500 text-lg bg-transparent rounded-lg border" />
-            <span className='text-sm text-gray-500'>{selectedName || 'Assign to'}</span>
-          </button>
-        </div>
+                  <div className="mb-4 flex justify-start space-x-3">
+            <button
+              className="flex items-center space-x-2 bg-transparent border-none outline-none focus:outline-none"
+              onClick={toggleUserNameVisibility}
+            >
+              <span className="text-gray-700 text-sm font-semibold">Assignee</span>
+              <FaUser className="text-gray-500 text-lg bg-transparent rounded-lg border" />
+              {selectedName && selectedName.length > 0 ? (
+                <div className="flex -space-x-4 items-center">
+                  {selectedName.map((user) => (
+                    <div key={user.id} className="flex items-center space-x-2">
+                      <img
+                        src={user.profilePicture?.url || 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'}  // Placeholder image URL
+                        alt={user.username}
+                        className="w-6 h-6 rounded-full"
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <span className="text-sm text-gray-500">Assign to</span>
+              )}
+            </button>
+          </div>
+
 
         <Dates
           startDate={startDate}
@@ -302,14 +340,15 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
         </div>
 
         <div className="flex justify-end space-x-4 mt-4">
-          <button
-            onClick={handleSubmit}
-            className="bg-red-600 w-full text-white px-4 py-2 rounded hover:bg-red-700"
-            
-          >
-                  {loading ? 'Submitting ...' : 'Submit'}
-          </button>
-        </div>
+  <button
+    onClick={handleSubmit}
+    className="bg-red-600 w-full text-white px-4 py-2 rounded hover:bg-red-700 flex justify-center items-center"
+    disabled={loading}
+  >
+    {loading ? <BarLoading  /> : 'Submit'}
+  </button>
+</div>
+
         {isUserNameModalOpen && (
           <UserNameModal
             isOpen={isUserNameModalOpen}
@@ -319,6 +358,17 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
           />
         )}
       </div>
+      <ToastContainer 
+        position="top-left" // Set the position for the toast notifications
+        autoClose={5000} // Duration before the toast auto-closes
+        hideProgressBar={false} // Show the progress bar
+        newestOnTop={false} // Show newest toast on top
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>,
     document.body
   );

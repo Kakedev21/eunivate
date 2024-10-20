@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import User from '../models/userModels.js';
+import User from '../models/Client/userModels.js';
 import nodemailer from 'nodemailer';
 // import Quotation from '../models/quotationModel.js';
 // import {text} from 'express';

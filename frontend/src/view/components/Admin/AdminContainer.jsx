@@ -95,7 +95,7 @@ const AdminContainer = ({ children }) => {
     const handleBellClick = async () => {
         setHasNewNotifications(false);
         try {
-            await fetch('http://localhost:5000/api/users/notifications', { method: 'GET' });
+            await fetch('http://localhost:5000/api/users/notification', { method: 'GET' });
         } catch (error) {
             console.error('Failed to fetch notifications', error);
         }
@@ -105,9 +105,10 @@ const AdminContainer = ({ children }) => {
         setIsNavOpen(false);
     };
 
+    // Updated to change the selected tab color to yellow when active
     const tabStyle = (isSelected) =>
         `py-2 px-6 rounded-full cursor-pointer transition-all duration-300 ${
-            isSelected ? 'bg-white shadow text-red-700 font-bold' : 'text-gray-500'
+            isSelected ? 'bg-white shadow text-yellow-500 font-bold' : 'text-gray-500'
         }`;
 
     return (
@@ -119,10 +120,16 @@ const AdminContainer = ({ children }) => {
                         <FontAwesomeIcon icon={isNavOpen ? faTimes : faBars} size="lg" />
                     </button>
 
-                    <h1 className="text-3xl sm:text-4xl font-bold text-red-800 cursor-pointer mb-6 mr-10" onClick={() => navigate('/admin')}>
+                    {/* Admin1 for website (desktop) view */}
+                    <h1 className="hidden sm:block text-3xl sm:text-4xl font-bold text-red-800 cursor-pointer mb-6 mr-10" onClick={() => navigate('/admin')}>
                         Admin
                     </h1>
+
                 </div>
+                {/* Admin2 for mobile view */}
+                <h1 className="block sm:hidden text-3xl sm:text-4xl font-bold text-red-800 cursor-pointer mb-6 mr-0" onClick={() => navigate('/admin')}>
+                    Admin
+                </h1>
 
                 {/* Desktop layout */}
                 <div className="hidden sm:flex flex-col items-center">
@@ -150,18 +157,17 @@ const AdminContainer = ({ children }) => {
                         className="text-gray-500 cursor-pointer mr-6"
                         onClick={handleBellClick}
                     />
-               {hasNewNotifications && (
-  <>
-    {/* Dot for mobile size */}
-    <span className="absolute top-8 right-[82px] w-2 h-2 bg-red-500 rounded-full 
-                    block lg:hidden sm:w-3 sm:h-3"></span>
-    
-    {/* Dot for website size */}
-    <span className="absolute top-10 right-[207px] w-2 h-2 bg-red-500 rounded-full 
-                    hidden lg:block"></span>
-  </>
-)}
-
+                    {hasNewNotifications && (
+                        <>
+                            {/* Dot for mobile size */}
+                            <span className="absolute top-8 right-[82px] w-2 h-2 bg-yellow-500 rounded-full 
+                                block lg:hidden sm:w-3 sm:h-3"></span>
+                            
+                            {/* Dot for website size */}
+                            <span className="absolute top-10 right-[207px] w-2 h-2 bg-yellow-500 rounded-full 
+                                hidden lg:block"></span>
+                        </>
+                    )}
 
                     <div
                         className="flex items-center cursor-pointer relative"

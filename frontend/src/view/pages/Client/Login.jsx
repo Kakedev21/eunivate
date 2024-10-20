@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Loginback } from '../../../constants/assets';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import LoadingBox from '../../pages/SuperAdmin/Loading Style/LoadingBox/LoadingBox'; // Import the LoadingBox component
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -11,7 +12,7 @@ const Login = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [savedCredentials, setSavedCredentials] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [loading, setloading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,29 +25,26 @@ const Login = () => {
   };
 
   const handleLogin = async () => {
-    setloading(true);
+    setLoading(true);
     try {
       const response = await axios.post('http://localhost:5000/api/users/login', {
         email,
         password,
       });
-
+  
       const data = response.data;
-
+  
       if (response.status === 200) {
-        
-        // Check if OTP is required
         if (data.twoFactorEnabled) {
           localStorage.setItem('user', JSON.stringify({
             userId: data._id,
             email: data.email,
             accessToken: data.accessToken, 
-        
           }));
           navigate('/verify-2fa-pending');
         } else {
           const { _id, firstName, lastName, email, role, username, phoneNumber, profilePicture, accessToken, twoFactorToken } = data;
-
+  
           localStorage.setItem('user', JSON.stringify({
             _id,
             firstName,
@@ -59,13 +57,13 @@ const Login = () => {
             twoFactorToken,
             accessToken,
           }));
-
+  
           if (rememberMe) {
             const newCreds = { email, password };
             const updatedCreds = [...savedCredentials.filter((cred) => cred.email !== email), newCreds];
             localStorage.setItem('savedCredentials', JSON.stringify(updatedCreds));
           }
-
+  
           const roleLowerCase = role.toLowerCase(); 
           if (roleLowerCase === 'superadmin') {
             navigate('/superadmin/dashboard');
@@ -73,17 +71,17 @@ const Login = () => {
             navigate('/admin');
           } else if (roleLowerCase === 'member') {
             navigate('/member-dashboard');
+          } else if (roleLowerCase === 'guest') {
+            navigate('/guest-dashboard'); // New route for guest accounts
           } else if (roleLowerCase === 'user') {
             navigate('/');
-          } else if (roleLowerCase === 'member') {
-            navigate('/member');  
           } else {
             console.error('Unknown role:', role);
           }
         }
       }
     } catch (error) {
-      setloading(false);
+      setLoading(false);
       if (error.response && error.response.status === 400) {
         setError('Invalid email or password.');
       } else if (error.response && error.response.status === 404) {
@@ -94,6 +92,7 @@ const Login = () => {
       console.error('Error logging in:', error);
     }
   };
+  
 
   const handleEmailFocus = () => {
     setShowSuggestions(true);
@@ -108,7 +107,13 @@ const Login = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-cover bg-no-repeat" style={{ backgroundImage: `url(${Loginback})` }}>
-      <div className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full">
+      <div className="relative bg-white p-8 rounded-xl shadow-lg max-w-md w-full">
+      {loading && (
+  <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 z-10">
+    <LoadingBox />
+  </div>
+)}
+
         <h2 className="text-3xl font-bold text-center mb-6">Log In</h2>
         {error && <p className="text-red-600 mb-4">{error}</p>}
         <div className="mb-4 relative">

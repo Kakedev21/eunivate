@@ -49,16 +49,22 @@ const EventsAdmin = () => {
   };
 
   const filteredWebinars = webinars
-    .filter(webinar =>
-      webinar.webinarName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      webinar.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      webinar.dateAndTime.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    .sort((a, b) => {
-      if (a[sortKey] < b[sortKey]) return -1;
-      if (a[sortKey] > b[sortKey]) return 1;
-      return 0;
-    });
+  .filter(webinar =>
+    webinar.webinarName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    webinar.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    webinar.dateAndTime.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+  .sort((a, b) => {
+    if (sortKey === 'webinarName') {
+      return a.webinarName.localeCompare(b.webinarName);
+    } else if (sortKey === 'dateAndTime') {
+      const dateA = new Date(a.dateAndTime);
+      const dateB = new Date(b.dateAndTime);
+      return dateA - dateB; // Ascending order
+    }
+    return 0;
+  });
+
 
   return (
     <Layout>
@@ -100,46 +106,45 @@ const EventsAdmin = () => {
         </div>
 
         <div className="space-y-4">
-  {filteredWebinars.map((webinar) => (
-    <div key={webinar._id} className="border rounded-lg shadow-lg p-4 bg-white">
-      {webinar.image && webinar.image.url ? (
-        <img
-          src={webinar.image.url}
-          alt={webinar.webinarName}
-          className="w-full h-32 object-cover rounded-lg mb-2"
-        />
-      ) : (
-        <p className="text-sm text-gray-500 mb-2">No image</p>
-      )}
-      <h3 className="text-lg font-semibold">{webinar.webinarName}</h3>
-      <p className="text-sm text-gray-600 mb-2 truncate">{webinar.description}</p>
-      <p className="text-xs text-gray-500 mb-2">{webinar.dateAndTime}</p>
-      <p className="text-xs text-blue-500 mb-2">
-        <a href={webinar.embeddedLink} target="_blank" rel="noopener noreferrer">
-          {webinar.embeddedLink}
-        </a>
-      </p>
+          {filteredWebinars.map((webinar) => (
+            <div key={webinar._id} className="border rounded-lg shadow-lg p-4 bg-white">
+              {webinar.image && webinar.image.url ? (
+                <img
+                  src={webinar.image.url}
+                  alt={webinar.webinarName}
+                  className="w-full h-32 object-cover rounded-lg mb-2"
+                />
+              ) : (
+                <p className="text-sm text-gray-500 mb-2">No image</p>
+              )}
+              <h3 className="text-lg font-semibold">{webinar.webinarName}</h3>
+              <p className="text-sm text-gray-600 mb-2 truncate">{webinar.description}</p>
+              <p className="text-xs text-gray-500 mb-2">{webinar.dateAndTime}</p>
+              <p className="text-xs text-blue-500 mb-2">
+                <a href={webinar.embeddedLink} target="_blank" rel="noopener noreferrer">
+                  {webinar.embeddedLink}
+                </a>
+              </p>
+              
+              <div className="flex justify-end space-x-2">
+                <button
+                  className="text-gray-600 hover:text-gray-900"
+                  onClick={() => handleEdit(webinar)}
+                >
+                  <FontAwesomeIcon icon={faEdit} />
+                </button>
+                <button
+                  className="text-gray-600 hover:text-gray-900"
+                  onClick={() => handleDelete(webinar._id)}
+                >
+                  <FontAwesomeIcon icon={faTrashAlt} />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
       
-      <div className="flex justify-end space-x-2">
-        <button
-          className="text-gray-600 hover:text-gray-900"
-          onClick={() => handleEdit(webinar)}
-        >
-          <FontAwesomeIcon icon={faEdit} />
-        </button>
-        <button
-          className="text-gray-600 hover:text-gray-900"
-          onClick={() => handleDelete(webinar._id)}
-        >
-          <FontAwesomeIcon icon={faTrashAlt} />
-        </button>
-      </div>
-    </div>
-  ))}
-</div>
-
-
-      </div>
       {/* Desktop layout */}
       <div className="hidden md:flex items-center justify-between mb-6">
         <div className="relative w-3/5 flex-grow">

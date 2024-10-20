@@ -2,12 +2,16 @@ import React, { useState } from 'react';
 import { FaPlus, FaTimes } from 'react-icons/fa';
 
 const ObjectiveList = ({ objectives, selectedObjective, setObjectives, setSelectedObjective }) => {
-  const [newObjective, setNewObjective] = useState('');
+  const [newObjectiveText, setNewObjectiveText] = useState('');
 
   const handleAddObjective = () => {
-    if (newObjective.trim()) {
-      setObjectives([...objectives, newObjective.trim()]);
-      setNewObjective('');
+    if (newObjectiveText.trim()) {
+      const newObjective = {
+        text: newObjectiveText.trim(),
+        done: false, // Default status
+      };
+      setObjectives([...objectives, newObjective]);
+      setNewObjectiveText('');
     }
   };
 
@@ -42,7 +46,9 @@ const ObjectiveList = ({ objectives, selectedObjective, setObjectives, setSelect
           {objectives.map((objective, index) => (
             <div key={index} className="mb-2 flex items-center space-x-2">
               <span className={`flex items-center space-x-2 ${selectedObjective === objective ? 'font-semibold' : ''}`}>
-                <span onClick={() => handleObjectiveSelect(objective)}>{objective || 'New Objective'}</span>
+                <span onClick={() => handleObjectiveSelect(objective)}>
+                  {objective.text || 'New Objective'}
+                </span>
                 {selectedObjective === objective && (
                   <button
                     onClick={() => handleObjectiveSelect(null)} // Deselects the current objective
@@ -66,8 +72,8 @@ const ObjectiveList = ({ objectives, selectedObjective, setObjectives, setSelect
       )}
       <input
         type="text"
-        value={newObjective}
-        onChange={(e) => setNewObjective(e.target.value)}
+        value={newObjectiveText}
+        onChange={(e) => setNewObjectiveText(e.target.value)}
         onKeyDown={handleKeyDown}
         className="appearance-none rounded w-full py-2 px-3 text-gray-900 leading-tight focus:outline-none focus:shadow-outline"
         placeholder="Add new objective"
