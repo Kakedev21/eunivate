@@ -48,7 +48,7 @@ const Task = () => {
                 console.log(`Fetching projects for workspace: ${selectedWorkspace.workspaceTitle} (ID: ${selectedWorkspace._id})`);
     
                 // Fetch projects associated with the selected workspace
-                const projectResponse = await axios.get('/api/users/sa-getnewproject', {
+                const projectResponse = await axios.get('https://eunivate-backend-56iw.onrender.com/api/users/sa-getnewproject', {
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
                     },
