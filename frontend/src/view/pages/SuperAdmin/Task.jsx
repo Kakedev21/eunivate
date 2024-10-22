@@ -48,7 +48,7 @@ const Task = () => {
                 console.log(`Fetching projects for workspace: ${selectedWorkspace.workspaceTitle} (ID: ${selectedWorkspace._id})`);
     
                 // Fetch projects associated with the selected workspace
-                const projectResponse = await axios.get('http://localhost:5000/api/users/sa-getnewproject', {
+                const projectResponse = await axios.get('/api/users/sa-getnewproject', {
                     headers: {
                         Authorization: `Bearer ${accessToken}`,
                     },
@@ -62,7 +62,7 @@ const Task = () => {
                     projectResponse.data.map(async (project) => {
                         try {
                             console.log(`Fetching tasks for project: ${project.projectName}, ID: ${project._id}`);
-                            const taskResponse = await axios.get(`http://localhost:5000/api/users/sa-tasks/${project._id}`, {
+                            const taskResponse = await axios.get(`/api/users/sa-tasks/${project._id}`, {
                                 headers: {
                                     Authorization: `Bearer ${accessToken}`, // Include the token here as well
                                 },

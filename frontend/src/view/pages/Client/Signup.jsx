@@ -89,7 +89,7 @@ const Signup = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:5000/api/users/signup', {
+      const response = await axios.post('https://eunivate-backend-56iw.onrender.com/api/users/signup', {
         firstName,
         lastName,
         username,

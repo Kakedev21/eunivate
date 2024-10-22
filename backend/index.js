@@ -21,7 +21,7 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173", // Client URL
+    origin: "https://e-univate.vercel.app", // Client URL
     methods: ["GET", "POST", "DELETE", "PATCH", "UPDATE"]
   }
 });
