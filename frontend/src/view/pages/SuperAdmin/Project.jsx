@@ -73,8 +73,8 @@ const Project = () => {
     if (selectedWorkspace) {
       fetchProjects();
     }
-    fetchProjects();
-  }, []);
+    
+  }, [selectedWorkspace]);
 
   // Fetch task counts (total and done) for each project
   useEffect(() => {

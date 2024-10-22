@@ -38,7 +38,6 @@ const Task = () => {
                     return;
                 }
                 
-                // Check if a workspace is selected
                 if (!selectedWorkspace) {
                     console.error('No workspace selected.');
                     setLoading(false);
@@ -47,15 +46,12 @@ const Task = () => {
     
                 console.log(`Fetching projects for workspace: ${selectedWorkspace.workspaceTitle} (ID: ${selectedWorkspace._id})`);
     
-                // Fetch projects associated with the selected workspace
                 const projectResponse = await axios.get('https://eunivate-backend-56iw.onrender.com/api/users/sa-getnewproject', {
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                    },
-                    params: {
-                        workspaceId: selectedWorkspace._id, // Pass the workspace ID to filter projects
-                    }
+                    headers: { Authorization: `Bearer ${accessToken}` },
+                    params: { workspaceId: selectedWorkspace._id },
                 });
+    
+                console.log('Project Response:', projectResponse.data); // Log the project response
     
                 const tasksList = [];
                 await Promise.all(
@@ -63,18 +59,17 @@ const Task = () => {
                         try {
                             console.log(`Fetching tasks for project: ${project.projectName}, ID: ${project._id}`);
                             const taskResponse = await axios.get(`https://eunivate-backend-56iw.onrender.com/api/users/sa-tasks/${project._id}`, {
-                                headers: {
-                                    Authorization: `Bearer ${accessToken}`, // Include the token here as well
-                                },
+                                headers: { Authorization: `Bearer ${accessToken}` },
                             });
-                            console.log(`Tasks for project ${project.projectName}:`, taskResponse.data.data);
+    
+                            console.log(`Task Response for Project ${project.projectName}:`, taskResponse.data); // Log the task response
     
                             const tasksWithProject = taskResponse.data.data.map(task => ({
                                 ...task,
                                 projectName: project.projectName,
-                                objectives: task.objectives || [], // Ensure objectives are included
+                                objectives: task.objectives || [],
                                 assignedUsers: task.assignedUsers || [],
-                                invitedUsers: project.invitedUsers || [] // Fetching invited users from the project
+                                invitedUsers: project.invitedUsers || []
                             }));
                             tasksList.push(...tasksWithProject);
                         } catch (taskError) {
@@ -94,7 +89,8 @@ const Task = () => {
         };
     
         fetchTasks();
-    }, [selectedWorkspace]); // Re-fetch tasks when selectedWorkspace changes
+    }, [selectedWorkspace]);
+    
     
 
     const openModal = (task) => {
