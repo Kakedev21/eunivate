@@ -62,7 +62,7 @@ const Task = () => {
                     projectResponse.data.map(async (project) => {
                         try {
                             console.log(`Fetching tasks for project: ${project.projectName}, ID: ${project._id}`);
-                            const taskResponse = await axios.get(`/api/users/sa-tasks/${project._id}`, {
+                            const taskResponse = await axios.get(`https://eunivate-backend-56iw.onrender.com/api/users/sa-tasks/${project._id}`, {
                                 headers: {
                                     Authorization: `Bearer ${accessToken}`, // Include the token here as well
                                 },
