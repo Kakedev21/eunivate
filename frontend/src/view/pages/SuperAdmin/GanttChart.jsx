@@ -17,7 +17,7 @@ const GanttChart = ({ projectId }) => {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/users/sa-tasks/${projectId}`);
+        const response = await axios.get(`https://eunivate-backend-56iw.onrender.com/api/users/sa-tasks/${projectId}`);
         setTasks(response.data.data);
       } catch (error) {
         console.error('Error fetching tasks:', error);
@@ -230,10 +230,10 @@ const GanttChart = ({ projectId }) => {
 
                       {/* Circle with a checkmark for 'Done' tasks */}
                       {task.status === 'Done' && (
-  <div className="absolute right-5 top-1/2 transform -translate-y-1/2 bg-green-500 text-white w-7 h-7 flex items-center justify-center rounded-full hidden sm:flex">
-    <FontAwesomeIcon icon={faCheck} className="w-4 h-4" />
-  </div>
-)}
+              <div className="absolute right-5 top-1/2 transform -translate-y-1/2 bg-green-500 text-white w-7 h-7 items-center justify-center rounded-full hidden sm:flex">
+                <FontAwesomeIcon icon={faCheck} className="w-4 h-4" />
+              </div>
+            )}
 
                     </div>
                   );

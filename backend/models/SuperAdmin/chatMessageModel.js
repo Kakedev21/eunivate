@@ -11,7 +11,7 @@ const messageSchema = new mongoose.Schema({
         required: true,
     },
     workspaceId: {  // Change workspaceId to be a string instead of ObjectId
-        type: String,  // Use String instead of ObjectId
+        type: String,  // Use String instead of ObjectIds
         required: true
     },
     replies: [

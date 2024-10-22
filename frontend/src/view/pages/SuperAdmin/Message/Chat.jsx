@@ -7,6 +7,24 @@ import 'react-quill/dist/quill.snow.css';
 import DOMPurify from 'dompurify';
 import './Chat.css'; // Ensure this file exists
 
+// Helper function to get initials from the group name
+const getInitials = (name) => {
+  const words = name.split(' ');
+  if (words.length > 1) {
+    return words[0].charAt(0).toUpperCase() + words[1].charAt(0).toUpperCase();
+  } else {
+    return words[0].charAt(0).toUpperCase();
+  }
+};
+
+// Helper function to generate a consistent color based on group name
+const getColorFromName = (name) => {
+  const colors = ['bg-red-500', 'bg-blue-500', 'bg-yellow-500',];
+  // Calculate a hash value from the group name and use it to select a color
+  const hash = [...name].reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  return colors[hash % colors.length];
+};
+
 const emojis = ['😀', '😂', '😍', '👍', '👏'];
 const flagColors = ['red', 'yellow', 'green']; // Define flag colors
 let socket;
@@ -44,7 +62,7 @@ const Chat = ({ group }) => {
 
   // Initialize socket and fetch initial messages (Pang realtime to)
   useEffect(() => {
-    socket = io("http://localhost:5000");
+    socket = io("https://eunivate-backend-56iw.onrender.com");
 
     const storedUser = JSON.parse(localStorage.getItem('user'));
     if (storedUser) {
@@ -124,7 +142,8 @@ const Chat = ({ group }) => {
       console.log('Workspace ID being used:', group.groupName); // Check if this is the correct ID
       const fetchMessages = async () => {
         try {
-          const response = await axios.get('http://localhost:5000/api/users/messages', {
+          const response = await axios.get('https://eunivate-backend-56iw.onrender.com/api/users/messages', {
+            
             params: { workspaceId: group.groupName }, // Fetch messages based on workspaceId
           });
           setMessages(response.data);
@@ -164,7 +183,7 @@ const Chat = ({ group }) => {
         };
   
         try {
-            await axios.post('http://localhost:5000/api/users/create-message', newMessage);
+            await axios.post('https://eunivate-backend-56iw.onrender.com/api/users/create-message', newMessage);
             setMessage(''); // Clear the message input
             setFile(null);  // Clear the file input
             setReplyMessage(null); // Clear the reply message
@@ -186,7 +205,7 @@ const Chat = ({ group }) => {
       };
 
       try {
-        await axios.post(`http://localhost:5000/api/users/${replyMessage?._id}/reply`, newReply);
+        await axios.post(`https://eunivate-backend-56iw.onrender.com/api/users/${replyMessage?._id}/reply`, newReply);
         setMessage('');
         setReplyMessage(null);
       } catch (error) {
@@ -229,7 +248,7 @@ const Chat = ({ group }) => {
     });
 
     try {
-      await axios.post(`http://localhost:5000/api/users/${messageId}/react`, {
+      await axios.post(`https://eunivate-backend-56iw.onrender.com/api/users/${messageId}/react`, {
         user: userId,
         reaction: emoji,
       });
@@ -246,7 +265,7 @@ const Chat = ({ group }) => {
     socket.emit('starred-message', { messageId, userId });
 
     try {
-      await axios.post(`http://localhost:5000/api/users/${messageId}/star`, { userId });
+      await axios.post(`https://eunivate-backend-56iw.onrender.com/api/users/${messageId}/star`, { userId });
     } catch (error) {
       console.error('Error starring message:', error.response ? error.response.data : error.message);
     }
@@ -264,7 +283,7 @@ const Chat = ({ group }) => {
     socket.emit('flagged-message', { messageId, priorityFlag: color });
 
     try {
-      await axios.post(`http://localhost:5000/api/users/${messageId}/flag`, {
+      await axios.post(`https://eunivate-backend-56iw.onrender.com/api/users/${messageId}/flag`, {
         priorityFlag: color,
       });
     } catch (error) {
@@ -283,13 +302,18 @@ const Chat = ({ group }) => {
   }
   return (
     <div className="flex flex-col h-full w-full p-4">
-      {/* Header */}
-      <div className="flex items-center justify-start border-b pb-3 mb-4">
-        <div>
-          <h2 className="text-base sm:text-lg font-bold">{group.groupName} Chat</h2>
-          <p className="text-sm text-gray-500">General chat for {group.groupName}</p>
-        </div>
+    {/* Header */}
+    <div className="flex items-center justify-start border-b pb-3 mb-4">
+      <div
+        className={`w-10 h-10 flex items-center justify-center text-white text-lg font-bold rounded-full ${getColorFromName(group.groupName)}`}
+      >
+        {getInitials(group.groupName)}
       </div>
+      <div className="ml-3">
+        <h2 className="text-base sm:text-lg font-bold">{group.groupName} Chat</h2>
+        <p className="text-sm text-gray-500">General chat for {group.groupName}</p>
+      </div>
+    </div>
 
       {/* Chat Messages */}
       <div ref={chatContainerRef} className="flex-1 overflow-y-auto mb-4 no-scrollbar">

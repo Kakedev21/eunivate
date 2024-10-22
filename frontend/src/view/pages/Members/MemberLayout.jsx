@@ -44,7 +44,7 @@ const MemberLayout = ({ isNavOpen }) => {
             }
 
             try {
-                const response = await axios.get('http://localhost:5000/api/users/workspaces', {
+                const response = await axios.get('https://eunivate-backend-56iw.onrender.com/api/users/workspaces', {
                     headers: { Authorization: `Bearer ${user.accessToken}` },
                 });
 
