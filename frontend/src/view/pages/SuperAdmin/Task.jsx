@@ -28,7 +28,6 @@ const Task = () => {
         const fetchTasks = async () => {
             setLoading(true);
             console.log('Fetching tasks...');
-    
             try {
                 const user = JSON.parse(localStorage.getItem('user'));
                 const accessToken = user ? user.accessToken : null;
@@ -37,46 +36,44 @@ const Task = () => {
                     console.error('No access token found. Please log in again.');
                     return;
                 }
-                
-                // Check if a workspace is selected
+    
                 if (!selectedWorkspace) {
                     console.error('No workspace selected.');
                     setLoading(false);
                     return;
                 }
     
-                console.log(`Fetching projects for workspace: ${selectedWorkspace.workspaceTitle} (ID: ${selectedWorkspace._id})`);
-    
-                // Fetch projects associated with the selected workspace
                 const projectResponse = await axios.get('https://eunivate-backend-56iw.onrender.com/api/users/sa-getnewproject', {
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                    },
-                    params: {
-                        workspaceId: selectedWorkspace._id, // Pass the workspace ID to filter projects
-                    }
+                    headers: { Authorization: `Bearer ${accessToken}` },
+                    params: { workspaceId: selectedWorkspace._id },
                 });
+    
+                console.log('Project Response:', projectResponse.data);
     
                 const tasksList = [];
                 await Promise.all(
                     projectResponse.data.map(async (project) => {
                         try {
-                            console.log(`Fetching tasks for project: ${project.projectName}, ID: ${project._id}`);
                             const taskResponse = await axios.get(`https://eunivate-backend-56iw.onrender.com/api/users/sa-tasks/${project._id}`, {
-                                headers: {
-                                    Authorization: `Bearer ${accessToken}`, // Include the token here as well
-                                },
+                                headers: { Authorization: `Bearer ${accessToken}` },
                             });
-                            console.log(`Tasks for project ${project.projectName}:`, taskResponse.data.data);
     
-                            const tasksWithProject = taskResponse.data.data.map(task => ({
-                                ...task,
-                                projectName: project.projectName,
-                                objectives: task.objectives || [], // Ensure objectives are included
-                                assignedUsers: task.assignedUsers || [],
-                                invitedUsers: project.invitedUsers || [] // Fetching invited users from the project
-                            }));
-                            tasksList.push(...tasksWithProject);
+                            // Log the response to see what is returned from the backend
+                            console.log(`Task Response for Project ${project.projectName}:`, taskResponse.data);
+    
+                            // Check if the data is an array before using map
+                            if (Array.isArray(taskResponse.data.data)) {
+                                const tasksWithProject = taskResponse.data.data.map(task => ({
+                                    ...task,
+                                    projectName: project.projectName,
+                                    objectives: task.objectives || [],
+                                    assignedUsers: task.assignedUsers || [],
+                                    invitedUsers: project.invitedUsers || [],
+                                }));
+                                tasksList.push(...tasksWithProject);
+                            } else {
+                                console.error('Task response data is not an array:', taskResponse.data);
+                            }
                         } catch (taskError) {
                             console.error(`Error fetching tasks for project ${project._id}:`, taskError);
                         }
@@ -94,7 +91,8 @@ const Task = () => {
         };
     
         fetchTasks();
-    }, [selectedWorkspace]); // Re-fetch tasks when selectedWorkspace changes
+    }, [selectedWorkspace]);
+    
     
 
     const openModal = (task) => {
