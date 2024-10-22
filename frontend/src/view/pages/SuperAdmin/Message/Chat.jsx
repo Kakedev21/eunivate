@@ -143,6 +143,7 @@ const Chat = ({ group }) => {
       const fetchMessages = async () => {
         try {
           const response = await axios.get('https://eunivate-backend-56iw.onrender.com/api/users/messages', {
+            
             params: { workspaceId: group.groupName }, // Fetch messages based on workspaceId
           });
           setMessages(response.data);
