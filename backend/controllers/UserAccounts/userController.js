@@ -92,3 +92,29 @@ export const createUser = async (req, res) => {
     res.status(500).json({ message: 'Error creating user', error: error.message });
   }
 };
+
+// Get the current user's data
+export const getCurrentUser = async (req, res) => {
+  try {
+    // Use req.user to find the currently authenticated user (set in the authenticate middleware)
+    const user = await User.findById(req.user.id).select('-password'); // Exclude the password field from the response
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json({
+      _id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      username: user.username,
+      email: user.email,
+      phoneNumber: user.phoneNumber,
+      profilePicture: user.profilePicture,
+      role: user.role,
+    });
+  } catch (error) {
+    console.error('Error fetching user data:', error.message);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};

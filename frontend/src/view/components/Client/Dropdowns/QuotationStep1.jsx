@@ -1,8 +1,51 @@
-import React from 'react';
+import React, {useEffect} from 'react';
+import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faEnvelope, faPhone, faBuilding } from '@fortawesome/free-solid-svg-icons';
 
 const QuotationStep1 = ({ formData, setFormData, nextStep }) => {
+
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+          
+            if (!token) {
+              console.error('No token found! Please log in.');
+              return;
+            }
+          
+            try {
+              const response = await axios.get('http://localhost:5000/api/users/current-user', {
+                headers: {
+                  Authorization: `Bearer ${token}`, // Add the token here
+                },
+              });
+              console.log('Current User:', response.data);
+
+              const {firstName, lastName, email, phoneNumber} = response.data;
+
+              setFormData({
+                name: `${firstName} ${lastName}` || '',
+                email: email || '',
+                phone: phoneNumber || '',
+              });
+
+            } catch (error) {
+              console.error('Error fetching current user:', error);
+              if (error.response && error.response.status === 401) {
+                // Handle unauthorized access (e.g., token expired)
+                console.error('Unauthorized access - possibly due to expired token.');
+              }
+            }
+          };
+          
+    
+        fetchUserData();
+    }, [setFormData]);
+    
+    
+
     return (
         <>
             {/* Header */}
@@ -42,7 +85,7 @@ const QuotationStep1 = ({ formData, setFormData, nextStep }) => {
                                     type="text"
                                     placeholder="Name"
                                     name='name'
-                                    value={formData.name}
+                                    value={formData.name || ''}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                     className="w-full pl-3 p-3 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                 />
@@ -56,7 +99,7 @@ const QuotationStep1 = ({ formData, setFormData, nextStep }) => {
                                     type="email"
                                     name='email'
                                     placeholder="Email address"
-                                    value={formData.email}
+                                    value={formData.email || ''}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                     className="w-full pl-3 p-3 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                 />
@@ -72,21 +115,20 @@ const QuotationStep1 = ({ formData, setFormData, nextStep }) => {
                                     type="text"
                                     placeholder="Phone Number"
                                     name='phone'
-                                    value={formData.phone}
+                                    value={formData.phone || ''}
                                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                                     className="w-full pl-3 p-3 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                 />
                             </div>
                         </div>
                         <div className="w-1/2">
-                            <label className="block font-semibold text-gray-600 mb-2">Company</label>
+                            <label className="block font-semibold text-gray-600 mb-2">Company Name</label>
                             <div className="relative">
                                 <FontAwesomeIcon icon={faBuilding} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                                 <input
                                     type="text"
-                                    placeholder="Company name"
+                                    placeholder="(Optional)"
                                     name='company'
-                                    value={formData.company}
                                     onChange={(e) => setFormData({ ...formData, company: e.target.value })}
                                     className="w-full pl-3 p-3 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                 />

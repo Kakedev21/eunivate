@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import userRoutes from './routes/userRoutes.js';
 import cors from 'cors';
+import User from './models/Client/userModels.js';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import saAddTask from './models/SuperAdmin/saAddTask.js';
@@ -21,7 +22,7 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: ['https://e-univate.vercel.app'], 
+    origin: ['http://localhost:5173'], 
     methods: ["GET", "POST", "DELETE", "PATCH", "UPDATE"]
   }
 });
@@ -90,6 +91,21 @@ app.get('/api/users/workspaces/selected', async (req, res) => {
   }
 });
 
+app.get('/api/users/current-user', async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id); // Assuming you use req.user to get the logged-in user's ID
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json(user);
+  } catch (error) {
+    console.error('Error fetching current user:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
+
+
 
 
 // Chat message routes
@@ -97,8 +113,9 @@ app.get('/api/users/quotation/confirm/', confirmQuotationEmail);
 
 app.get('/quotation-complete', (req, res) => {
 // res.send('Quotation verification complete');
-res.redirect(`https://eunivate.vercel.app/quotation-complete`);
+res.redirect(`http://localhost:5173/quotation-complete`);
 });
+
 
 
 // Error handling middleware
