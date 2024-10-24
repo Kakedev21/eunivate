@@ -3,27 +3,17 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 import logomobile from "../../../assets/logomobile.png"; // Correct image import
+import { searchOptions } from './Search'; // Import the search options
+import '../SuperAdmin/Css/Search.css'
 
 const AdminNavbarG = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
   const [user, setUser] = useState({ firstName: '', lastName: '', profilePicture: { url: '' } });
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredResults, setFilteredResults] = useState([]);
+  const [clickedOption, setClickedOption] = useState('');  // Track the clicked search option
   const navigate = useNavigate();
   const defaultProfilePicture = 'https://res.cloudinary.com/dzxzc7kwb/image/upload/v1725974053/DefaultProfile/qgtsyl571c1neuls9evd.png'; 
   const dropdownRef = useRef();
-
-  // Sample data for search results (replace this with your actual data source)
-  const sampleData = [
-    'Task Management',
-    'User Profiles',
-    'Project Overview',
-    'Reports',
-    'Settings',
-    'Notifications',
-    'Analytics',
-    'Integrations',
-    'User Roles',
-  ];
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
@@ -52,17 +42,17 @@ const AdminNavbarG = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
   };
 
   const handleProfileClick = () => {
-    navigate('/guest-dashboard/settingsG');
+    navigate('/superadmin/settings');
   };
 
   const handleSearch = (event) => {
     const query = event.target.value;
     setSearchQuery(query);
 
-    // Filter the sample data based on the query
+    // Filter the search options based on the query
     if (query) {
-      const results = sampleData.filter(item =>
-        item.toLowerCase().includes(query.toLowerCase())
+      const results = searchOptions.filter(option =>
+        option.name.toLowerCase().includes(query.toLowerCase())
       );
       setFilteredResults(results);
     } else {
@@ -71,11 +61,13 @@ const AdminNavbarG = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
   };
 
   const handleResultClick = (result) => {
-    // Handle click on a result (e.g., navigate to a specific page)
-    console.log('Selected:', result);
+    setClickedOption(result.name);  // Set the clicked option
+    navigate(result.route);  // Navigate to the route based on the selected result
     setSearchQuery('');
     setFilteredResults([]);
-    // Add your navigation logic here if needed
+    
+    // Optionally stop the blinking after a period (e.g., 2 seconds)
+    setTimeout(() => setClickedOption(''), 2000);
   };
 
   return (
@@ -105,20 +97,23 @@ const AdminNavbarG = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
             className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
           />
           
-          {/* Dropdown for Search Results */}
-          {filteredResults.length > 0 && (
-            <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
-              {filteredResults.map((result, index) => (
-                <div
-                  key={index}
-                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                  onClick={() => handleResultClick(result)}
-                >
-                  {result}
-                </div>
-              ))}
-            </div>
-          )}
+{/* Dropdown for Search Results */}
+{filteredResults.length > 0 && (
+  <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-10 custom-scrollbar" 
+       style={{ maxHeight: '200px', overflowY: 'scroll' }}> {/* Set max height and enable scrolling */}
+    {filteredResults.map((result, index) => (
+      <div
+        key={index}
+        className={`px-4 py-2 hover:bg-gray-100 cursor-pointer ${clickedOption === result.name ? 'bg-yellow-300 animate-blink' : ''}`}
+        onClick={() => handleResultClick(result)}
+      >
+        {result.name}
+      </div>
+    ))}
+  </div>
+)}
+
+
         </div>
 
         {/* User Profile */}

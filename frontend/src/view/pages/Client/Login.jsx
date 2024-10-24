@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Loginback } from '../../../constants/assets';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import LoadingBox from '../../pages/SuperAdmin/Loading Style/LoadingBox/LoadingBox'; // Import the LoadingBox component
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -108,11 +107,7 @@ const Login = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-cover bg-no-repeat" style={{ backgroundImage: `url(${Loginback})` }}>
       <div className="relative bg-white p-8 rounded-xl shadow-lg max-w-md w-full">
-      {loading && (
-  <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 z-10">
-    <LoadingBox />
-  </div>
-)}
+   
 
         <h2 className="text-3xl font-bold text-center mb-6">Log In</h2>
         {error && <p className="text-red-600 mb-4">{error}</p>}
