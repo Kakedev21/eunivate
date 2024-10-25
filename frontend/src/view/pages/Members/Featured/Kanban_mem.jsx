@@ -28,7 +28,7 @@ const Kanban_mem = () => {
           console.error('Project ID is not defined');
           return;
         }
-        const response = await axios.get(`http://localhost:5000/api/users/sa-tasks/${projectId}`);
+        const response = await axios.get(`https://eunivate-backend-56iw.onrender.com/api/users/sa-tasks/${projectId}`);
         setTasks(response.data.data);
       } catch (error) {
         console.error('Error fetching tasks:', error);
@@ -61,7 +61,7 @@ const Kanban_mem = () => {
   // Update the task status in the backend
   const updateTaskStatus = async (taskId, newStatus) => {
     try {
-      await axios.patch(`http://localhost:5000/api/users/sa-tasks/${taskId}`, { status: newStatus });
+      await axios.patch(`https://eunivate-backend-56iw.onrender.com/api/users/sa-tasks/${taskId}`, { status: newStatus });
     } catch (error) {
       console.error('Error updating task status:', error);
     }

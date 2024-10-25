@@ -192,7 +192,7 @@ const SettingProfile_Members = () => {
       }
   
       const response = await axios.put(
-        `http://localhost:5000/api/users/${storedUser._id}/password`,
+        `https://eunivate-backend-56iw.onrender.com/api/users/${storedUser._id}/password`,
         { newPassword },
         {
           headers: {

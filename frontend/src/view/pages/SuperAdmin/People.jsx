@@ -33,7 +33,7 @@ const People = () => {
                 throw new Error('No access token found. Please log in again.');
             }
 
-            const response = await axios.get('http://localhost:5000/api/users/sa-getnewproject', {
+            const response = await axios.get('https://eunivate-backend-56iw.onrender.com/api/users/sa-getnewproject', {
                 headers: { Authorization: `Bearer ${accessToken}` },
             });
 
@@ -53,7 +53,7 @@ const People = () => {
             }
     
             // Fetch all users
-            const response = await axios.get('http://localhost:5000/api/users/', {
+            const response = await axios.get('https://eunivate-backend-56iw.onrender.com/api/users/', {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
@@ -64,7 +64,7 @@ const People = () => {
     
             // Fetch invited users specific to the selected workspace
             if (selectedWorkspace) {
-                const invitedUsersResponse = await axios.get('http://localhost:5000/api/users/invited', {
+                const invitedUsersResponse = await axios.get('https://eunivate-backend-56iw.onrender.com/api/users/invited', {
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`,
@@ -188,7 +188,7 @@ const People = () => {
     
         try {
             // Make sure this endpoint is correct and matches your backend API structure
-            const response = await axios.post('http://localhost:5000/api/users/invite', {
+            const response = await axios.post('https://eunivate-backend-56iw.onrender.com/api/users/invite', {
                 userIds: selectedUsers.map(user => user.id),
                 projects: selectedUsers.map(user => user.projects).flat(),
                 roles: selectedUsers.map(user => user.role),
@@ -240,7 +240,7 @@ const People = () => {
                 throw new Error(`User with email ${userEmail} not found`);
             }
 
-            const response = await fetch(`http://localhost:5000/api/users/${user._id}/role`, {
+            const response = await fetch(`https://eunivate-backend-56iw.onrender.com/api/users/${user._id}/role`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -288,7 +288,7 @@ const People = () => {
     
         try {
             // Send the actual user ID for deletion
-            const response = await fetch(`http://localhost:5000/api/users/invited/${invitedMember.userId}`, {
+            const response = await fetch(`https://eunivate-backend-56iw.onrender.com/api/users/invited/${invitedMember.userId}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',

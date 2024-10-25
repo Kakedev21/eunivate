@@ -27,7 +27,7 @@ const Login = () => {
   const handleLogin = async () => {
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:5000/api/users/login', {
+      const response = await axios.post('https://eunivate-backend-56iw.onrender.com/api/users/login', {
         email,
         password,
       });
