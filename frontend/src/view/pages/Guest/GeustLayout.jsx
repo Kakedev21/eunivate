@@ -46,7 +46,7 @@ const GeustLayout = ({ isNavOpen }) => {
             }
 
             try {
-                const response = await axios.get('https://eunivate-backend-56iw.onrender.com/api/users/workspaces', {
+                const response = await axios.get('https://eunivate-jys4.onrender.com/api/users/workspaces', {
                     headers: { Authorization: `Bearer ${user.accessToken}` },
                 });
 
