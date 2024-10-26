@@ -63,7 +63,7 @@ const SideNav = ({ isNavOpen }) => {
                     setError('Failed to load workspaces');
                 }
             } catch (err) {
-                setError(`Failed to load workspaces: ${err.message}`);
+                setError();
             }
         };
 
