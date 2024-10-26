@@ -10,7 +10,7 @@ import AssigneeModal from './AssigneeModal';
 
 
 
-const socket = io('https://eunivate-backend-56iw.onrender.com');
+const socket = io('https://eunivate-jys4.onrender.com');
 
 const TaskDetailModal = ({ isOpen, onClose, task, projectName, projectId, onUpdateTask }) => {
   if (!task) return null;
@@ -97,7 +97,7 @@ const TaskDetailModal = ({ isOpen, onClose, task, projectName, projectId, onUpda
     
     const fetchUsers = async () => {
       try {
-        const response = await axios.get(`https://eunivate-backend-56iw.onrender.com/api/users/get-assignee?projectId=${projectId}`);
+        const response = await axios.get(`https://eunivate-jys4.onrender.com/api/users/get-assignee?projectId=${projectId}`);
         setMembersList(response.data.invitedUsers); // Adjust based on the response structure
       } catch (error) {
         console.error('Error fetching users:', error);
@@ -108,7 +108,7 @@ const TaskDetailModal = ({ isOpen, onClose, task, projectName, projectId, onUpda
      // Fetch comments for the task
         const fetchComments = async () => {
           try {
-            const response = await axios.get(`https://eunivate-backend-56iw.onrender.com/api/users/sa-tasks/${task._id}/comments`);
+            const response = await axios.get(`https://eunivate-jys4.onrender.com/api/users/sa-tasks/${task._id}/comments`);
             if (response.data.success) {
               setCommentsList(response.data.data); // Populate commentsList with fetched comments
             } else {
@@ -141,7 +141,7 @@ const TaskDetailModal = ({ isOpen, onClose, task, projectName, projectId, onUpda
               modifiedBy: currentUserId,  // Add userId to the request body
             };
         
-            const response = await fetch(`https://eunivate-backend-56iw.onrender.com/api/users/sa-tasks/${task._id}`, {
+            const response = await fetch(`https://eunivate-jys4.onrender.com/api/users/sa-tasks/${task._id}`, {
               method: 'PATCH',
               headers: {
                 'Content-Type': 'application/json',
@@ -366,7 +366,7 @@ const handleSaveStatus = async () => {
     
       // Only send objectives to the backend
       try {
-        const response = await axios.patch(`https://eunivate-backend-56iw.onrender.com/api/users/sa-tasks/${task._id}/objectives`, {
+        const response = await axios.patch(`https://eunivate-jys4.onrender.com/api/users/sa-tasks/${task._id}/objectives`, {
           objectives: updatedObjectives
         });
     
@@ -418,7 +418,7 @@ const handleSaveStatus = async () => {
         };
   
       try {
-        const response = await axios.post(`https://eunivate-backend-56iw.onrender.com/api/users/sa-tasks/${task._id}/comments`, newComment);
+        const response = await axios.post(`https://eunivate-jys4.onrender.com/api/users/sa-tasks/${task._id}/comments`, newComment);
   
         if (response.data.success) {
           // If the API returns the full list of comments, replace the state with the new list

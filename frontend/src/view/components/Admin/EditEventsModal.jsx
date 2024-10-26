@@ -71,7 +71,7 @@ const EditEventModal = ({ webinar ,onClose, onSave }) => {
             };
 
             const response = await axios.put(
-                `https://eunivate-backend-56iw.onrender.com/api/users/events/${webinar._id}`,          
+                `https://eunivate-jys4.onrender.com/api/users/events/${webinar._id}`,          
                 updatedEvent
             );
 

@@ -31,7 +31,7 @@ const ResetPassword = () => {
     }
 
     try {
-      const response = await fetch(`https://eunivate-backend-56iw.onrender.com/api/users/reset-password/${token}`, {
+      const response = await fetch(`https://eunivate-jys4.onrender.com/api/users/reset-password/${token}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

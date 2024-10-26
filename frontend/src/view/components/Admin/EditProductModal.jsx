@@ -62,7 +62,7 @@ const EditProductModal = ({ product, onClose, onSave }) => {
       };
 
       const response = await axios.put(
-        `https://eunivate-backend-56iw.onrender.com/api/users/products/${product._id}`,
+        `https://eunivate-jys4.onrender.com/api/users/products/${product._id}`,
         updatedProduct
       );
 

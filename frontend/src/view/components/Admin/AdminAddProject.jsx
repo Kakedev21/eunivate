@@ -57,7 +57,7 @@ const AdminAddProject = () => {
         image: imageUrl ? { url: imageUrl, publicId: selectedImage.name } : null,
       };
 
-      const response = await axios.post('https://eunivate-backend-56iw.onrender.com/api/users/addproject', projectData);
+      const response = await axios.post('https://eunivate-jys4.onrender.com/api/users/addproject', projectData);
 
       console.log(response.data);
       setLoading(false);
