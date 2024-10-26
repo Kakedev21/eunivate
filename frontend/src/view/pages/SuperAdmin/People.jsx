@@ -2,12 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import '../../../admin.css';
 import AdminNavbar from '../../components/SuperAdmin/AdminNavbar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronDown, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { faChevronDown, faChevronRight, faEllipsisV } from '@fortawesome/free-solid-svg-icons';
 import { User } from '../../../constants/assets';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useWorkspace } from '../../components/SuperAdmin/workspaceContext';
 import axios from 'axios';
+import Modal_Profile from './People/Modal_Profile'; // Import the Modal_Profile component
+
 const People = () => {
     const [user, setUser] = useState({ profilePicture: { url: '' } });
     const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
@@ -22,6 +24,8 @@ const People = () => {
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [profileModalVisible, setProfileModalVisible] = useState(false); // New state for Modal_Profile visibility
+    const [selectedProfileUser, setSelectedProfileUser] = useState(null); // State to hold user whose profile is clicked
     const { selectedWorkspace } = useWorkspace(); // Get selected workspace from context
 
     const fetchProjects = async () => {
@@ -47,11 +51,11 @@ const People = () => {
         try {
             const user = JSON.parse(localStorage.getItem('user'));
             const token = user?.accessToken;
-    
+
             if (!token) {
                 throw new Error('No access token found. Please log in again.');
             }
-    
+
             // Fetch all users
             const response = await axios.get('https://eunivate-jys4.onrender.com/api/users/', {
                 headers: {
@@ -75,7 +79,7 @@ const People = () => {
                 const invitedUsersData = invitedUsersResponse.data.invitedUsers.map((invitedUser) => {
                     const userFromDB = response.data.find((user) => user.email === invitedUser.email);
     
-                    return userFromDB
+                     return userFromDB
                         ? { ...invitedUser, role: userFromDB.role, profilePicture: userFromDB.profilePicture, _id: userFromDB._id }
                         : invitedUser;
                 });
@@ -107,6 +111,8 @@ const People = () => {
             [userEmail]: !prev[userEmail],
         }));
     };
+
+    
     
     const toggleModal = () => {
         setIsModalOpen((prev) => !prev);
@@ -338,6 +344,11 @@ const People = () => {
         setClickedEmail(email === clickedEmail ? null : email); // Toggle email display
     };
 
+    const toggleProfileModal = (user) => {
+        setSelectedProfileUser(user);
+        setProfileModalVisible(true); // Show the Modal_Profile modal
+    };
+
     return (
         <div className="bg-gray-100 min-h-screen p-6">
             <div className="w-full flex justify-between items-center mb-16">
@@ -367,38 +378,37 @@ const People = () => {
 
             <div className="relative">
                 <table className="min-w-full bg-white divide-y divide-gray-200">
-                    <thead className="bg-gray-100">
-                        <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profile</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Project</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                        </tr>
+                <thead className="bg-gray-100">
+    <tr>
+        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profile</th>
+        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ">Role</th>
+        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Project</th>
+        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+    </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                        {invitedUsers.length > 0 ? (
-                            invitedUsers.map((user, index) => (
-                                <tr key={index}>
-                                    <td className="px-6 py-4 whitespace-nowrap flex items-center relative">
-                                        <div className="relative">
-                                            <img
-                                                src={user.profilePicture?.url || user.profilePicture || User}
-                                                alt="Profile"
-                                                className="w-12 h-12 rounded-full mr-4 object-cover cursor-pointer"
-                                                onClick={() => handleAvatarClick(user.email)}
-                                            />
-                                            {/* Display email on mobile when avatar is clicked */}
-                                            {clickedEmail === user.email && (
-                                                <div className="absolute left-0 top-full mt-2 px-2 py-1 bg-white border border-gray-200 rounded-lg shadow-lg text-gray-900 text-sm z-50">
-                                                    {user.email}
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="hidden sm:block">
-                                            <div className="text-sm font-medium text-gray-900">{user.email}</div>
-                                            <div className="text-xs text-gray-500">{user.email}</div>
-                                        </div>
-                                    </td>
+                    {invitedUsers.length > 0 ? (
+        invitedUsers.map((user, index) => (
+            <tr key={index}>
+                <td className="px-6 py-4 whitespace-nowrap flex items-center relative">
+                    <div className="relative">
+                        <img
+                            src={user.profilePicture?.url || user.profilePicture || User}
+                            alt="Profile"
+                            className="w-12 h-12 rounded-full mr-4 object-cover cursor-pointer"
+                            onClick={() => handleAvatarClick(user.email)}
+                        />
+                        {clickedEmail === user.email && (
+                            <div className="absolute left-0 top-full mt-2 px-2 py-1 bg-white border border-gray-200 rounded-lg shadow-lg text-gray-900 text-sm z-50">
+                                {user.email}
+                            </div>
+                        )}
+                                      </div>
+                    <div className="hidden sm:block">
+                        <div className="text-sm font-medium text-gray-900">{user.email}</div>
+                        <div className="text-xs text-gray-500">{user.email}</div>
+                    </div>
+                </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 relative">
                                         <div className="flex items-center">
                                             {user.role}
@@ -426,21 +436,20 @@ const People = () => {
 
                         </td>
                 
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 relative">
-    <div className="flex items-center">
-        {/* Safely check if user.project is an array and display the first project name only */}
-        {Array.isArray(user.project) && user.project.length > 0 
-            ? user.project[0].projectName  // Display the first project name
-            : 'No Project Assigned'}
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 relative hidden sm:table-cell">
+                    <div className="flex items-center">
+                        {Array.isArray(user.project) && user.project.length > 0 
+                            ? user.project[0].projectName
+                            : 'No Project Assigned'}
 
-        {Array.isArray(user.project) && user.project.length > 1 && (  // Show dropdown icon if more than one project
-            <FontAwesomeIcon
-                icon={isProjectDropdownOpen[user.email] ? faChevronDown : faChevronRight}
-                className="ml-2 cursor-pointer"
-                onClick={() => toggleProjectDropdown(user.email)}
-            />
-        )}
-    </div>
+                        {Array.isArray(user.project) && user.project.length > 1 && (
+                            <FontAwesomeIcon
+                                icon={isProjectDropdownOpen[user.email] ? faChevronDown : faChevronRight}
+                                className="ml-2 cursor-pointer"
+                                onClick={() => toggleProjectDropdown(user.email)}
+                            />
+                        )}
+                    </div>
 
     {/* Dropdown for all projects */}
     {isProjectDropdownOpen[user.email] && Array.isArray(user.project) && user.project.length > 1 && (
@@ -462,14 +471,22 @@ const People = () => {
 
 
 
-                        <td className="px-6 py-4 whitespace-nowrap">
-                            <button
-                                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-                                onClick={() => handleRemoveUser(user.email)}
-                            >
-                                Remove
-                            </button>
-                        </td>
+<td className="px-6 py-4 whitespace-nowrap flex items-center justify-between">
+    <button
+        className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+        onClick={() => handleRemoveUser(user.email)}
+    >
+        Remove
+    </button>
+
+    <button
+        className="text-gray-600 hover:text-gray-900 ml-2 sm:ml-10 sm:block md:hidden" // Hidden on medium screens and larger
+        onClick={() => toggleProfileModal(user)}
+    >
+        <FontAwesomeIcon icon={faEllipsisV} />
+    </button>
+</td>
+
                     </tr>
                 ))
             ) : (
@@ -483,7 +500,9 @@ const People = () => {
     </table>
 </div>
 
-
+{profileModalVisible && selectedProfileUser && (
+                <Modal_Profile user={selectedProfileUser} onClose={() => setProfileModalVisible(false)} />
+            )}
 
 
 

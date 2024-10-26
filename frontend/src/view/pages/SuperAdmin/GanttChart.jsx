@@ -53,30 +53,42 @@ const GanttChart = ({ projectId }) => {
   const calculateTaskLeft = (startDate) => {
     const weekStart = startOfWeek(currentWeekStart, { weekStartsOn: 1 });
     const taskStart = new Date(startDate);
-    
+  
     // Ensure the task only starts after the current week's start date
-    if (taskStart < weekStart) {
-      return 0; // Task starts before the current week, so it begins at 0%
+    if (taskStart < currentWeekStart) {
+      return 0; // Task starts before the current week
     }
-    
-    const daysFromWeekStart = Math.floor((taskStart - weekStart) / (1000 * 60 * 60 * 24));
+  
+    // Calculate how many days the task is from the start of the current week
+    const daysFromWeekStart = Math.floor((taskStart - currentWeekStart) / (1000 * 60 * 60 * 24));
     return (daysFromWeekStart / 7) * 100;
   };
   
   const calculateTaskWidth = (startDate, dueDate) => {
     const totalDaysInWeek = 7;
-    const weekEnd = addDays(currentWeekStart, totalDaysInWeek - 1); 
+    const weekEnd = addDays(currentWeekStart, totalDaysInWeek - 1); // Current week's end date
     const taskStart = new Date(startDate);
     const taskEnd = new Date(dueDate);
   
-    // Handle tasks that span across weeks
-    const startWithinWeek = taskStart >= currentWeekStart ? taskStart : currentWeekStart;
-    const endWithinWeek = taskEnd <= weekEnd ? taskEnd : weekEnd;
+    // If the task ends before the current week, it's not visible
+    if (taskEnd < currentWeekStart) {
+      return 0;
+    }
   
-    // Calculate the number of days the task is visible within the current week
-    const taskDurationWithinWeek = getDaysDifference(startWithinWeek, endWithinWeek) + 1;
+    // If the task starts after the current week, it's not visible
+    if (taskStart > weekEnd) {
+      return 0;
+    }
+  
+    // Calculate the visible start and end of the task within the current week
+    const visibleStart = taskStart < currentWeekStart ? currentWeekStart : taskStart;
+    const visibleEnd = taskEnd > weekEnd ? weekEnd : taskEnd;
+  
+    // Calculate the number of days the task spans within the current week
+    const taskDurationWithinWeek = getDaysDifference(visibleStart, visibleEnd) + 1;
     return (taskDurationWithinWeek / totalDaysInWeek) * 100;
   };
+  
   
 
   const getStatusIconColor = (status) => {
