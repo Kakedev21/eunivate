@@ -2,7 +2,8 @@ import express from 'express';
 const router = express.Router();
 
       //UserAccounts
-      import {createUser } from '../controllers/UserAccounts/userController.js'
+      import {createUser, getCurrentUser } from '../controllers/UserAccounts/userController.js'
+      import User from '../models/Client/userModels.js';
       import { loginUser, forgotPassword, resetPassword } from '../controllers/UserAccounts/authController.js';
       import {verifyLoginOtp, verifyTwoFactorAuth, resendOtp } from '../controllers/SuperAdmin/adminAuthentication.js';
       import { updateUser, updateUserPassword } from '../controllers/UserAccounts/updateUserInformation.js'
@@ -96,6 +97,18 @@ const router = express.Router();
       router.post('/quotation',createQuotation);
       router.get('/quotation/confirm/:quotationToken', confirmQuotationEmail);
       router.get('/quotations/:id/status', checkVerificationStatus);
+      router.get('/current-user', protect, async (req, res) => {
+        try {
+            const user = await User.findById(req.user.id).select('-password'); // Exclude password from response
+            if (!user) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+            res.json(user);
+        } catch (error) {
+            console.error('Error fetching current user:', error); // Log the error
+            res.status(500).json({ message: 'Server error' });
+        }
+    });
 
       // User Update Routes
       router.put('/:id', updateUser);

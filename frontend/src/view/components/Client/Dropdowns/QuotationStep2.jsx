@@ -7,6 +7,10 @@ const QuotationStep2 = ({ formData, setFormData, nextStep, prevStep }) => {
         setFormData({ ...formData, service });
     };
 
+    const handleServiceDescriptionChange = (e) => {
+        setFormData({ ...formData, serviceDescription: e.target.value });
+    };
+
     return (
         <>
             {/* Header */}
@@ -36,39 +40,53 @@ const QuotationStep2 = ({ formData, setFormData, nextStep, prevStep }) => {
                 <h1 className = "font-semibold mb-3 text-xl text-gray-800">Our services</h1>
                 <p className='mb-5 text-gray-800'>Please select which service you are interested in.</p>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-4 gap-3">
                     <div
-                        className={`p-4 border-2 rounded-2xl cursor-pointer flex flex-col items-center justify-center ${formData.service === 'Development' ? 'border-red-500' : 'border-gray-200'}`}
+                        className={`pt-4 pb-4 pe-1 ps-1 border-2 rounded-2xl cursor-pointer flex flex-col items-center justify-center ${formData.service === 'Development' ? 'border-red-500' : 'border-gray-200'}`}
                         onClick={() => handleServiceSelect('Development')}
                     >
-                        <FontAwesomeIcon icon={faLaptopCode} size="3x" className="text-yellow-500" />
-                        <p className="mt-2 font-semibold text-gray-700">Development</p>
+                        <FontAwesomeIcon icon={faLaptopCode} size="2x" className="text-yellow-500" />
+                        <p className="mt-2 font-semibold text-sm text-gray-700">Development</p>
                     </div>
 
                     <div
-                        className={`p-4 border-2 rounded-2xl cursor-pointer flex flex-col items-center justify-center ${formData.service === 'Web Design' ? 'border-red-500' : 'border-gray-200'}`}
+                        className={`pt-4 pb-4 pe-1 ps-1 border-2 rounded-2xl cursor-pointer flex flex-col items-center justify-center ${formData.service === 'Web Design' ? 'border-red-500' : 'border-gray-200'}`}
                         onClick={() => handleServiceSelect('Web Design')}
                     >
-                        <FontAwesomeIcon icon={faPaintBrush} size="3x" className="text-yellow-500" />
-                        <p className="mt-2 font-semibold text-gray-700">Web Design</p>
+                        <FontAwesomeIcon icon={faPaintBrush} size="2x" className="text-yellow-500" />
+                        <p className="mt-2 font-semibold text-sm text-gray-700">Web Design</p>
                     </div>
 
                     <div
-                        className={`p-4 border-2 rounded-2xl cursor-pointer flex flex-col items-center justify-center ${formData.service === 'Marketing' ? 'border-red-500' : 'border-gray-200'}`}
+                        className={`pt-4 pb-4 pe-1 ps-1 border-2 rounded-2xl cursor-pointer flex flex-col items-center justify-center ${formData.service === 'Marketing' ? 'border-red-500' : 'border-gray-200'}`}
                         onClick={() => handleServiceSelect('Marketing')}
                     >
-                        <FontAwesomeIcon icon={faBullhorn} size="3x" className="text-yellow-500" />
-                        <p className="mt-2 font-semibold text-gray-700">Marketing</p>
+                        <FontAwesomeIcon icon={faBullhorn} size="2x" className="text-yellow-500" />
+                        <p className="mt-2 font-semibold text-sm text-gray-700">Marketing</p>
                     </div>
-
-                    <div
-                        className={`p-4 border-2 rounded-2xl cursor-pointer flex flex-col items-center justify-center ${formData.service === 'Other' ? 'border-red-500' : 'border-gray-200'}`}
-                        onClick={() => handleServiceSelect('Other')}
-                    >
-                        <FontAwesomeIcon icon={faCog} size="3x" className="text-yellow-500" />
-                        <p className="mt-2 font-semibold text-gray-700">Other</p>
-                    </div>
+                    
+                        <div
+                            className={`pt-4 pb-4 pe-1 ps-1 border-2 rounded-2xl cursor-pointer flex flex-col items-center justify-center ${formData.service === 'Other' ? 'border-red-500' : 'border-gray-200'}`}
+                            onClick={() => handleServiceSelect('Other')}
+                        >
+                            <FontAwesomeIcon icon={faCog} size="2x" className="text-yellow-500" />
+                            <p className="mt-2 font-semibold  text-sm text-gray-700">Other</p>
+                        </div>
+                   
                 </div>
+
+                
+                <p className="mt-2 mb-2 text-sm text-gray-700">Short description:</p>
+               
+                <textarea
+                        type="text"
+                        placeholder="Please provide a short description of the service you require."
+                        name='serviceDescription'
+                        value={formData.serviceDescription || ''}
+                        onChange={handleServiceDescriptionChange}
+                        className="w-full h-20 text-sm p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+        
 
                 <div className="mt-8 flex justify-between">
                     <button

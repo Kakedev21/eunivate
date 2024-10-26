@@ -15,12 +15,17 @@ const QuotationSchema = new mongoose.Schema({
     },
     company: {
         type: String, 
-        required: true
+        
     },
     service: {
         type: String,
         required: true
     },
+
+    serviceDescription: {
+        type: String,
+    },
+
     budget: {
         type:  String,
         required: true

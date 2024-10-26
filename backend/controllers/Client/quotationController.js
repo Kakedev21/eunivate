@@ -8,7 +8,7 @@ import verifyQuotationEmail from '../../utils/jwtUtils.js';
 // Create and save quotation, generate token, and send verification email
 
 export const createQuotation = async (req, res) => {
-    const { name, email, phone, company, service, budget, additionalInfo } = req.body;
+    const { name, email, phone, company, service, serviceDescription, budget, additionalInfo } = req.body;
 
     try {
         // Create and save the quotation
@@ -18,6 +18,7 @@ export const createQuotation = async (req, res) => {
             phone,
             company,
             service,
+            serviceDescription,
             budget, 
             additionalInfo,
         });
@@ -35,7 +36,7 @@ export const createQuotation = async (req, res) => {
         console.log('Quotation token saved successfully:', quotationToken);
 
         // Create verification link
-        const verificationLink = `https://eunivatebe.vercel.app/api/users/quotation/confirm/${quotationToken.quotationToken}`;
+        const verificationLink = `https://eunivate-backend-56iw.onrender.com/api/users/quotation/confirm/${quotationToken.quotationToken}`;
 
         // Send the verification email
         try {
@@ -123,6 +124,7 @@ export const confirmQuotationEmail = async (req, res) => {
             Other info:
 
             Type of Service: ${quotation.service}
+            Service Description ${quotation.serviceDescription}
             Preferred Budget: ${quotation.budget}
             Additional Info: ${quotation.additionalInfo || 'N/A'}
             `,
