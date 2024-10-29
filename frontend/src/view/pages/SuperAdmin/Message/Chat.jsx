@@ -62,7 +62,7 @@ const Chat = ({ group }) => {
 
   // Initialize socket and fetch initial messages (Pang realtime to)
   useEffect(() => {
-    socket = io("https://eunivate-backend-56iw.onrender.com");
+    socket = io("https://eunivate-jys4.onrender.com");
 
     const storedUser = JSON.parse(localStorage.getItem('user'));
     if (storedUser) {
@@ -142,7 +142,7 @@ const Chat = ({ group }) => {
       console.log('Workspace ID being used:', group.groupName); // Check if this is the correct ID
       const fetchMessages = async () => {
         try {
-          const response = await axios.get('https://eunivate-backend-56iw.onrender.com/api/users/messages', {
+          const response = await axios.get('https://eunivate-jys4.onrender.com/api/users/messages', {
             
             params: { workspaceId: group.groupName }, // Fetch messages based on workspaceId
           });
@@ -183,7 +183,7 @@ const Chat = ({ group }) => {
         };
   
         try {
-            await axios.post('https://eunivate-backend-56iw.onrender.com/api/users/create-message', newMessage);
+            await axios.post('https://eunivate-jys4.onrender.com/api/users/create-message', newMessage);
             setMessage(''); // Clear the message input
             setFile(null);  // Clear the file input
             setReplyMessage(null); // Clear the reply message
@@ -205,7 +205,7 @@ const Chat = ({ group }) => {
       };
 
       try {
-        await axios.post(`https://eunivate-backend-56iw.onrender.com/api/users/${replyMessage?._id}/reply`, newReply);
+        await axios.post(`https://eunivate-jys4.onrender.com/api/users/${replyMessage?._id}/reply`, newReply);
         setMessage('');
         setReplyMessage(null);
       } catch (error) {
@@ -248,7 +248,7 @@ const Chat = ({ group }) => {
     });
 
     try {
-      await axios.post(`https://eunivate-backend-56iw.onrender.com/api/users/${messageId}/react`, {
+      await axios.post(`https://eunivate-jys4.onrender.com/api/users/${messageId}/react`, {
         user: userId,
         reaction: emoji,
       });
@@ -265,7 +265,7 @@ const Chat = ({ group }) => {
     socket.emit('starred-message', { messageId, userId });
 
     try {
-      await axios.post(`https://eunivate-backend-56iw.onrender.com/api/users/${messageId}/star`, { userId });
+      await axios.post(`https://eunivate-jys4.onrender.com/api/users/${messageId}/star`, { userId });
     } catch (error) {
       console.error('Error starring message:', error.response ? error.response.data : error.message);
     }
@@ -283,7 +283,7 @@ const Chat = ({ group }) => {
     socket.emit('flagged-message', { messageId, priorityFlag: color });
 
     try {
-      await axios.post(`https://eunivate-backend-56iw.onrender.com/api/users/${messageId}/flag`, {
+      await axios.post(`https://eunivate-jys4.onrender.com/api/users/${messageId}/flag`, {
         priorityFlag: color,
       });
     } catch (error) {
