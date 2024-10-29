@@ -80,7 +80,6 @@ const SideNav = ({ isNavOpen }) => {
     const handleCreateWorkspace = async (e) => {
         e.preventDefault();
     
-        // Check if the workspace title is empty
         if (!workspaceTitle.trim()) {
             setError('Workspace title is required');
             return;
@@ -89,22 +88,40 @@ const SideNav = ({ isNavOpen }) => {
         const user = JSON.parse(localStorage.getItem('user'));
         const accessToken = user ? user.accessToken : null;
     
-        // Check if the access token exists
         if (!accessToken) {
             setError('No access token found. Please log in again.');
             return;
         }
     
         try {
+            // Fetch existing workspaces to check for duplicates
+            const existingWorkspacesResponse = await axios.get('http://localhost:5000/api/users/workspaces', {
+                headers: { Authorization: `Bearer ${accessToken}` },
+            });
+    
+            const existingWorkspaces = existingWorkspacesResponse.data;
+            
+            // Check for duplicate title
+            const isDuplicate = existingWorkspaces.some(workspace => workspace.workspaceTitle === workspaceTitle);
+            
+            if (isDuplicate) {
+                alert('Workspace title already exists. Please choose a different title.'); // Alert for duplicate title
+                return;
+            }
+    
+            // Proceed to create the new workspace
             const response = await axios.post(
                 'http://localhost:5000/api/users/workspace',
                 { workspaceTitle },
-                { headers: { Authorization: `Bearer ${accessToken}` } }
+                {
+                    headers: { Authorization: `Bearer ${accessToken}` },
+                }
             );
     
             if (response.status === 201) {
-                const newWorkspace = response.data; 
+                const newWorkspace = response.data;
                 localStorage.setItem('currentWorkspaceId', newWorkspace._id);
+    
                 setAlertMessage('Workspace created successfully!');
                 closeModal();
                 setWorkspaces([...workspaces, newWorkspace]);
@@ -112,14 +129,11 @@ const SideNav = ({ isNavOpen }) => {
                 navigate(`/superadmin/dashboard?workspaceId=${newWorkspace._id}&workspaceTitle=${newWorkspace.workspaceTitle}`);
             }
         } catch (err) {
-            // Display a specific error message if workspace title already exists
-            const errorMessage = err.response?.data?.error || 'An error occurred while creating the workspace';
-            console.error("Error creating workspace:", errorMessage);
-            
-            // Show error in UI
-            setError(errorMessage);
+            console.error("Error creating workspace:", err.response?.data?.error || err.message);
+            setError(err.response?.data?.error || 'An error occurred while creating the workspace');
         }
     };
+    
     
     const handleWorkspaceSelect = (workspace) => {
         setSelectedWorkspace(workspace);
