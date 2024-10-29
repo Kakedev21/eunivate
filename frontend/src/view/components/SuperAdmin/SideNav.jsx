@@ -48,6 +48,19 @@ const SideNav = ({ isNavOpen }) => {
         navigate(`/superadmin/dashboard?workspaceId=${workspace._id}&workspaceTitle=${workspace.workspaceTitle}`);
     };
     
+  const [showTutorial, setShowTutorial] = useState(true); // Step 1: Add tutorial state
+
+    const handleWorkspaceSelect = (workspace) => {
+        setSelectedWorkspace(workspace);
+        setIsDropdownOpen(false);
+    
+        // Store workspace details in localStorage
+        localStorage.setItem('currentWorkspaceId', workspace._id);
+        localStorage.setItem('currentWorkspaceTitle', workspace.workspaceTitle);
+    
+        navigate(`/superadmin/dashboard?workspaceId=${workspace._id}&workspaceTitle=${workspace.workspaceTitle}`);
+    };
+    
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
@@ -156,12 +169,11 @@ const SideNav = ({ isNavOpen }) => {
         }
     };
     
-    
-
     return (
         <div
             className={`side-nav-admin fixed top-0 left-0 h-full bg-red-750 shadow-lg transition-transform transform ${
                 isNavOpen ? 'translate-x-0' : '-translate-x-full'
+            } lg:translate-x-0 lg:w-[250px] z-30 w-[250px]`}  
             } lg:translate-x-0 lg:w-[250px] z-30 w-[250px]`}  
         >
             <div className="dashboard-logo flex items-center p-4">
