@@ -7,6 +7,13 @@ import tutImage5 from '../../../assets/Tutorial/tut5.png'; // Example additional
 import tutImage6 from '../../../assets/Tutorial/tut6.png'; // Example additional image
 import tutImage7 from '../../../assets/Tutorial/tut7.png'; // Example additional image
 import tutImage8 from '../../../assets/Tutorial/tut8.png'; // Example additional image
+import tutImage9 from '../../../assets/Tutorial/tut9.png'; // Example additional image
+import tutImage10 from '../../../assets/Tutorial/tut10.png'; // Example additional image
+import tutImage11 from '../../../assets/Tutorial/tut11.png'; // Example additional image
+import tutImage12 from '../../../assets/Tutorial/tut12.png'; // Example additional image
+import tutImage13 from '../../../assets/Tutorial/tut13.png'; // Example additional image
+import tutImage14 from '../../../assets/Tutorial/tut14.png'; // Example additional image
+import tutImage15 from '../../../assets/Tutorial/tut15.png'; // Example additional image
 
 const tutorialSteps = [
   {
@@ -29,6 +36,22 @@ const tutorialSteps = [
     text: "This is the fifth tutorial step. Here you can explain the next part of your application.",
     images: [tutImage7, tutImage8], // Images for the fifth step
   },
+  {
+    text: "This is the fourth tutorial step. Here you can explain the next part of your application.",
+    images: [tutImage9,tutImage5], // Images for the fourth step
+  },
+  {
+    text: "This is the third tutorial step. Here you can explain the next part of your application.",
+    images: [tutImage10,tutImage11], // Single image for the third step
+  },
+  {
+    text: "This is the third tutorial step. Here you can explain the next part of your application.",
+    images: [tutImage12,tutImage13], // Single image for the third step
+  },
+  {
+    text: "This is the third tutorial step. Here you can explain the next part of your application.",
+    images: [tutImage14,tutImage15], // Single image for the third step
+  },
 ];
 
 const TutorialModal = ({ isOpen, onClose }) => {
@@ -37,11 +60,10 @@ const TutorialModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   const handleNext = () => {
-    // Move to the next step or close the modal if at the last step
     if (currentStep < tutorialSteps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      onClose(); // Close modal if last step is reached
+      onClose();
     }
   };
 
@@ -55,38 +77,50 @@ const TutorialModal = ({ isOpen, onClose }) => {
         <p>{currentTutorial.text}</p>
         
         {/* Images below the paragraph */}
-        <div className="flex justify-center mt-4"> {/* Flex container for centering images */}
+        <div className="flex justify-center mt-4">
           {currentTutorial.images.map((image, index) => (
-            <div className="flex items-center justify-center mx-2 bg-black p-2" key={index}> {/* Centering and black background for images */}
+            <div className="flex items-center justify-center mx-2 bg-black p-2" key={index}>
               <img 
-                src={image} // Use the current tutorial images
+                src={image}
                 alt={`Tutorial step ${currentStep + 1} image ${index + 1}`} 
-                className={`rounded ${currentStep === 0 || currentStep === 2 ? 'w-96' : 'w-60'} h-auto`} // Larger width for tutImage1 and tutImage3
+                className={`rounded ${image === tutImage14 || image === tutImage15 ? 'w-40' : 'w-60'} h-auto`} 
               />
             </div>
           ))}
         </div>
 
+       
+
         {/* Close Button (X) */}
         <button
-          className="absolute top-0 right-2 text-gray-600 hover:text-gray-900 text-2xl p-2" // Increased font size and added padding
+          className="absolute top-0 right-2 text-gray-600 hover:text-gray-900 text-2xl p-2"
           onClick={onClose}
         >
-          &times; {/* HTML entity for multiplication sign (X) */}
+          &times;
         </button>
 
         {/* Previous and Next buttons */}
         <div className="flex justify-between mt-4">
           <button 
             className="bg-gray-300 text-gray-800 px-4 py-2 rounded" 
-            onClick={() => setCurrentStep(currentStep > 0 ? currentStep - 1 : 0)} // Allow going back
-            disabled={currentStep === 0} // Disable if on the first step
+            onClick={() => setCurrentStep(currentStep > 0 ? currentStep - 1 : 0)}
+            disabled={currentStep === 0}
           >
             Previous
           </button>
+
+           {/* Page indicator below the images */}
+        <div className="flex justify-center mt-0">
+          <div className="bg-gray-300 text-gray-800 px-4 py-2 rounded text-sm">
+            Step {currentStep + 1} of {tutorialSteps.length}
+          </div>
+        </div>
+
           <button className="bg-red-700 text-white px-4 py-2 rounded" onClick={handleNext}>
             {currentStep < tutorialSteps.length - 1 ? 'Next' : 'Finish'}
           </button>
+
+          
         </div>
       </div>
     </div>
