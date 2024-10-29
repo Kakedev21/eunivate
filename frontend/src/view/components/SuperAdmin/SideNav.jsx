@@ -35,75 +35,58 @@ const SideNav = ({ isNavOpen }) => {
     const { selectedWorkspace, setSelectedWorkspace } = useWorkspace();
     const [workspaces, setWorkspaces] = useState([]);
     const location = useLocation(); // Use the useLocation hook
-  const [showTutorial, setShowTutorial] = useState(true); // Step 1: Add tutorial state
-
     const handleWorkspaceSelect = (workspace) => {
         setSelectedWorkspace(workspace);
         setIsDropdownOpen(false);
-    
-        // Store workspace details in localStorage
-        localStorage.setItem('currentWorkspaceId', workspace._id);
-        localStorage.setItem('currentWorkspaceTitle', workspace.workspaceTitle);
-    
-        navigate(`/superadmin/dashboard?workspaceId=${workspace._id}&workspaceTitle=${workspace.workspaceTitle}`);
-    };
-    
-  const [showTutorial, setShowTutorial] = useState(true); // Step 1: Add tutorial state
 
-    const handleWorkspaceSelect = (workspace) => {
-        setSelectedWorkspace(workspace);
-        setIsDropdownOpen(false);
-    
         // Store workspace details in localStorage
         localStorage.setItem('currentWorkspaceId', workspace._id);
         localStorage.setItem('currentWorkspaceTitle', workspace.workspaceTitle);
-    
+
         navigate(`/superadmin/dashboard?workspaceId=${workspace._id}&workspaceTitle=${workspace.workspaceTitle}`);
     };
-    
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         const workspaceId = params.get('workspaceId');
         const workspaceTitle = params.get('workspaceTitle');
-    
+
         if (workspaceId && workspaceTitle) {
             setSelectedWorkspace({ _id: workspaceId, workspaceTitle });
         } else {
             // Check if there's a workspace saved in localStorage
             const storedWorkspaceId = localStorage.getItem('currentWorkspaceId');
             const storedWorkspaceTitle = localStorage.getItem('currentWorkspaceTitle');
-    
+
             if (storedWorkspaceId && storedWorkspaceTitle) {
                 setSelectedWorkspace({ _id: storedWorkspaceId, workspaceTitle: storedWorkspaceTitle });
             }
         }
-    
+
         const fetchWorkspaces = async () => {
             const user = JSON.parse(localStorage.getItem('user'));
             if (!user || !user.accessToken) {
                 setError('User is not authenticated.');
                 return;
             }
-    
+
             try {
                 const response = await axios.get('http://localhost:5000/api/users/workspaces', {
                     headers: { Authorization: `Bearer ${user.accessToken}` },
                 });
-    
+
                 if (response.status === 200) {
                     setWorkspaces(response.data);
                 } else {
                     setError('Failed to load workspaces');
                 }
             } catch (err) {
-                setError();
+                setError('An error occurred while fetching workspaces.');
             }
         };
-    
+
         fetchWorkspaces();
     }, [location.search, setSelectedWorkspace]);
-    
 
     const closeModal = () => {
         setIsModalOpen(false);
@@ -114,53 +97,47 @@ const SideNav = ({ isNavOpen }) => {
 
     const handleCreateWorkspace = async (e) => {
         e.preventDefault();
-    
+
         if (!workspaceTitle.trim()) {
             setError('Workspace title is required');
             return;
         }
-    
+
         const user = JSON.parse(localStorage.getItem('user'));
         const accessToken = user ? user.accessToken : null;
-    
+
         if (!accessToken) {
             setError('No access token found. Please log in again.');
             return;
         }
-    
+
         try {
-            // Fetch existing workspaces to check for duplicates
             const existingWorkspacesResponse = await axios.get('http://localhost:5000/api/users/workspaces', {
                 headers: { Authorization: `Bearer ${accessToken}` },
             });
-    
+
             const existingWorkspaces = existingWorkspacesResponse.data;
-            
-            // Check for duplicate title
             const isDuplicate = existingWorkspaces.some(workspace => workspace.workspaceTitle === workspaceTitle);
-            
+
             if (isDuplicate) {
-                alert('Workspace title already exists. Please choose a different title.'); // Alert for duplicate title
+                alert('Workspace title already exists. Please choose a different title.');
                 return;
             }
-    
-            // Proceed to create the new workspace
+
             const response = await axios.post(
                 'http://localhost:5000/api/users/workspace',
                 { workspaceTitle },
-                {
-                    headers: { Authorization: `Bearer ${accessToken}` },
-                }
+                { headers: { Authorization: `Bearer ${accessToken}` } }
             );
-    
+
             if (response.status === 201) {
                 const newWorkspace = response.data;
                 localStorage.setItem('currentWorkspaceId', newWorkspace._id);
-    
+
                 setAlertMessage('Workspace created successfully!');
                 closeModal();
                 setWorkspaces([...workspaces, newWorkspace]);
-    
+
                 navigate(`/superadmin/dashboard?workspaceId=${newWorkspace._id}&workspaceTitle=${newWorkspace.workspaceTitle}`);
             }
         } catch (err) {
@@ -168,12 +145,11 @@ const SideNav = ({ isNavOpen }) => {
             setError(err.response?.data?.error || 'An error occurred while creating the workspace');
         }
     };
-    
+
     return (
         <div
             className={`side-nav-admin fixed top-0 left-0 h-full bg-red-750 shadow-lg transition-transform transform ${
                 isNavOpen ? 'translate-x-0' : '-translate-x-full'
-            } lg:translate-x-0 lg:w-[250px] z-30 w-[250px]`}  
             } lg:translate-x-0 lg:w-[250px] z-30 w-[250px]`}  
         >
             <div className="dashboard-logo flex items-center p-4">
@@ -308,4 +284,3 @@ const SideNav = ({ isNavOpen }) => {
 };
 
 export default SideNav;
-
