@@ -141,21 +141,32 @@ const Kanban = ({ projectId, projectName }) => {
       return date.toLocaleString('default', { month: 'short' }); 
     };
 
+    const Tooltip = ({ children, title }) => {
+      return (
+        <div className="relative group">
+          {children}
+          <div className="absolute hidden group-hover:block bg-gray-700 text-white text-xs rounded-md p-2 -bottom-8 left-1/2 transform -translate-x-1/2">
+            {title}
+          </div>
+        </div>
+      );
+    };
+
     return (
       <div ref={drag} className="p-4 rounded-lg shadow-md bg-white relative" onClick={handleTaskClick}>
-        <div className="flex items-start justify-between">
-          <div className={`px-3 py-2 text-sm font-medium rounded-sm ${getPriorityBackgroundColor(task.priority)}`}>
-            {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
-          </div>
-          <div className='flex -space-x-3'>
-            {task.assignee && task.assignee.map((member, index) => (
+      <div className="flex items-start justify-between">
+        <div className={`px-3 py-2 text-sm font-medium rounded-sm ${getPriorityBackgroundColor(task.priority)}`}>
+          {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+        </div>
+        <div className='flex -space-x-3'>
+          {task.assignee && task.assignee.map((member, index) => (
+            <Tooltip key={index} title={member.name}>
               <img
-                key={index}
                 src={member.profilePicture?.url || member.profilePicture} 
                 alt={member.name}
                 className="w-8 h-8 rounded-full border-2 border-white"
-                title={member.name}
               />
+            </Tooltip>
             ))}
           </div>
         </div>
