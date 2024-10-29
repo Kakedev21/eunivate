@@ -1,18 +1,45 @@
 import Workspace from "../../models/SuperAdmin/addWorkspaceModel.js";
-import saInvitedMember from "../../models/SuperAdmin/saInvitedMember.js";
+// import saInvitedMember from "../../models/SuperAdmin/saInvitedMember.js";
+
+// export const addNewWorkspace = async (req, res) => {
+//     try {
+//         const { workspaceTitle } = req.body;
+
+//         const addWorkspace = new Workspace({
+//             workspaceTitle: workspaceTitle,
+//             owner: req.user._id, 
+//         });
+
+        
+//         const savedWorkspace = await addWorkspace.save();
+
+
+//         return res.status(201).json(savedWorkspace);
+//     } catch (error) {
+//         console.error("Error in creating newWorkspace:", error.message);
+//         return res.status(500).json({ error: error.message || 'An error occurred while creating the Workspace' });
+//     }
+// };
+
 
 export const addNewWorkspace = async (req, res) => {
     try {
         const { workspaceTitle } = req.body;
+        const ownerId = req.user._id;
 
+        // Check if a workspace with the same title and owner already exists
+        const existingWorkspace = await Workspace.findOne({ workspaceTitle, owner: ownerId });
+        if (existingWorkspace) {
+            return res.status(400).json({ error: 'Workspace title already exists for this account' });
+        }
+
+        // If no duplicate is found, create the new workspace
         const addWorkspace = new Workspace({
             workspaceTitle: workspaceTitle,
-            owner: req.user._id, 
+            owner: ownerId,
         });
 
-        
         const savedWorkspace = await addWorkspace.save();
-
 
         return res.status(201).json(savedWorkspace);
     } catch (error) {
@@ -20,7 +47,6 @@ export const addNewWorkspace = async (req, res) => {
         return res.status(500).json({ error: error.message || 'An error occurred while creating the Workspace' });
     }
 };
-
 
 
 export const getAllWorkspaces = async (req, res) => {

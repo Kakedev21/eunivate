@@ -80,6 +80,7 @@ const SideNav = ({ isNavOpen }) => {
     const handleCreateWorkspace = async (e) => {
         e.preventDefault();
     
+        // Check if the workspace title is empty
         if (!workspaceTitle.trim()) {
             setError('Workspace title is required');
             return;
@@ -88,6 +89,7 @@ const SideNav = ({ isNavOpen }) => {
         const user = JSON.parse(localStorage.getItem('user'));
         const accessToken = user ? user.accessToken : null;
     
+        // Check if the access token exists
         if (!accessToken) {
             setError('No access token found. Please log in again.');
             return;
@@ -95,27 +97,27 @@ const SideNav = ({ isNavOpen }) => {
     
         try {
             const response = await axios.post(
-                'http://localhost:5000/api/users/workspace', 
-                { workspaceTitle }, 
-                {
-                    headers: { Authorization: `Bearer ${accessToken}` },
-                }
+                'http://localhost:5000/api/users/workspace',
+                { workspaceTitle },
+                { headers: { Authorization: `Bearer ${accessToken}` } }
             );
     
             if (response.status === 201) {
                 const newWorkspace = response.data; 
                 localStorage.setItem('currentWorkspaceId', newWorkspace._id);
-    
                 setAlertMessage('Workspace created successfully!');
-    
                 closeModal();
                 setWorkspaces([...workspaces, newWorkspace]);
-
+    
                 navigate(`/superadmin/dashboard?workspaceId=${newWorkspace._id}&workspaceTitle=${newWorkspace.workspaceTitle}`);
             }
         } catch (err) {
-            console.error("Error creating workspace:", err.response?.data?.error || err.message);
-            setError(err.response?.data?.error || 'An error occurred while creating the workspace');
+            // Display a specific error message if workspace title already exists
+            const errorMessage = err.response?.data?.error || 'An error occurred while creating the workspace';
+            console.error("Error creating workspace:", errorMessage);
+            
+            // Show error in UI
+            setError(errorMessage);
         }
     };
     

@@ -3,8 +3,7 @@ import mongoose from 'mongoose';
 const workspaceSchema = new mongoose.Schema({
     workspaceTitle: {
       type: String,
-      required: true,
-      unique: true
+      required: true
     },
     owner: { 
       type: mongoose.Schema.Types.ObjectId, 
