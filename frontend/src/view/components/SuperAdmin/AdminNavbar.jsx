@@ -1,16 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faChevronDown, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 import logomobile from "../../../assets/logomobile.png"; // Correct image import
 import { searchOptions } from './Search/SearchContext'; // Import the search options
-import './Css/Search.css'
+import TutorialModal from './TutotialModal'; // Import the TutorialModal
+import './Css/Search.css';
 
 const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
   const [user, setUser] = useState({ firstName: '', lastName: '', profilePicture: { url: '' } });
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredResults, setFilteredResults] = useState([]);
   const [clickedOption, setClickedOption] = useState('');  // Track the clicked search option
+  const [isModalOpen, setIsModalOpen] = useState(false); // State to control modal visibility
   const navigate = useNavigate();
   const defaultProfilePicture = 'https://res.cloudinary.com/dzxzc7kwb/image/upload/v1725974053/DefaultProfile/qgtsyl571c1neuls9evd.png'; 
   const dropdownRef = useRef();
@@ -70,6 +72,14 @@ const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
     setTimeout(() => setClickedOption(''), 2000);
   };
 
+  const openModal = () => {
+    setIsModalOpen(true); // Open the modal
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false); // Close the modal
+  };
+
   return (
     <>
       {/* Mobile Image */}
@@ -97,25 +107,33 @@ const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
             className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
           />
           
-{/* Dropdown for Search Results */}
-{filteredResults.length > 0 && (
-  <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-10 custom-scrollbar" 
-       style={{ maxHeight: '200px', overflowY: 'scroll' }}> {/* Set max height and enable scrolling */}
-    {filteredResults.map((result, index) => (
-      <div
-        key={index}
-        className={`px-4 py-2 hover:bg-gray-100 cursor-pointer ${clickedOption === result.name ? 'bg-yellow-300 animate-blink' : ''}`}
-        onClick={() => handleResultClick(result)}
-      >
-        {result.name}
-      </div>
-    ))}
-  </div>
-)}
-
-
+          {/* Dropdown for Search Results */}
+          {filteredResults.length > 0 && (
+            <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-10 custom-scrollbar" 
+                 style={{ maxHeight: '200px', overflowY: 'scroll' }}> {/* Set max height and enable scrolling */}
+              {filteredResults.map((result, index) => (
+                <div
+                  key={index}
+                  className={`px-4 py-2 hover:bg-gray-100 cursor-pointer ${clickedOption === result.name ? 'bg-yellow-300 animate-blink' : ''}`}
+                  onClick={() => handleResultClick(result)}
+                >
+                  {result.name}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
+        {/* Question Mark Icon in Square Box */}
+        <div className="relative hidden lg:block"> {/* Add margin for spacing */}
+          <div className="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-lg cursor-pointer" onClick={openModal}>
+            <FontAwesomeIcon
+              icon={faQuestionCircle} // Use the question mark icon
+              className="text-gray-500"
+            />
+          </div>
+        </div>
+        
         {/* User Profile */}
         <div ref={dropdownRef} className="relative flex items-center cursor-pointer" onClick={toggleAccountDropdown}>
           {user.profilePicture ? (
@@ -159,6 +177,9 @@ const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
           </div>
         </div>
       </div>
+
+      {/* Tutorial Modal */}
+      <TutorialModal isOpen={isModalOpen} onClose={closeModal} />
     </>
   );
 };

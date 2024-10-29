@@ -146,7 +146,7 @@ const SideNav = ({ isNavOpen }) => {
         <div
             className={`side-nav-admin fixed top-0 left-0 h-full bg-red-750 shadow-lg transition-transform transform ${
                 isNavOpen ? 'translate-x-0' : '-translate-x-full'
-            } lg:translate-x-0 lg:w-[250px] z-30 w-[250px]`}  // Fixed width for consistency
+            } lg:translate-x-0 lg:w-[250px] z-30 w-[250px]`}  
         >
             <div className="dashboard-logo flex items-center p-4">
                 <img
