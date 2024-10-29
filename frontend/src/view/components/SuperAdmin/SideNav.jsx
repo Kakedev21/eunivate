@@ -35,28 +35,49 @@ const SideNav = ({ isNavOpen }) => {
     const { selectedWorkspace, setSelectedWorkspace } = useWorkspace();
     const [workspaces, setWorkspaces] = useState([]);
     const location = useLocation(); // Use the useLocation hook
+  const [showTutorial, setShowTutorial] = useState(true); // Step 1: Add tutorial state
+
+    const handleWorkspaceSelect = (workspace) => {
+        setSelectedWorkspace(workspace);
+        setIsDropdownOpen(false);
+    
+        // Store workspace details in localStorage
+        localStorage.setItem('currentWorkspaceId', workspace._id);
+        localStorage.setItem('currentWorkspaceTitle', workspace.workspaceTitle);
+    
+        navigate(`/superadmin/dashboard?workspaceId=${workspace._id}&workspaceTitle=${workspace.workspaceTitle}`);
+    };
+    
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         const workspaceId = params.get('workspaceId');
         const workspaceTitle = params.get('workspaceTitle');
-
+    
         if (workspaceId && workspaceTitle) {
             setSelectedWorkspace({ _id: workspaceId, workspaceTitle });
+        } else {
+            // Check if there's a workspace saved in localStorage
+            const storedWorkspaceId = localStorage.getItem('currentWorkspaceId');
+            const storedWorkspaceTitle = localStorage.getItem('currentWorkspaceTitle');
+    
+            if (storedWorkspaceId && storedWorkspaceTitle) {
+                setSelectedWorkspace({ _id: storedWorkspaceId, workspaceTitle: storedWorkspaceTitle });
+            }
         }
-
+    
         const fetchWorkspaces = async () => {
             const user = JSON.parse(localStorage.getItem('user'));
             if (!user || !user.accessToken) {
                 setError('User is not authenticated.');
                 return;
             }
-
+    
             try {
                 const response = await axios.get('http://localhost:5000/api/users/workspaces', {
                     headers: { Authorization: `Bearer ${user.accessToken}` },
                 });
-
+    
                 if (response.status === 200) {
                     setWorkspaces(response.data);
                 } else {
@@ -66,9 +87,10 @@ const SideNav = ({ isNavOpen }) => {
                 setError(`Failed to load workspaces: ${err.message}`);
             }
         };
-
+    
         fetchWorkspaces();
     }, [location.search, setSelectedWorkspace]);
+    
 
     const closeModal = () => {
         setIsModalOpen(false);
@@ -119,11 +141,6 @@ const SideNav = ({ isNavOpen }) => {
         }
     };
     
-    const handleWorkspaceSelect = (workspace) => {
-        setSelectedWorkspace(workspace);
-        setIsDropdownOpen(false);
-        navigate(`/superadmin/dashboard?workspaceId=${workspace._id}&workspaceTitle=${workspace.workspaceTitle}`);
-    };
 
     return (
         <div
@@ -263,3 +280,4 @@ const SideNav = ({ isNavOpen }) => {
 };
 
 export default SideNav;
+
