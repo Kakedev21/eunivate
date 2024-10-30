@@ -16,7 +16,7 @@ const QuotationStep1 = ({ formData, setFormData, nextStep }) => {
             }
           
             try {
-              const response = await axios.get('https://eunivate-jys4.onrender.com/api/users/current-user', {
+              const response = await axios.get('http://localhost:5000/api/users/current-user', {
                 headers: {
                   Authorization: `Bearer ${token}`, // Add the token here
                 },
@@ -98,7 +98,7 @@ const QuotationStep1 = ({ formData, setFormData, nextStep }) => {
                                 <input
                                     type="email"
                                     name='email'
-                                    placeholder="Email address"
+                                    placeholder="Input Email"
                                     value={formData.email || ''}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                     className="w-full pl-3 p-3 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -113,7 +113,7 @@ const QuotationStep1 = ({ formData, setFormData, nextStep }) => {
                                 <FontAwesomeIcon icon={faPhone} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                                 <input
                                     type="text"
-                                    placeholder="Phone Number"
+                                    placeholder="Phone"
                                     name='phone'
                                     value={formData.phone || ''}
                                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}

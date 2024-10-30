@@ -35,6 +35,16 @@ const SideNav = ({ isNavOpen }) => {
     const { selectedWorkspace, setSelectedWorkspace } = useWorkspace();
     const [workspaces, setWorkspaces] = useState([]);
     const location = useLocation(); // Use the useLocation hook
+    const handleWorkspaceSelect = (workspace) => {
+        setSelectedWorkspace(workspace);
+        setIsDropdownOpen(false);
+
+        // Store workspace details in localStorage
+        localStorage.setItem('currentWorkspaceId', workspace._id);
+        localStorage.setItem('currentWorkspaceTitle', workspace.workspaceTitle);
+
+        navigate(`/superadmin/dashboard?workspaceId=${workspace._id}&workspaceTitle=${workspace.workspaceTitle}`);
+    };
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
@@ -43,6 +53,14 @@ const SideNav = ({ isNavOpen }) => {
 
         if (workspaceId && workspaceTitle) {
             setSelectedWorkspace({ _id: workspaceId, workspaceTitle });
+        } else {
+            // Check if there's a workspace saved in localStorage
+            const storedWorkspaceId = localStorage.getItem('currentWorkspaceId');
+            const storedWorkspaceTitle = localStorage.getItem('currentWorkspaceTitle');
+
+            if (storedWorkspaceId && storedWorkspaceTitle) {
+                setSelectedWorkspace({ _id: storedWorkspaceId, workspaceTitle: storedWorkspaceTitle });
+            }
         }
 
         const fetchWorkspaces = async () => {
@@ -53,7 +71,7 @@ const SideNav = ({ isNavOpen }) => {
             }
 
             try {
-                const response = await axios.get('https://eunivate-jys4.onrender.com/api/users/workspaces', {
+                const response = await axios.get('http://localhost:5000/api/users/workspaces', {
                     headers: { Authorization: `Bearer ${user.accessToken}` },
                 });
 
@@ -63,7 +81,7 @@ const SideNav = ({ isNavOpen }) => {
                     setError('Failed to load workspaces');
                 }
             } catch (err) {
-                setError();
+                setError('An error occurred while fetching workspaces.');
             }
         };
 
@@ -79,35 +97,44 @@ const SideNav = ({ isNavOpen }) => {
 
     const handleCreateWorkspace = async (e) => {
         e.preventDefault();
-    
+
         if (!workspaceTitle.trim()) {
             setError('Workspace title is required');
             return;
         }
-    
+
         const user = JSON.parse(localStorage.getItem('user'));
         const accessToken = user ? user.accessToken : null;
-    
+
         if (!accessToken) {
             setError('No access token found. Please log in again.');
             return;
         }
-    
+
         try {
+            const existingWorkspacesResponse = await axios.get('http://localhost:5000/api/users/workspaces', {
+                headers: { Authorization: `Bearer ${accessToken}` },
+            });
+
+            const existingWorkspaces = existingWorkspacesResponse.data;
+            const isDuplicate = existingWorkspaces.some(workspace => workspace.workspaceTitle === workspaceTitle);
+
+            if (isDuplicate) {
+                alert('Workspace title already exists. Please choose a different title.');
+                return;
+            }
+
             const response = await axios.post(
-                'https://eunivate-jys4.onrender.com/api/users/workspace', 
-                { workspaceTitle }, 
-                {
-                    headers: { Authorization: `Bearer ${accessToken}` },
-                }
+                'http://localhost:5000/api/users/workspace',
+                { workspaceTitle },
+                { headers: { Authorization: `Bearer ${accessToken}` } }
             );
-    
+
             if (response.status === 201) {
-                const newWorkspace = response.data; 
+                const newWorkspace = response.data;
                 localStorage.setItem('currentWorkspaceId', newWorkspace._id);
-    
+
                 setAlertMessage('Workspace created successfully!');
-    
                 closeModal();
                 setWorkspaces([...workspaces, newWorkspace]);
 
@@ -118,18 +145,12 @@ const SideNav = ({ isNavOpen }) => {
             setError(err.response?.data?.error || 'An error occurred while creating the workspace');
         }
     };
-    
-    const handleWorkspaceSelect = (workspace) => {
-        setSelectedWorkspace(workspace);
-        setIsDropdownOpen(false);
-        navigate(`/superadmin/dashboard?workspaceId=${workspace._id}&workspaceTitle=${workspace.workspaceTitle}`);
-    };
 
     return (
         <div
             className={`side-nav-admin fixed top-0 left-0 h-full bg-red-750 shadow-lg transition-transform transform ${
                 isNavOpen ? 'translate-x-0' : '-translate-x-full'
-            } lg:translate-x-0 lg:w-[250px] z-30 w-[250px]`}  // Fixed width for consistency
+            } lg:translate-x-0 lg:w-[250px] z-30 w-[250px]`}  
         >
             <div className="dashboard-logo flex items-center p-4">
                 <img
