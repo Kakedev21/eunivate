@@ -16,7 +16,7 @@ import {
     messages_icon, 
     settings_icon 
 } from "../../../constants/assets"; 
-import '../../components/SuperAdmin/Css/SideNav.css'; // Ensure this file exists
+import '../../components/SuperAdmin/Css/SideNav.css';
 
 const MemberLayout = ({ isNavOpen }) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -26,7 +26,6 @@ const MemberLayout = ({ isNavOpen }) => {
     const { selectedWorkspace, setSelectedWorkspace } = useWorkspace();
     const location = useLocation();
 
-    // Fetch the workspaces and set selected workspace
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         const workspaceId = params.get('workspaceId');
@@ -34,6 +33,15 @@ const MemberLayout = ({ isNavOpen }) => {
 
         if (workspaceId && workspaceTitle) {
             setSelectedWorkspace({ _id: workspaceId, workspaceTitle });
+            localStorage.setItem('currentWorkspaceId', workspaceId);
+            localStorage.setItem('currentWorkspaceTitle', workspaceTitle);
+        } else {
+            // Retrieve stored workspace if available
+            const storedWorkspaceId = localStorage.getItem('currentWorkspaceId');
+            const storedWorkspaceTitle = localStorage.getItem('currentWorkspaceTitle');
+            if (storedWorkspaceId && storedWorkspaceTitle) {
+                setSelectedWorkspace({ _id: storedWorkspaceId, workspaceTitle: storedWorkspaceTitle });
+            }
         }
 
         const fetchWorkspaces = async () => {
@@ -64,6 +72,8 @@ const MemberLayout = ({ isNavOpen }) => {
     const handleWorkspaceSelect = (workspace) => {
         setSelectedWorkspace(workspace);
         setIsDropdownOpen(false);
+        localStorage.setItem('currentWorkspaceId', workspace._id);
+        localStorage.setItem('currentWorkspaceTitle', workspace.workspaceTitle);
         navigate(`/member/projectmem?workspaceId=${workspace._id}&workspaceTitle=${workspace.workspaceTitle}`);
     };
 
