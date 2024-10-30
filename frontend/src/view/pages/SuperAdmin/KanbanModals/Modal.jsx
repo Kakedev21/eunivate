@@ -191,6 +191,9 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
         console.error('Error saving task:', error);
         toast.error('Failed to save task.');
       }
+        finally {
+          setLoading(false); // Stop loading animation
+      }
     };
 
   
