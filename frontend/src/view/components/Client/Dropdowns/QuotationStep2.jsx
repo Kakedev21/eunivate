@@ -40,7 +40,7 @@ const QuotationStep2 = ({ formData, setFormData, nextStep, prevStep }) => {
                 <h1 className = "font-semibold mb-3 text-xl text-gray-800">Our services</h1>
                 <p className='mb-5 text-gray-800'>Please select which service you are interested in.</p>
 
-                <div className="grid grid-cols-4 gap-3">
+                <div className="grid grid-cols-4 gap-3 services">
                     <div
                         className={`pt-4 pb-4 pe-1 ps-1 border-2 rounded-2xl cursor-pointer flex flex-col items-center justify-center ${formData.service === 'Development' ? 'border-red-500' : 'border-gray-200'}`}
                         onClick={() => handleServiceSelect('Development')}

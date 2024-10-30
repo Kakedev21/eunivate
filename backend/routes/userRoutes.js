@@ -90,7 +90,7 @@ const router = express.Router();
         router.post('/:messageId/react', reactToMessage);
         router.post('/:messageId/star', starMessage);
         router.post('/:messageId/flag', flagMessage);
-        router.delete('/:messageId', deleteMessage);
+        router.delete('/:messageId/delete', deleteMessage);
         router.get('/get-added-members', getAddedMembersForMessage); 
 
       // quotation route  

@@ -284,4 +284,3 @@ const SideNav = ({ isNavOpen }) => {
 };
 
 export default SideNav;
-
