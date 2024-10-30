@@ -284,7 +284,7 @@ const Chat_Members = ({ group }) => {
   
     try {
       // Send a request to delete the message from the backend
-      await axios.delete(`http://localhost:5000/api/users/${messageId}/delete`);
+      await axios.delete(`https://eunivate-jys4.onrender.com/api/users/${messageId}/delete`);
   
       // Update the messages state to remove the deleted message
       setMessages((prevMessages) => prevMessages.filter((msg) => msg._id !== messageId));
