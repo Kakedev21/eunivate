@@ -411,3 +411,10 @@
   flex-shrink: 0; /* Prevent items from shrinking */
   min-width: 120px; /* Adjust based on the desired item width */
 }
+@media (max-width: 576px){
+  .services{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 1rem;
+  }
+}
