@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import { useNavigate } from 'react-router-dom';
 
 const SettingProfile_Members = () => {
   const [isEmailEditable, setIsEmailEditable] = useState(false);
@@ -28,6 +28,9 @@ const SettingProfile_Members = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
+
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
   const defaultProfilePictureUrl = 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png';
 
@@ -59,6 +62,14 @@ const SettingProfile_Members = () => {
     }
   }, []);
 
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    setUser(null);
+    navigate('/login');
+  };
+
+
   const handleEditClick = async (field) => {
     if (field === 'email') {
       setIsEmailEditable((prevState) => !prevState);
@@ -84,146 +95,125 @@ const SettingProfile_Members = () => {
     setProfilePicture(file);
   };
 
-  const handleSaveProfile = async (shouldCloseModal = true) => {
-    const uploadImageToCloudinary = async (file) => {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('upload_preset', 'EunivateImage'); // Replace with your actual Cloudinary upload preset
-      formData.append('cloud_name', 'dzxzc7kwb'); // Replace with your actual Cloudinary cloud name
-
-      try {
-        const response = await axios.post(
-          'https://api.cloudinary.com/v1_1/dzxzc7kwb/image/upload',
-          formData
-        );
-        return response.data.url;
-      } catch (error) {
-        console.error('Error uploading image:', error);
-        throw error;
-      }
-    };
+  const handleSaveProfile = async (e) => {
+    e.preventDefault(); // Prevent default form submission
 
     const storedUser = JSON.parse(localStorage.getItem('user'));
-
     if (!storedUser || !storedUser._id) {
-      console.error('User is not logged in or user ID is missing.');
-      return;
+        console.error('User is not logged in or user ID is missing.');
+        return;
     }
 
     let profilePictureUrl = profilePicture;
     if (profilePicture instanceof File) {
-      try {
-        profilePictureUrl = await uploadImageToCloudinary(profilePicture);
-      } catch (error) {
-        console.error('Error uploading profile picture:', error);
-        return;
-      }
+        try {
+            const formData = new FormData();
+            formData.append('file', profilePicture);
+            formData.append('upload_preset', 'EunivateImage');
+            formData.append('cloud_name', 'dzxzc7kwb');
+
+            const response = await axios.post(
+                'https://api.cloudinary.com/v1_1/dzxzc7kwb/image/upload',
+                formData
+            );
+            profilePictureUrl = response.data.url;
+        } catch (error) {
+            console.error('Error uploading profile picture:', error);
+            return;
+        }
     } else if (!profilePictureUrl) {
-      // If profilePicture is empty or null, set it to default
-      profilePictureUrl = defaultProfilePictureUrl;
+        profilePictureUrl = defaultProfilePictureUrl; // Ensure this is defined
     }
 
     const updatedUser = {
-      firstName,
-      lastName,
-      email,
-      phoneNumber,
-      username,
-      profilePicture: profilePictureUrl,
-      role: biodata,
+        firstName,
+        lastName,
+        email,
+        phoneNumber,
+        username,
+        profilePicture: profilePictureUrl,
+        role: biodata,
     };
 
     try {
-      const response = await axios.put(
-        `/api/users/${storedUser._id}`,
-        updatedUser,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-        }
-      );
-      localStorage.setItem('user', JSON.stringify(response.data));
-      localStorage.setItem('biodata', biodata);
-      setIsEmailEditable(false);
-      setIsPhoneEditable(false);
-      setIsBiodataEditable(false);
+        const response = await axios.put(
+            `http://localhost:5000/api/users/${storedUser._id}`,
+            updatedUser
+        );
 
-      // Show success toast notification
-      toast.success('Successfully changed your profile!', {
-        position: 'top-right',
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        closeButton: <button>Close</button>
-      });
+        // Update user state and local storage
+        setUser(response.data.user);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        localStorage.setItem('biodata', biodata);
 
-      // Conditionally close the modal based on the parameter
-      if (shouldCloseModal) {
-        toggleEditProfileModal();
-      }
+        toast.success('Successfully changed your profile!', {
+            position: 'top-right',
+            autoClose: 3000,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+        });
+
+        toggleEditProfileModal(); // Close the modal
     } catch (error) {
-      console.error('Error updating profile', error);
-      toast.error('Error updating profile');
+        console.error('Error updating profile:', error);
+        toast.error('Error updating profile');
     }
-  };
+};
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
   
     if (!validatePassword(newPassword)) {
-      setError("Password must be at least 9 characters long and include at least one number and one symbol.");
-      return;
+        setError("Password must be at least 9 characters long and include at least one number and one symbol.");
+        return;
     }
   
     if (newPassword !== confirmPassword) {
-      setError("Passwords do not match");
-      return;
+        setError("Passwords do not match");
+        return;
     }
   
     try {
-      const storedUser = JSON.parse(localStorage.getItem('user'));
-      if (!storedUser || !storedUser._id) {
-        setError('User not logged in or user ID is missing.');
-        return;
-      }
-  
-      const response = await axios.put(
-        `http://localhost:5000/api/users/${storedUser._id}/password`,
-        { newPassword },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-          },
+        const storedUser = JSON.parse(localStorage.getItem('user'));
+        if (!storedUser || !storedUser._id) {
+            setError('User not logged in or user ID is missing.');
+            return;
         }
-      );
   
-      if (response.status === 200) {
-        // Show success toast notification
-        toast.success("Password changed successfully!", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        });
+        const response = await axios.put(
+            `http://localhost:5000/api/users/${storedUser._id}/password`,
+            { newPassword },
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+                },
+            }
+        );
   
-        setTimeout(() => {
-          setShowChangePasswordModal(false);
-          setNewPassword('');
-          setConfirmPassword('');
-          setError('');
-          setSuccess('');
-        }, 3000);
-      } else {
-        setError(response.data.message || 'Something went wrong');
-      }
+        if (response.status === 200) {
+            // Show success toast notification
+            toast.success("Password changed successfully!", {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+            });
+  
+            handleLogout(); // Call the logout function
+  
+            // Reset form fields
+            setNewPassword('');
+            setConfirmPassword('');
+            setError('');
+            setSuccess('');
+        } else {
+            setError(response.data.message || 'Something went wrong');
+        }
     } catch (err) {
-      setError('An error occurred');
+        setError('An error occurred');
     }
   };
   

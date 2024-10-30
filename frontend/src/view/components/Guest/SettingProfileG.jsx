@@ -203,7 +203,7 @@ const handleChangePassword = async (e) => {
               draggable: true,
           });
 
-          logoutUser(); // Call the logout function
+          handleLogout(); // Call the logout function
 
           // Reset form fields
           setNewPassword('');

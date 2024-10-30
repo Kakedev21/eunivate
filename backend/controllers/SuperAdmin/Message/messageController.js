@@ -190,3 +190,31 @@
                 res.status(500).json({ message: 'Error deleting message', error });
             }
         };
+
+
+        // Delete a message (soft delete)
+        // export const deleteMessage = async (req, res) => {
+        //   const { messageId } = req.params;
+        //   const userId = req.user.id;
+
+        //   try {
+        //       const message = await Message.findById(messageId);
+
+        //       if (!message) {
+        //           return res.status(404).json({ message: 'Message not found' });
+        //       }
+
+        //       // Check if the logged-in user is the sender of the message
+        //       if (message.sender.toString() !== userId) {
+        //           return res.status(403).json({ message: 'You are not authorized to delete this message' });
+        //       }
+
+        //       message.removed = true; // Mark the message as removed
+
+        //       await message.save();
+        //       io.emit('deleted-message', { messageId }); // Broadcast message removal
+        //       res.status(200).json({ message: 'Message deleted successfully' });
+        //   } catch (error) {
+        //       res.status(500).json({ message: 'Error deleting message', error });
+        //   }
+        // };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FaPaperPlane, FaReply, FaSmile, FaStar, FaFlag } from 'react-icons/fa';
+import { FaPaperPlane, FaReply, FaSmile, FaStar, FaFlag, FaTrash } from 'react-icons/fa';
 import { io } from 'socket.io-client';
 import axios from 'axios';
 import ReactQuill from 'react-quill';
@@ -128,6 +128,15 @@ const Chat = ({ group }) => {
                   : msg.starredBy.filter((id) => id !== starData.userId),
               }
             : msg
+        )
+      );
+    });
+
+   // Listen for deleted messages
+    socket.on('deleted-message', (deleteData) => {
+      setMessages((prevMessages) =>
+        prevMessages.map((msg) =>
+          msg._id === deleteData.messageId ? { ...msg, removed: true } : msg
         )
       );
     });
@@ -271,6 +280,25 @@ const Chat = ({ group }) => {
     }
   };
 
+  // Handle deleting a message
+const handleTrashClick = async (index) => {
+  const messageId = messages[index]._id;
+
+  try {
+    // Send a request to delete the message from the backend
+    await axios.delete(`http://localhost:5000/api/users/${messageId}/delete`);
+
+    // Update the messages state to remove the deleted message
+    setMessages((prevMessages) => prevMessages.filter((msg) => msg._id !== messageId));
+
+    // Emit a socket event for deleted message (optional)
+    socket.emit('deleted-message', { messageId });
+  } catch (error) {
+    console.error('Error deleting message:', error.response ? error.response.data : error.message);
+  }
+};
+
+
   const handleFlagSelect = async (color, index) => {
     setSelectedFlag((prev) => ({
       ...prev,
@@ -290,6 +318,8 @@ const Chat = ({ group }) => {
       console.error('Error flagging message:', error);
     }
   };
+
+
   // Fallback UI for when there are no members
   if (!group.selectedMembers || group.selectedMembers.length === 0) {
     return (
@@ -391,7 +421,7 @@ const Chat = ({ group }) => {
                   <FaReply size={12} />
                 </button>
 
-                {/* Emoji Picker */}
+              {/* Emoji Picker */}
                 <div className="relative">
                   <button
                     className="text-gray-500 hover:text-blue-500"
@@ -410,44 +440,51 @@ const Chat = ({ group }) => {
                   )}
                 </div>
 
-                {/* Star Button */}
-                <button
-                  className={`hover:text-blue-500 ${
-                    msg.starredBy.includes(currentUser._id) ? 'text-yellow-500' : 'text-gray-500'
-                  }`}
-                  onClick={() => toggleStar(index)}
-                >
-                  <FaStar size={12} />
-                </button>
-
-                {/* Flag Picker */}
-                <div className="relative">
+                  {/* Star Button */}
                   <button
-                    className="text-gray-500 hover:text-blue-500"
-                    onClick={() => setShowFlagPicker((prev) => (prev === index ? null : index))}
+                    className={`hover:text-blue-500 ${
+                      msg.starredBy.includes(currentUser._id) ? 'text-yellow-500' : 'text-gray-500'
+                    }`}
+                    onClick={() => toggleStar(index)}
                   >
-                    <FaFlag size={12} />
+                    <FaStar size={12} />
                   </button>
-                  {showFlagPicker === index && (
-                    <div className="absolute bottom-8 right-0 bg-white shadow-lg rounded-lg p-2 flex space-x-2 z-50 sm:bottom-12">
-                      {flagColors.map((color) => (
-                        <button
-                          key={color}
-                          onClick={() => handleFlagSelect(color, index)}
-                          className={`text-${color}-500`}
-                        >
-                          <FaFlag size={12} />
-                        </button>
-                      ))}
-                    </div>
-                  )}
+
+                  {/* Trash Button */}
+                  <button className="text-gray-500 hover:text-blue-500" onClick={() => handleTrashClick(index)}>
+                    <FaTrash size={12} />
+                  </button>
+
+                  {/* Flag Picker */}
+                  <div className="relative">
+                    <button
+                      className="text-gray-500 hover:text-blue-500"
+                      onClick={() => setShowFlagPicker((prev) => (prev === index ? null : index))}
+                    >
+                      <FaFlag size={12} />
+                    </button>
+                    {showFlagPicker === index && (
+                      <div className="absolute bottom-8 right-0 bg-white shadow-lg rounded-lg p-2 flex space-x-2 z-50 sm:bottom-12">
+                        {flagColors.map((color) => (
+                          <button
+                            key={color}
+                            onClick={() => handleFlagSelect(color, index)}
+                            className={`text-${color}-500`}
+                          >
+                            <FaFlag size={12} />
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
+
             </div>
           </div>
         ))}
       </div>
-
+    
+  
       {/* Reply Preview */}
       {replyMessage && (
         <div className="bg-gray-200 p-2 mb-2 rounded-md text-xs text-gray-700 flex justify-between items-center">
