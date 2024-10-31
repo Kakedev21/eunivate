@@ -254,6 +254,7 @@ import { io } from '../../../index.js';
         }
       };
 
+      
       export const updateTaskObjectives = async (req, res) => {
         try {
           const { id } = req.params; // Task ID

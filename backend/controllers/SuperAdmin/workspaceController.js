@@ -1,5 +1,5 @@
 import Workspace from "../../models/SuperAdmin/addWorkspaceModel.js";
-import saInvitedMember from "../../models/SuperAdmin/saInvitedMember.js";
+
 
 export const addNewWorkspace = async (req, res) => {
     try {

@@ -65,7 +65,7 @@ const Activity = () => {
 
         task.history.forEach((change) => {
             const parsedChanges = JSON.parse(change.changes);
-            const username = change.modifiedBy?.username || change.modifiedBy.username || 'Unknown User';
+            const username = change.modifiedBy?.username || 'Unknown User';
             const userPicture = change.modifiedBy?.profilePicture?.url || change.modifiedBy?.profilePicture || defaultProfilePictureUrl;
 
             if (!changesByUser[username]) {
