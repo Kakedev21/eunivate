@@ -122,9 +122,6 @@ export const getUsers = async (req, res) => {
 };
 
 
-
-
-
 //Get Invited Users by userId
 
 // export const getInvitedUsers = async (req, res) => {
@@ -172,26 +169,19 @@ export const getInvitedUsers = async (req, res) => {
             return res.status(400).json({ message: 'Workspace ID is required' });
         }
 
-        // 1. Find the current user's record in saInvitedMember to get who invited them.
+        // 1. Find the current user's record in InviteMember to check their invitation status.
         const currentUserInvite = await InviteMember.findOne({
             userId: userId,
             workspaceId: workspaceId,
         });
 
-        if (!currentUserInvite) {
-            return res.status(404).json({ message: 'User not invited to this workspace' });
-        }
-
-        const inviterId = currentUserInvite.invitedBy[0]; // Assuming single inviter per user
-
-        // 2. Fetch all users invited by the same inviter (the one who invited the current user) in the same workspace.
+        // 2. Fetch all invited users in the workspace, regardless of who invited them.
         const invitedUsers = await InviteMember.find({
-            invitedBy: inviterId,
             workspaceId: workspaceId,
         }).populate('project', 'projectName');
 
         if (invitedUsers.length === 0) {
-            return res.status(404).json({ message: 'No invited users found for this inviter' });
+            return res.status(404).json({ message: 'No invited users found for this workspace' });
         }
 
         // Return the list of invited users
@@ -201,7 +191,6 @@ export const getInvitedUsers = async (req, res) => {
         res.status(500).json({ message: 'Error fetching invited users', error: error.message });
     }
 };
-
 
 
 
@@ -244,8 +233,6 @@ export const updateUserRole = async (req, res) => {
 
 
 //Delete the invited members
-
-
 export const removeInvitedMember = async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
