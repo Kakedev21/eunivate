@@ -1,5 +1,6 @@
 import Workspace from "../../models/SuperAdmin/addWorkspaceModel.js";
 
+
 export const addNewWorkspace = async (req, res) => {
     try {
         const { workspaceTitle } = req.body;
