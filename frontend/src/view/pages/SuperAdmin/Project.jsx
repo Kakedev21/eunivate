@@ -353,10 +353,10 @@ const Project = () => {
               <div className="relative mt-2">
                 <select
                   className="w-full p-2 border border-gray-300 rounded-md text-gray-700"
-                  value={team}
+                  value={team || selectedWorkspace._id}
                   onChange={(e) => setTeam(e.target.value)}
                 >
-                  <option value="" disabled>Select Workspace</option>
+                 
                   {workspaces.map((workspace) => (
                     <option key={workspace._id} value={workspace._id}>
                       {workspace.workspaceTitle}
