@@ -141,16 +141,16 @@ const Kanban = ({ projectId, projectName }) => {
       return date.toLocaleString('default', { month: 'short' }); 
     };
 
-    const Tooltip = ({ children, title }) => {
-      return (
-        <div className="relative group">
-          {children}
-          <div className="absolute hidden group-hover:block bg-gray-700 text-white text-xs rounded-md p-2 -bottom-8 left-1/2 transform -translate-x-1/2">
-            {title}
-          </div>
-        </div>
-      );
-    };
+ const Tooltip = ({ children, title }) => {
+    return (
+      <div className="relative group">
+        {children}
+        <div className="absolute hidden group-hover:block bg-gray-700 text-white text-xs rounded-md p-2 -bottom-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap z-10">
+        {title}
+      </div>
+      </div>
+    );
+  };
 
     return (
       <div ref={drag} className="p-4 rounded-lg shadow-md bg-white relative" onClick={handleTaskClick}>
@@ -160,10 +160,10 @@ const Kanban = ({ projectId, projectName }) => {
         </div>
         <div className='flex -space-x-3'>
           {task.assignee && task.assignee.map((member, index) => (
-            <Tooltip key={index} title={member.name}>
+            <Tooltip key={index} title={`${member.firstName} ${member.lastName}`}>
               <img
                 src={member.profilePicture?.url || member.profilePicture} 
-                alt={member.name}
+                alt={`${member.firstName} ${member.lastName}`} // Update alt text for better accessibility
                 className="w-8 h-8 rounded-full border-2 border-white"
               />
             </Tooltip>
@@ -198,7 +198,6 @@ const Kanban = ({ projectId, projectName }) => {
           <div className="flex items-center space-x-2 flex-shrink-0">
             <FaCheckCircle className="text-gray-400" />
             <p>{task.doneObjectivesCount || 0}</p>
-
           </div>
         </div>
       </div>
