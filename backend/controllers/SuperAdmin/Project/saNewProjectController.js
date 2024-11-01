@@ -32,39 +32,47 @@ export const createSaNewProject = async (req, res) => {
     }
 };
 
-
 export const getAllProjects = async (req, res) => {
   try {
-    const { workspaceId } = req.query; // Get the workspaceId from query parameters
+      const { workspaceId } = req.query;
 
-    // Validate the workspaceId
-    if (!workspaceId) { 
-      return res.status(400).json({ message: 'Workspace ID is required' });
-    }
+      // Construct query to fetch projects based on workspaceId or all projects if no workspaceId is provided
+      const query = { owner: req.user._id };
+      if (workspaceId) {
+          query.workspaceId = workspaceId;
+      }
 
-    // Find owned and invited projects that match the workspaceId
-    const ownedProjects = await SaNewProject.find({ owner: req.user._id, workspaceId })
-      .populate('invitedUsers', 'username profilePicture')
-      .populate('workspaceId', 'workspaceTitle'); // Populate the workspace info
-    const invitedProjects = await SaNewProject.find({ invitedUsers: req.user._id, workspaceId })
-      .populate('invitedUsers', 'username profilePicture')
-      .populate('workspaceId', 'workspaceTitle'); // Populate the workspace info
+      // Fetch both owned and invited projects matching the query
+      const ownedProjects = await SaNewProject.find(query)
+          .populate('invitedUsers', 'username profilePicture')
+          .populate('workspaceId', 'workspaceTitle');
 
-    // Combine the projects
-    const allProjects = [...ownedProjects, ...invitedProjects];
+      const invitedProjects = await SaNewProject.find({
+          invitedUsers: req.user._id,
+          ...(workspaceId ? { workspaceId } : {})
+      })
+          .populate('invitedUsers', 'username profilePicture')
+          .populate('workspaceId', 'workspaceTitle');
 
-    // Check if there are any projects
-    if (allProjects.length === 0) {
-      return res.status(404).json({ message: 'No projects found for the selected workspace' });
-    }
+      // Combine owned and invited projects
+      const allProjects = [...ownedProjects, ...invitedProjects];
 
-    // Send the filtered projects as a response
-    return res.status(200).json(allProjects);
+      // Remove duplicates using a Map to ensure each project appears only once
+      const uniqueProjects = Array.from(
+          new Map(allProjects.map(project => [project._id.toString(), project])).values()
+      );
+
+      if (uniqueProjects.length === 0) {
+          return res.status(404).json({ message: 'No projects found' });
+      }
+
+      return res.status(200).json(uniqueProjects);
   } catch (error) {
-    console.error("Error in fetching projects:", error.message);
-    return res.status(500).json({ error: error.message || 'An error occurred while fetching the projects' });
+      console.error("Error in fetching projects:", error.message);
+      return res.status(500).json({ error: error.message || 'An error occurred while fetching the projects' });
   }
 };
+
 
   
   

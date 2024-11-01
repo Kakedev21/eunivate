@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { FaCalendarAlt, FaPaperclip, FaCheckCircle } from 'react-icons/fa';
-import axios from 'axios';
 import { useWorkspace } from '../../../components/SuperAdmin/workspaceContext'; // Import the workspace context
 import BoxLoader from '../Loading Style/Box Loading/BoxLoader'; // Add loader for better user experience
 
-const Ongoing_Project = ({ taskDetails, calculateProgress }) => {
-    const [projects, setProjects] = useState([]);  // State for storing the ongoing projects
+const Ongoing_Project = ({ projects, taskDetails, calculateProgress }) => {
     const [loading, setLoading] = useState(false); // Loading state
     const { selectedWorkspace } = useWorkspace();  // Fetch the selected workspace from the context
 
@@ -31,17 +29,7 @@ const Ongoing_Project = ({ taskDetails, calculateProgress }) => {
 
                 console.log(`Fetching projects for workspace: ${selectedWorkspace.workspaceTitle} (ID: ${selectedWorkspace._id})`);
 
-                // Fetch the ongoing projects related to the selected workspace
-                const response = await axios.get('http://localhost:5000/api/users/sa-getnewproject', {
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                    },
-                    params: {
-                        workspaceId: selectedWorkspace._id,  // Filter by workspace ID
-                    }
-                });
-
-                setProjects(response.data);  // Store the fetched projects in the state
+                // The fetched projects are already passed as props, so no need to set them again
                 setLoading(false);  // End loading
             } catch (error) {
                 console.error('Error fetching projects:', error);
