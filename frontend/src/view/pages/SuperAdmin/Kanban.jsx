@@ -181,7 +181,7 @@ const Kanban = ({ projectId, projectName }) => {
       <Tooltip key={index} title={`${member.firstName} ${member.lastName}`}>
               <img
                 src={member.profilePicture?.url || member.profilePicture} 
-                alt={member.name}
+                alt={`${member.firstName} ${member.lastName}`} // Update alt text for better accessibility
                 className="w-8 h-8 rounded-full border-2 border-white"
               />
             </Tooltip>
@@ -216,7 +216,6 @@ const Kanban = ({ projectId, projectName }) => {
           <div className="flex items-center space-x-2 flex-shrink-0">
             <FaCheckCircle className="text-gray-400" />
             <p>{task.doneObjectivesCount || 0}</p>
-
           </div>
         </div>
       </div>
