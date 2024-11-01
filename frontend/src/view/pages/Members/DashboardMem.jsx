@@ -7,9 +7,9 @@ import AdminNavbar from '../../components/SuperAdmin/AdminNavbar';
 import '../../../admin.css';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import Today_Task from './Dashboard Table/Today_Task';
-import Ongoing_Project from './Dashboard Table/Ongoing_Project';
-import Activity_Task from './Dashboard Table/Activity_Task';
+import Today_Task from './Dashboard Members/Today_Taskmem';
+import Ongoing_Project from './Dashboard Members/Ongoing_Projectmem';
+import Activity_Task from './Dashboard Members/Activity_Taskmem';
 import { useWorkspace } from '../../components/SuperAdmin/workspaceContext';
 
 const Dashboard = () => {
