@@ -44,10 +44,10 @@ export const getAllProjects = async (req, res) => {
 
     // Find owned and invited projects that match the workspaceId
     const ownedProjects = await SaNewProject.find({ owner: req.user._id, workspaceId })
-      .populate('invitedUsers', 'username profilePicture')
+      .populate('invitedUsers', 'username  firstName lastName  profilePicture')
       .populate('workspaceId', 'workspaceTitle'); // Populate the workspace info
     const invitedProjects = await SaNewProject.find({ invitedUsers: req.user._id, workspaceId })
-      .populate('invitedUsers', 'username profilePicture')
+      .populate('invitedUsers', 'username  firstName lastName  profilePicture')
       .populate('workspaceId', 'workspaceTitle'); // Populate the workspace info
 
     // Combine the projects

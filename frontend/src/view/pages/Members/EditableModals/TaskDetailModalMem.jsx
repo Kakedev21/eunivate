@@ -5,14 +5,14 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import axios from 'axios';
 import { io } from 'socket.io-client';
-import AssigneeModal from './AssigneeModal';
+import AssigneeModalMem from './AssigneeModalMem';
 
 
 
 
 const socket = io('http://localhost:5000');
 
-const TaskDetailModal = ({ isOpen, onClose, task, projectName, projectId, onUpdateTask }) => {
+const TaskDetailModalMem = ({ isOpen, onClose, task, projectName, projectId, onUpdateTask }) => {
   if (!task) return null;
 
   // State hooks for managing form inputs and other data
@@ -791,7 +791,7 @@ const handleSaveStatus = async () => {
         </div>
       </div>
         {isAssigneeModalOpen && (
-          <AssigneeModal
+          <AssigneeModalMem
             isOpen={isAssigneeModalOpen}
             onClose={() => setIsAssigneeModalOpen(false)}
             members={membersList}
@@ -808,4 +808,4 @@ const handleSaveStatus = async () => {
 
 };
 
-export default TaskDetailModal;
+export default TaskDetailModalMem;

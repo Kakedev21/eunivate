@@ -52,6 +52,20 @@ const Ongoing_Project = ({ taskDetails, calculateProgress }) => {
         fetchProjects();  // Call the fetch function when the component mounts or when the workspace changes
     }, [selectedWorkspace]);  // Re-fetch projects when selectedWorkspace changes
 
+    const Tooltip = ({ children, title }) => {
+        return (
+          <div className="relative group">
+            {children}
+            <div
+              className="absolute hidden group-hover:flex bg-gray-500 text-white text-xs rounded-md p-2 whitespace-nowrap -top-10 left-1/2 transform -translate-x-1/2"
+              style={{ zIndex: 10 }}
+            >
+              {title}
+            </div>
+          </div>
+        );
+      };
+
     return (
         <div className="flex flex-col">
             <h2 className="text-medium font-semibold text-gray-800 mb-2">Ongoing Projects</h2>
@@ -87,14 +101,15 @@ const Ongoing_Project = ({ taskDetails, calculateProgress }) => {
                                             <p>{taskDetails[project._id]?.objectivesCount || 0}</p>
                                         </div>
                                     </div>
-                                    <div className="flex items-center ml-auto mr-3">
-                                        {project.invitedUsers && project.invitedUsers.slice(0, 3).map((user, i) => (
-                                            <img
-                                                key={i}
-                                                src={user.profilePicture?.url || user.profilePicture}
-                                                alt={user.username || 'User'}
-                                                className="w-5 h-5 rounded-full object-cover border border-white -ml-3"
-                                            />
+                                    <div className="flex items-center ml-auto mr-3 -space-x-3">
+                                        {project.invitedUsers && project.invitedUsers.slice(0, 3).map((user, index  ) => (
+                                    <Tooltip key={index} title={`${user.firstName} ${user.lastName}`}>
+                                                    <img
+                                                        src={user.profilePicture?.url || user.profilePicture} // Ensure it falls back to a default if no picture
+                                                        alt={user.username || 'Profile Picture'}
+                                                    className="w-6 h-6 rounded-full object-cover border border-gray-300"
+                                                    />
+                                            </Tooltip>
                                         ))}
                                         {project.invitedUsers.length > 3 && (
                                             <div className="text-sm text-gray-500">+{project.invitedUsers.length - 3}</div>

@@ -225,7 +225,7 @@ import { io } from '../../../index.js';
           
           // Fetch tasks based on the query
           const tasks = await saAddTask.find(query)
-          .populate('assignee', 'username profilePicture')
+          .populate('assignee', 'username firstName lastName profilePicture')
           .populate('history.modifiedBy', 'username profilePicture');
           // console.log('Tasks found:', tasks); // Debug log
 
