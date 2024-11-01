@@ -50,16 +50,30 @@ const Kanban = ({ projectId, projectName }) => {
     setSelectedTask(null); // Clear selected task
   };
 
-  const updateTaskStatus = async (taskId, newStatus,modifiedBy) => {
+  const updateTaskStatus = async (taskId, newStatus, modifiedBy) => {
     try {
-      await axios.patch(`http://localhost:5000/api/users/sa-tasks/${taskId}`, {    status: newStatus,
+      // Capture the user details
+      const user = JSON.parse(localStorage.getItem('user'));
+      const modifiedUser = {
+        username: `${user.firstName} ${user.lastName}`,
+        profilePicture: user.profilePicture?.url || user.profilePicture || defaultProfilePictureUrl,
+      };
+  
+      // Update the task status on the server
+      await axios.patch(`http://localhost:5000/api/users/sa-tasks/${taskId}`, {
+        status: newStatus,
         modifiedBy: modifiedBy,
-        
-       });
+        history: {
+          modifiedBy: modifiedUser,
+          modifiedAt: new Date().toISOString(),
+          changes: JSON.stringify({ status: newStatus }),
+        },
+      });
     } catch (error) {
       console.error('Error updating task status:', error);
     }
   };
+  
 
   const moveTask = (taskId, newStatus) => {
     const updatedTask = tasks.find(task => task._id === taskId);
@@ -141,16 +155,20 @@ const Kanban = ({ projectId, projectName }) => {
       return date.toLocaleString('default', { month: 'short' }); 
     };
 
- const Tooltip = ({ children, title }) => {
-    return (
-      <div className="relative group">
-        {children}
-        <div className="absolute hidden group-hover:block bg-gray-700 text-white text-xs rounded-md p-2 -bottom-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap z-10">
-        {title}
-      </div>
-      </div>
-    );
-  };
+    const Tooltip = ({ children, title }) => {
+      return (
+        <div className="relative group">
+          {children}
+          <div
+            className="absolute hidden group-hover:flex bg-gray-500 text-white text-xs rounded-md p-2 whitespace-nowrap -top-10 left-1/2 transform -translate-x-1/2"
+            style={{ zIndex: 10 }}
+          >
+            {title}
+          </div>
+        </div>
+      );
+    };
+    
 
     return (
       <div ref={drag} className="p-4 rounded-lg shadow-md bg-white relative" onClick={handleTaskClick}>
@@ -160,7 +178,7 @@ const Kanban = ({ projectId, projectName }) => {
         </div>
         <div className='flex -space-x-3'>
           {task.assignee && task.assignee.map((member, index) => (
-            <Tooltip key={index} title={`${member.firstName} ${member.lastName}`}>
+      <Tooltip key={index} title={`${member.firstName} ${member.lastName}`}>
               <img
                 src={member.profilePicture?.url || member.profilePicture} 
                 alt={`${member.firstName} ${member.lastName}`} // Update alt text for better accessibility

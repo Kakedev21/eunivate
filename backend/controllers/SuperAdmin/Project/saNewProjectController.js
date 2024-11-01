@@ -44,14 +44,14 @@ export const getAllProjects = async (req, res) => {
 
       // Fetch both owned and invited projects matching the query
       const ownedProjects = await SaNewProject.find(query)
-          .populate('invitedUsers', 'username profilePicture')
+          .populate('invitedUsers', 'username firstName lastName profilePicture')
           .populate('workspaceId', 'workspaceTitle');
 
       const invitedProjects = await SaNewProject.find({
           invitedUsers: req.user._id,
           ...(workspaceId ? { workspaceId } : {})
       })
-          .populate('invitedUsers', 'username profilePicture')
+          .populate('invitedUsers', 'username firstName lastName   profilePicture')
           .populate('workspaceId', 'workspaceTitle');
 
       // Combine owned and invited projects

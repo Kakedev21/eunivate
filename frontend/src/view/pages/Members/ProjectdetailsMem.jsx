@@ -72,6 +72,20 @@
       return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+    const Tooltip = ({ children, title }) => {
+      return (
+        <div className="relative group">
+          {children}
+          <div
+            className="absolute hidden group-hover:flex bg-gray-500 text-white text-xs rounded-md p-2 whitespace-nowrap -top-10 left-1/2 transform -translate-x-1/2"
+            style={{ zIndex: 10 }}
+          >
+            {title}
+          </div>
+        </div>
+      );
+    };
+    
     return (
       <div className="bg-gray-100 min-h-screen p-6">
         <div className="w-full flex justify-between items-center mb-16">
@@ -123,13 +137,15 @@
     {/* Invited Users' profile images next to the icon */}
     <div className="flex ml-auto -space-x-3 mt-[-13px]">
       {invitedUsers.length > 0 ? (
-        invitedUsers.slice(0, 5).map((user) => (
+        invitedUsers.slice(0, 5).map((user, index) => (
+          <Tooltip key={index} title={`${user.firstName} ${user.lastName}`}>
           <img
             key={user._id}
             src={user.profilePicture?.url || user.profilePicture || 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'} // Default image fallback
             alt={user.username}
             className="w-6 h-6 rounded-full object-cover border border-gray-300"
           />
+          </Tooltip>
         ))
       ) : (
         <p className="text-gray-500 text-sm">No users invited yet.</p>

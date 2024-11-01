@@ -2,18 +2,18 @@ import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { FaTimes, FaUser } from 'react-icons/fa';
 import axios from 'axios';
-import UserNameModal from './UserNameModal';
-import ObjectiveList from './ObjectiveList';
-import StatusDropdown from './StatusDropdown';
-import PriorityDropdown from './PriorityDropdown';
-import AttachmentSection from './AttachmentSection';
-import Dates from './Dates';
-import BarLoading from '../Loading Style/Bar Loading/Barloader';
+import UserNameModalMem from './UserNameModalMem';
+import AttachmentSectionMem from './AttachmentSectionMem';
+import DatesMem from './DatesMem';
+import ObjectiveListMem from './ObjectiveListMem';
+import PriorityDropdownMem from './PriorityDropdownMem';
+import StatusDropdownMem from './StatusDropdownMem';
+import Barloader from '../../SuperAdmin/Loading Style/Bar Loading/Barloader';
 import { toast, ToastContainer } from 'react-toastify'; // Importing toast and ToastContainer
 import 'react-toastify/dist/ReactToastify.css'; // Import the CSS for the toast notifications
 
 
-const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
+const ModalMem = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
   const [taskName, setTaskName] = useState('');
   const [description, setDescription] = useState('');
   const [objectives, setObjectives] = useState([]);
@@ -282,21 +282,21 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
           </div>
 
 
-        <Dates
+        <DatesMem
           startDate={startDate}
           dueDate={dueDate}
           setStartDate={setStartDate}
           setDueDate={setDueDate}
         />
 
-        <PriorityDropdown
+        <PriorityDropdownMem
           priority={priority}
           setPriority={setPriority}
           isDropdownOpen={isPriorityDropdownOpen}
           setIsDropdownOpen={setIsPriorityDropdownOpen}
           dropdownRef={dropdownRef}
         />
-        <StatusDropdown
+        <StatusDropdownMem
           status={status}
           setStatus={setStatus}
           isDropdownOpen={isStatusDropdownOpen}
@@ -315,7 +315,7 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
           />
         </div>
 
-        <AttachmentSection
+        <AttachmentSectionMem
           fileInputRef={fileInputRef}
           handleClickFileInput={handleClickFileInput}
           handleFileSelect={handleFileSelect}
@@ -324,7 +324,7 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
           handleImageDelete={handleImageDelete}
         />
 
-        <ObjectiveList
+        <ObjectiveListMem
           objectives={objectives}
           selectedObjective={selectedObjective}
           setObjectives={setObjectives}
@@ -348,12 +348,12 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
     className="bg-red-600 w-full text-white px-4 py-2 rounded hover:bg-red-700 flex justify-center items-center"
     disabled={loading}
   >
-    {loading ? <BarLoading  /> : 'Submit'}
+    {loading ? <Barloader  /> : 'Submit'}
   </button>
 </div>
 
         {isUserNameModalOpen && (
-          <UserNameModal
+          <UserNameModalMem
             isOpen={isUserNameModalOpen}
             onClose={() => setIsUserNameModalOpen(false)}
             membersList={membersList}
@@ -377,4 +377,4 @@ const Modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
   );
 };
 
-export default Modal;
+export default ModalMem;

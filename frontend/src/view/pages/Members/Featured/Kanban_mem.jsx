@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { FaPlus, FaCalendar, FaPaperclip, FaCheckCircle } from 'react-icons/fa';
 import { useDrag, useDrop, DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import Modal from '../../SuperAdmin/KanbanModals/Modal';
-import TaskDetailModal from '../../SuperAdmin/EditableModals/TaskDetailModal';
+import ModalMem from '../KanbanModals/ModalMem';
+import TaskDetailModalMem from '../EditableModals/TaskDetailModalMem';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 
@@ -24,13 +24,14 @@ const Kanban_mem = () => {
       if (!projectId) return console.error('Project ID is not defined');
       try {
         const response = await axios.get(`http://localhost:5000/api/users/sa-tasks/${projectId}`);
-        setTasks(response.data.data);
+        setTasks(response.data.data); // Update the tasks state with fetched data
       } catch (error) {
         console.error('Error fetching tasks:', error);
       }
     };
-    if (!initialTasks || initialTasks.length === 0) fetchTasks();
-  }, [projectId, initialTasks]);
+
+    fetchTasks(); // Fetch tasks on initial render and when projectId changes
+  }, [projectId]);
 
   const handleOpenModal = () => setModalOpen(true);
   const handleCloseModal = () => setModalOpen(false);
@@ -45,22 +46,45 @@ const Kanban_mem = () => {
     setSelectedTask(null);
   };
 
-  const updateTaskStatus = async (taskId, newStatus) => {
+
+  const updateTaskStatus = async (taskId, newStatus, modifiedBy) => {
     try {
-      await axios.patch(`http://localhost:5000/api/users/sa-tasks/${taskId}`, { status: newStatus });
+      // Capture the user details
+      const user = JSON.parse(localStorage.getItem('user'));
+      const modifiedUser = {
+        username: `${user.firstName} ${user.lastName}`,
+        profilePicture: user.profilePicture?.url || user.profilePicture || 'default_image_url.png',
+      };
+  
+      // Update the task status on the server and include the history entry
+      await axios.patch(`http://localhost:5000/api/users/sa-tasks/${taskId}`, {
+        status: newStatus,
+        modifiedBy: modifiedBy,
+        history: [
+          ...(tasks.find(task => task._id === taskId).history || []), // Include existing history
+          {
+            modifiedBy: modifiedUser,
+            modifiedAt: new Date().toISOString(),
+            changes: JSON.stringify({ status: newStatus }),
+          },
+        ],
+      });
     } catch (error) {
       console.error('Error updating task status:', error);
     }
   };
-
+  
   const moveTask = (taskId, newStatus) => {
     const updatedTask = tasks.find(task => task._id === taskId);
     if (updatedTask) {
       updatedTask.status = newStatus;
+      const user = JSON.parse(localStorage.getItem('user'));
+      const currentUserId = user?._id;
       setTasks([...tasks]);
-      updateTaskStatus(taskId, newStatus);
+      updateTaskStatus(taskId, newStatus,currentUserId);
     }
   };
+
 
   const handleTaskSubmit = (newTask) => {
     setTasks(prevTasks => [...prevTasks, newTask]);
@@ -123,7 +147,20 @@ const Kanban_mem = () => {
       const date = new Date(startDate);
       return date.toLocaleString('default', { month: 'short' });
     };
-
+    
+    const Tooltip = ({ children, title }) => {
+      return (
+        <div className="relative group">
+          {children}
+          <div
+            className="absolute hidden group-hover:flex bg-gray-500 text-white text-xs rounded-md p-2 whitespace-nowrap -top-10 left-1/2 transform -translate-x-1/2"
+            style={{ zIndex: 10 }}
+          >
+            {title}
+          </div>
+        </div>
+      );
+    };
     return (
       <div ref={drag} className="p-4 rounded-lg shadow-md bg-white relative" onClick={handleTaskClick}>
         <div className="flex items-start justify-between">
@@ -132,6 +169,7 @@ const Kanban_mem = () => {
           </div>
           <div className='flex -space-x-3'>
             {task.assignee?.map((member, index) => (
+               <Tooltip key={index} title={`${member.firstName} ${member.lastName}`}>
               <img
                 key={index}
                 src={member.profilePicture?.url || member.profilePicture || 'default_image_url.png'}
@@ -139,6 +177,7 @@ const Kanban_mem = () => {
                 className="w-8 h-8 rounded-full border-2 border-white"
                 title={member.name}
               />
+              </Tooltip>
             ))}
           </div>
         </div>
@@ -189,13 +228,13 @@ const Kanban_mem = () => {
           </Column>
         ))}
       </div>
-      <Modal 
+      <ModalMem 
         isOpen={isModalOpen} 
         onClose={handleCloseModal} 
         projectId={projectId} 
         onTaskSubmit={handleTaskSubmit} 
       />
-      <TaskDetailModal
+      <TaskDetailModalMem
         isOpen={isTaskDetailModalOpen} 
         onClose={handleCloseTaskDetailModal} 
         task={selectedTask} 
