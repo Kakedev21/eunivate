@@ -3,7 +3,6 @@ import { FaCheckCircle, FaRegCircle, FaRegCalendarAlt, FaPaperclip, FaFlag } fro
 import { format, parseISO } from 'date-fns';
 import filterIcon from '../../../../assets/Filter.png';
 
-// Tooltip component with higher z-index
 const Tooltip = ({ children, title }) => {
   // Function to determine if the title is long
   const isLongName = title.length > 10;
@@ -21,6 +20,8 @@ const Tooltip = ({ children, title }) => {
     </div>
   );
 };
+
+
 
 const Today_Task = ({ projects, taskDetails }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -133,5 +134,6 @@ const Today_Task = ({ projects, taskDetails }) => {
     </div>
   );
 };
+
 
 export default Today_Task;
