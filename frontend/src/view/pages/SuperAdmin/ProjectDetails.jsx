@@ -15,6 +15,7 @@ const ProjectDetails = () => {
     const [selectedView, setSelectedView] = useState('Kanban');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+    const [currentModal, setCurrentModal] = useState(null);
     const [error, setError] = useState(null);
     const [selectedMembers, setSelectedMembers] = useState([]); 
     const [addedMembers, setAddedMembers] = useState([]);
@@ -23,6 +24,7 @@ const ProjectDetails = () => {
     const [addText, setAddText] = useState('');
     const [project, setProject] = useState({});
     const [isImageVisible, setIsImageVisible] = useState(false);
+    const [projectData, setProjectData] = useState({ name: '', invitedUsers: [] });
     // const [isVisible, setIsVisible] = useState(false);
 
     const [tasks, setTasks] = useState([]);
@@ -32,7 +34,7 @@ const ProjectDetails = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const projectId = location.state?.projectId;
-
+    
     useEffect(() => {
         const fetchTasks = async () => {
             // Existing fetch logic
@@ -218,6 +220,43 @@ const ProjectDetails = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+    const fetchProjectDetails = async () => {
+        try {
+            const user = JSON.parse(localStorage.getItem('user'));
+            const token = user?.accessToken;
+    
+            if (!token) {
+                setError('No access token found. Please log in again.');
+                console.error("No token found");
+                return;
+            }
+    
+            const response = await axios.get(`http://localhost:5000/api/users/sa-getnewproject/${projectId}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+    
+            const { projectName, invitedUsers } = response.data;
+    
+            setProject(prev => ({ ...prev, name: projectName }));
+            setAddedMembers(invitedUsers); // Assuming this sets invitedUsers properly in your state
+        } catch (error) {
+            console.error('Error fetching project details:', error);
+            setError('Error fetching project details.');
+        }
+    };
+    
+    
+
+    const toggleModal = (optionModal) => {
+        if(currentModal === optionModal){
+            setCurrentModal(null);    
+        } else {
+            setCurrentModal(optionModal);     
+        } if (currentModal === 'optionModal'){
+            fetchProjectDetails();
+        }
+    }
+
 
 return (
     <div className="bg-gray-100 min-h-screen p-6">
@@ -253,8 +292,15 @@ return (
                         >
                             Project
                         </button>
-                        <span className="text-gray-500">/</span>
+                        <span className="text-gray-500">|</span>
                         <span className="text-gray-500">Detail</span>
+                        <span className="text-gray-500">|</span>
+                        <button
+                            onClick={() => toggleModal('optionModal')}
+                            className="text-gray-500 hover:underline"
+                        >
+                            Option
+                        </button>
                     </div>
 
                     <div className="relative flex items-center space-x-4">
@@ -343,6 +389,27 @@ return (
                 </div>
             </div>
         </div>
+
+        {currentModal === 'optionModal' && (
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-500 bg-opacity-50">
+        <div className="bg-white w-1/2 p-6 rounded-md shadow-lg border border-gray-200">
+            <h2 className="text-lg font-semibold mb-4">Project Details</h2>
+            <p className="text-gray-800">Project Name: {project.projectName}</p>
+            <h3 className="mt-4">Invited Users:</h3>
+            <ul>
+                {addedMembers.map(member => (
+                    <li key={member._id} className="text-gray-600">{member.username}</li>
+                ))}
+            </ul>
+            <button onClick={() => setCurrentModal(null)} className="mt-4 text-blue-500 hover:underline">
+                Close
+            </button>
+        </div>
+    </div>
+)}
+
+
+
 
         <div className="mt-6 border-gray-200">
 {selectedView === 'Kanban' && 
