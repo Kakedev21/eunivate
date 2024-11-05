@@ -52,7 +52,7 @@ const MemberLayout = ({ isNavOpen }) => {
 
         const fetchWorkspaces = async () => {
             const user = JSON.parse(localStorage.getItem('user'));
-            if (!user || !user.accessToken) {
+            if (!user || !user.accessToken) {https://eunivate-jys4.onrender.com
                 setError('User is not authenticated.');
                 return;
             }

@@ -60,7 +60,7 @@ const Kanban = ({ projectId, projectName }) => {
       };
   
       // Update the task status on the server
-      await axios.patch(`http://localhost:5000/api/users/sa-tasks/${taskId}`, {
+      await axios.patch(`https://eunivate-jys4.onrender.com/api/users/sa-tasks/${taskId}`, {
         status: newStatus,
         modifiedBy: modifiedBy,
         history: {
