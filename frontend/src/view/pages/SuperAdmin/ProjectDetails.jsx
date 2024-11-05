@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserPlus } from '@fortawesome/free-solid-svg-icons';
+import { faUserPlus, faPen  } from '@fortawesome/free-solid-svg-icons';
 import AdminNavbar from '../../components/SuperAdmin/AdminNavbar.jsx';
 import Kanban from './Kanban';
 import List from './List';
@@ -261,6 +261,12 @@ return (
                         <h2 className="text-3xl font-semibold mt-[-1rem]">
                             {project.projectName}
                         </h2>
+                        <FontAwesomeIcon 
+                            icon={faPen} 
+                            className="cursor-pointer mr-15 mt-[-2rem]" 
+                            size="sm" 
+                            onClick={() => console.log('Edit icon clicked')} // Add your edit handler here
+                             />
                         <FontAwesomeIcon 
                             icon={faUserPlus} 
                             className="cursor-pointer mt-[-1rem]" 

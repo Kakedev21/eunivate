@@ -63,6 +63,7 @@ import TaskMem from "./view/pages/Members/TaskMem.jsx";
 import ProjectDetailsMem from "./view/pages/Members/ProjectdetailsMem.jsx"; 
 import Settings_Members from './view/pages/Members/Settings_Members.jsx';
 import Messages_Mem from './view/pages/Members/Messages_Mem.jsx';
+import DashboardMem from './view/pages/Members/DashboardMem.jsx';
 
 
 //Guest
@@ -135,6 +136,7 @@ const App = () => {
           {/* Default route for "/member" */}
           <Route index element={<ProjMem />} />
           {/* Nested member-specific routes */}
+          <Route path="dashboardmem" element={<DashboardMem />} />
           <Route path="projects/:id" element={<ProjectDetailsMem />} />
           <Route path="projectmem" element={<ProjMem />} />
           <Route path="taskmem" element={<TaskMem />} />

@@ -6,15 +6,21 @@ import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import { useWorkspace } from '../../components/SuperAdmin/workspaceContext';
 import { 
-    dashboard_logo, 
-    project_red, 
-    task_red, 
-    messages_red, 
-    settings_red, 
-    project_icon, 
-    task_icon, 
-    messages_icon, 
-    settings_icon 
+    dashboard_logo,
+    dashboard_sidenav_icon,
+    activity_red,
+    dashboard_red,
+    messages_red,
+    people_red,
+    project_red,
+    settings_red,
+    task_red,
+    activity_icon,
+    messages_icon,
+    people_icon,
+    project_icon,
+    settings_icon,
+    task_icon,
 } from "../../../constants/assets"; 
 import '../../components/SuperAdmin/Css/SideNav.css';
 
@@ -94,6 +100,10 @@ const MemberLayout = ({ isNavOpen }) => {
 
             <ul className="list-none p-0">
                 {[{
+                    to: "dashboardmem", text: "Dashboard",  icon: dashboard_sidenav_icon, hoverIcon: dashboard_red
+                },
+                    
+                    {
                     to: "projectmem", text: "Project", icon: project_icon, hoverIcon: project_red
                 },
                 {
