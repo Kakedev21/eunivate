@@ -234,7 +234,7 @@ const ProjectDetails = () => {
                 return;
             }
     
-            const response = await axios.get(`http://localhost:5000/api/users/sa-getnewproject/${projectId}`, {
+            const response = await axios.get(`https://eunivate-jys4.onrender.com/api/users/sa-getnewproject/${projectId}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
     
@@ -274,7 +274,7 @@ const ProjectDetails = () => {
             }
 
             await axios.put(
-                `http://localhost:5000/api/users/sa-updateprojectname/${projectId}`,
+                `https://eunivate-jys4.onrender.com/api/users/sa-updateprojectname/${projectId}`,
                 { projectName },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
