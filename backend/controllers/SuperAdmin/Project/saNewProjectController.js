@@ -169,3 +169,28 @@ export const deleteSaNewProject = async (req, res) => {
     return res.status(500).json({ message: 'An error occurred while deleting the project' });
   }
 };
+
+export const saUpdateProject = async (req, res) => {
+  try {
+    const { projectId } = req.params;
+    const { projectName } = req.body;
+
+    if (!projectId || !projectName) {
+      return res.status(400).json({ message: 'Missing project ID or project name.' });
+    }
+
+    const project = await SaNewProject.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ message: 'Project not found' });
+    }
+
+    project.projectName = projectName;
+    const updatedProject = await project.save();
+
+    return res.status(200).json(updatedProject);
+  } catch (error) {
+    console.error('Error updating project:', error);
+    return res.status(500).json({ message: 'An error occurred while updating the project' });
+  }
+};
+

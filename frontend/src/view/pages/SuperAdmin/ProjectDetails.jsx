@@ -9,6 +9,8 @@ import List from './List';
 import Calendar from './Calendar';
 import GanttChart from './GanttChart';
 import RaciMatrix from './RaciMatrix';
+import BarLoading from './Loading Style/Fill Renamed Loading/Loader.jsx';
+
 
 const ProjectDetails = () => {
     const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
@@ -26,7 +28,8 @@ const ProjectDetails = () => {
     const [isImageVisible, setIsImageVisible] = useState(false);
     const [projectData, setProjectData] = useState({ name: '', invitedUsers: [] });
     // const [isVisible, setIsVisible] = useState(false);
-
+    const [loading, setLoading] = useState(false);
+    const [projectName, setProjectName] = useState(project.projectName || '');
     const [tasks, setTasks] = useState([]);
 
 
@@ -244,7 +247,7 @@ const ProjectDetails = () => {
             setError('Error fetching project details.');
         }
     };
-    
+
     
 
     const toggleModal = (optionModal) => {
@@ -257,6 +260,35 @@ const ProjectDetails = () => {
         }
     }
 
+    useEffect(() => {
+        setProjectName(project.projectName || '');
+    }, [project.projectName]);
+
+    
+    const updateProjectName = async () => {
+        try {
+            const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+            if (!token) {
+                console.error('No access token found. Please log in again.');
+                return;
+            }
+
+            await axios.put(
+                `http://localhost:5000/api/users/sa-updateprojectname/${projectId}`,
+                { projectName },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+        
+            setLoading(true);
+            toggleModal(); 
+            setTimeout(() => {
+                setLoading(false); 
+                window.location.reload(); 
+            }, 2000);
+        } catch (error) {
+            console.error('Error updating project name:', error);
+        }
+    };
 
 return (
     <div className="bg-gray-100 min-h-screen p-6">
@@ -390,25 +422,51 @@ return (
             </div>
         </div>
 
+        {loading && <BarLoading />}
+
         {currentModal === 'optionModal' && (
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-500 bg-opacity-50">
-        <div className="bg-white w-1/2 p-6 rounded-md shadow-lg border border-gray-200">
-            <h2 className="text-lg font-semibold mb-4">Project Details</h2>
-            <p className="text-gray-800">Project Name: {project.projectName}</p>
-            <h3 className="mt-4">Invited Users:</h3>
-            <ul>
-                {addedMembers.map(member => (
-                    <li key={member._id} className="text-gray-600">{member.username}</li>
-                ))}
-            </ul>
-            <button onClick={() => setCurrentModal(null)} className="mt-4 text-blue-500 hover:underline">
-                Close
-            </button>
-        </div>
-    </div>
-)}
-
-
+            <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-500 bg-opacity-50">
+                <div className="bg-white w-1/3 p-6 rounded-md shadow-lg border border-gray-200">
+                    <h2 className="text-xl font-semibold mb-4">Project Option</h2>
+                    <p className="text-gray-800 mb-2">Rename Project</p>
+                    <div className="relative">
+                    <input
+                            type="text"
+                            className="flex-grow w-full p-2 border border-gray-300 rounded-md text-sm md:text-base"
+                            value={projectName}
+                            onChange={(e) => setProjectName(e.target.value)}
+                        />
+                        <i className="fas fa-pencil-alt absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    </div>
+                    <h3 className="mt-4 mb-2">Memebers</h3>
+                    <ul>
+                        {addedMembers.map(member => (
+                            <li key={member._id} className="text-black-600 md:text-md flex m-2 relative">
+                                <img
+                                        src={typeof member.profilePicture === 'string' ? member.profilePicture : member.profilePicture?.url}
+                                        alt={member.username}
+                                        className="w-7 h-7 rounded-full mr-1"
+                                    />
+                                <div className='flex justify-between '>
+                                    <p>{member.username}</p>
+                                </div> 
+                                <button onClick={() => setCurrentModal(null)} className="absolute right-1 text-red-600 hover:underline">
+                                        Remove
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
+                    <div className='flex justify-between mt-12'>
+                        <button onClick={() => setCurrentModal(null)} className="bg-gray-500 text-white shadow px-6 py-2 rounded-md text-base md:text-lg hover:bg-gray-600">
+                            Cancel
+                        </button>
+                        <button onClick={updateProjectName} className="bg-red-600 text-white shadow px-4 py-2 rounded-md text-base md:text-lg hover:bg-red-700">
+                            Save Changes
+                        </button>
+                    </div>
+                </div>
+            </div>
+    )}
 
 
         <div className="mt-6 border-gray-200">
