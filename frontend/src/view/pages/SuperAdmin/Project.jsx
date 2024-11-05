@@ -135,9 +135,14 @@ const Project = () => {
     setSelectedImage(null);
     setImagePreview(null);
     setProjectName('');
-    setTeam('');
     setError('');
   };
+
+  useEffect(() => {
+    if (selectedWorkspace) {
+      setTeam(selectedWorkspace._id);
+    }
+  }, [selectedWorkspace]);
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
@@ -367,10 +372,10 @@ const Project = () => {
               <div className="relative mt-2">
                 <select
                   className="w-full p-2 border border-gray-300 rounded-md text-gray-700"
-                  value={team}
+                  defaultValue={selectedWorkspace._id}
                   onChange={(e) => setTeam(e.target.value)}
                 >
-                  <option value="" disabled>Select Workspace</option>
+                 
                   {workspaces.map((workspace) => (
                     <option key={workspace._id} value={workspace._id}>
                       {workspace.workspaceTitle}
@@ -383,7 +388,7 @@ const Project = () => {
             <input
               type="hidden"
               name="workspaceId"
-              value={selectedWorkspace ? selectedWorkspace.workspaceTitle : ''}
+              value={selectedWorkspace ? selectedWorkspace._id : ''}
             />      
 
             <div className="mt-6 flex flex-col justify-center">
