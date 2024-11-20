@@ -52,9 +52,7 @@ const Navbar = () => {
       hasDropdown: true,
       subLinks: [
         { id: "services", title: "Services", path: "/services" },
-        { id: "webinars", title: "Webinars", path: "/webinar" },
         { id: "events", title: "Events", path: "/events" },
-        { id: "challenges", title: "Challenges", path: "/challenges" },
         { id: "projectManagement", title: "Project Management", path: isAuthenticated ? "/project" : "/superadmin"},
       ],
       imageUrl: webinar,

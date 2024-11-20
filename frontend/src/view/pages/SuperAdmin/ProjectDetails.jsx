@@ -263,7 +263,7 @@ return (
                         </h2>
                         <FontAwesomeIcon 
                             icon={faPen} 
-                            className="cursor-pointer mr-15 mt-[-2rem]" 
+                            className="cursor-pointer mr-1 5 mt-[-2rem]" 
                             size="sm" 
                             onClick={() => console.log('Edit icon clicked')} // Add your edit handler here
                              />
