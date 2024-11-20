@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faChevronDown, faChevronUp, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { useWorkspace } from './workspaceContext';
@@ -23,6 +23,44 @@ import {
   settings_icon,
   task_icon,
 } from '../../../constants/assets';
+
+const handleDeleteWorkspace = async (workspaceId) => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const accessToken = user?.accessToken;
+
+    if (!accessToken) {
+        alert('No access token found. Please log in again.');
+        return;
+    }
+
+    try {
+        const response = await axios.delete(
+            `http://localhost:5000/api/workspaces/${workspaceId}`,
+            {
+                headers: { Authorization: `Bearer ${accessToken}` },
+            }
+        );
+
+        if (response.status === 200) {
+            alert('Workspace deleted successfully!');
+            setWorkspaces((prevWorkspaces) =>
+                prevWorkspaces.filter((workspace) => workspace._id !== workspaceId)
+            );
+
+            // Clear selected workspace if deleted
+            if (selectedWorkspace?._id === workspaceId) {
+                setSelectedWorkspace(null);
+                localStorage.removeItem('currentWorkspaceId');
+                localStorage.removeItem('currentWorkspaceTitle');
+            }
+        }
+    } catch (error) {
+        console.error('Error deleting workspace:', error.response?.data?.error || error.message);
+        alert('Failed to delete workspace.');
+    }
+};
+
+
 
 const SideNav = ({ isNavOpen }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -204,21 +242,34 @@ const SideNav = ({ isNavOpen }) => {
                     </button>
 
                     {isDropdownOpen && (
-    <ul className="workspaceList absolute z-10 bottom-full mb-2 bg-white text-black shadow max-h-48 overflow-y-scroll rounded hide-scrollbar">
-        {workspaces.length > 0 ? (
-            workspaces.map((workspace) => (
-                <li
-                    key={workspace._id}
-                    onClick={() => handleWorkspaceSelect(workspace)}
-                    className="p-2 hover:bg-gray-400 cursor-pointer"
-                >
-                    {workspace.workspaceTitle}
-                </li>
-            ))
-        ) : (
-            <li className="p-2 text-gray-500">No workspaces available</li>
-        )}
-    </ul>
+   <ul className="workspaceList absolute z-10 bottom-full mb-2 bg-white text-black shadow max-h-48 overflow-y-scroll rounded hide-scrollbar">
+   {workspaces.length > 0 ? (
+       workspaces.map((workspace) => (
+           <li
+               key={workspace._id}
+               className="flex items-center justify-between p-2 hover:bg-gray-400 cursor-pointer"
+           >
+               <span onClick={() => handleWorkspaceSelect(workspace)}>
+                   {workspace.workspaceTitle}
+               </span>
+               <button
+                   onClick={(e) => {
+                       e.stopPropagation(); // Prevent triggering workspace selection
+                       handleDeleteWorkspace(workspace._id);
+                   }}
+                   className="text-red-600 hover:text-red-800"
+                   aria-label="Delete Workspace"
+               >
+                   <FontAwesomeIcon icon={faTrash} />
+               </button>
+           </li>
+       ))
+   ) : (
+       <li className="p-2 text-gray-500">No workspaces available</li>
+   )}
+</ul>
+
+
 )}
 
                 </div>

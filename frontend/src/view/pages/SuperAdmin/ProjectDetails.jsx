@@ -367,7 +367,7 @@ return (
     />
 }
 {selectedView === 'GanttChart' && <GanttChart projectId={projectId} />}
-{selectedView === 'RaciMatrix' && <RaciMatrix projectId={projectId} />}
+{selectedView === 'RaciMatrix' && <RaciMatrix tasks={tasks} />}
 </div>
 
 

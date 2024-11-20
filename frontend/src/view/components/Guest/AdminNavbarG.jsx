@@ -85,17 +85,7 @@ const AdminNavbarG = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
       <div className="flex items-center space-x-9 p-0 relative ">
         {/* Search Bar with Icon */}
         <div className="relative hidden lg:block"> {/* Hide on mobile */}
-          <input
-            type="text"
-            placeholder="Search anything..."
-            className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={searchQuery}
-            onChange={handleSearch}
-          />
-          <FontAwesomeIcon 
-            icon={faSearch} 
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-          />
+          
           
 {/* Dropdown for Search Results */}
 {filteredResults.length > 0 && (
