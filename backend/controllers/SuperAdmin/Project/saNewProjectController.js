@@ -51,7 +51,7 @@ export const getAllProjects = async (req, res) => {
           invitedUsers: req.user._id,
           ...(workspaceId ? { workspaceId } : {})
       })
-          .populate('invitedUsers', 'username firstName lastName   profilePicture')
+          .populate('invitedUsers', 'username firstName lastName  profilePicture')
           .populate('workspaceId', 'workspaceTitle');
 
       // Combine owned and invited projects

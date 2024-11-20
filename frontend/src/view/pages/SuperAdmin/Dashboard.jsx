@@ -17,9 +17,9 @@ const Dashboard = () => {
     const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
     const [projects, setProjects] = useState([]);
     const [taskDetails, setTaskDetails] = useState({});
-    const [allTasks, setAllTasks] = useState([]); // New state to store all tasks
+    const [allTasks, setAllTasks] = useState([]);
     const navigate = useNavigate();
-    const { selectedWorkspace } = useWorkspace();
+    const { selectedWorkspace, setSelectedWorkspace } = useWorkspace();
 
     const user = JSON.parse(localStorage.getItem('user'));
     const profilePicture = user?.profilePicture?.url || user?.profilePicture;
@@ -38,43 +38,44 @@ const Dashboard = () => {
     const handleProjectClick = async (projectId, projectName) => {
         if (projectName === "All") {
             setSelectedProjectName("All");
-    
+            setSelectedWorkspace(null); // Clear workspace when selecting "All"
+
             try {
                 const user = JSON.parse(localStorage.getItem('user'));
                 const accessToken = user ? user.accessToken : null;
-    
+
                 const response = await axios.get('http://localhost:5000/api/users/sa-getnewproject', {
                     headers: { Authorization: `Bearer ${accessToken}` }
                 });
-    
+
                 const allProjects = response.data;
                 setProjects(allProjects); // Store all projects across workspaces
     
-                // Aggregate all tasks and calculate progress
+                // Calculate task counts and aggregate tasks
                 let totalAssignedTask = 0;
                 let totalTaskComplete = 0;
                 let totalObjectiveComplete = 0;
                 let aggregatedTasks = [];
-    
-                const allTaskDetails = await Promise.all(
+
+                await Promise.all(
                     allProjects.map(async (project) => {
                         const taskResponse = await axios.get(`http://localhost:5000/api/users/sa-tasks/${project._id}`);
                         const tasks = taskResponse.data.data;
-    
+
                         totalAssignedTask += tasks.length;
                         totalTaskComplete += tasks.filter(task => task.status === "Done").length;
                         totalObjectiveComplete += tasks.reduce((total, task) => total + (task.doneObjectivesCount || 0), 0);
     
                         aggregatedTasks = [...aggregatedTasks, ...tasks]; // Collect all tasks
     
-                        return { projectId: project._id, tasks };
+                        return tasks;
                     })
                 );
-    
+
                 const totalProjectComplete = totalAssignedTask > 0
                     ? Math.round((totalTaskComplete / totalAssignedTask) * 100)
                     : 0;
-    
+
                 setSelectedProjectTaskCounts({
                     assignedTask: totalAssignedTask,
                     taskComplete: totalTaskComplete,
@@ -83,50 +84,38 @@ const Dashboard = () => {
                 });
     
                 setAllTasks(aggregatedTasks); // Set all tasks for Today_Task component
-    
-                // Map tasks to task details for display in Ongoing_Project
-                const taskDetailsMap = allTaskDetails.reduce((acc, { projectId, tasks }) => {
-                    const attachmentsCount = tasks.reduce((total, task) => total + (task.attachment?.length || 0), 0);
-                    const objectivesCount = tasks.reduce((total, task) => total + (task.objectives?.length || 0), 0);
-                    acc[projectId] = { attachmentsCount, objectivesCount, tasks };
-                    return acc;
-                }, {});
-    
-                setTaskDetails(taskDetailsMap);
                 setIsProjectDropdownOpen(false);
             } catch (error) {
                 console.error("Error fetching all projects and tasks:", error);
             }
             return;
         }
-    
-        // Logic for individual project selection
+
         setSelectedProjectName(projectName);
         try {
             const taskResponse = await axios.get(`http://localhost:5000/api/users/sa-tasks/${projectId}`);
             const tasks = taskResponse.data.data;
+
             const assignedTaskCount = tasks.length;
             const taskCompleteCount = tasks.filter(task => task.status === "Done").length;
             const objectiveCompleteCount = tasks.reduce(
                 (total, task) => total + (task.doneObjectivesCount || 0),
                 0
             );
+
             const projectComplete = assignedTaskCount > 0
                 ? Math.round((taskCompleteCount / assignedTaskCount) * 100)
                 : 0;
-    
+
             setSelectedProjectTaskCounts({
                 assignedTask: assignedTaskCount,
                 taskComplete: taskCompleteCount,
                 objectiveComplete: objectiveCompleteCount,
                 projectComplete: projectComplete,
             });
-    
-            // Filter to show only the selected project
-            const filteredProjects = projects.filter(project => project._id === projectId);
-            setProjects(filteredProjects);
-    
-            setAllTasks(tasks); // Set tasks for the selected project
+
+            setProjects(projects.filter(project => project._id === projectId));
+            setAllTasks(tasks);
             setIsProjectDropdownOpen(false);
         } catch (error) {
             console.error("Error fetching task details:", error);
@@ -159,7 +148,6 @@ const Dashboard = () => {
                 });
 
                 const details = await Promise.all(taskDetailsPromises);
-
                 const taskDetailsMap = details.reduce((acc, { projectId, attachmentsCount, objectivesCount, tasks }) => {
                     acc[projectId] = { attachmentsCount, objectivesCount, tasks };
                     return acc;
@@ -198,7 +186,7 @@ const Dashboard = () => {
         <div className="bg-gray-100 min-h-screen p-6">
             <div className="w-full flex justify-between items-center mb-4">
                 <div className="relative">
-                    <h1 className={`text-2xl font-medium text-gray-800 hidden md:block`}>Dashboard</h1>
+                    <h1 className="text-2xl font-medium text-gray-800 hidden md:block">Dashboard</h1>
                 </div>
                 <AdminNavbar
                     isAccountDropdownOpen={isAccountDropdownOpen}
@@ -217,9 +205,7 @@ const Dashboard = () => {
                 >
                     <span className="text-sm font-medium">{selectedProjectName}</span>
                     <svg
-                        className={`absolute right-4 w-5 h-5 transform transition-transform duration-300 ${
-                            isProjectDropdownOpen ? "rotate-180" : "rotate-0"
-                        }`}
+                        className={`absolute right-4 w-5 h-5 transform transition-transform duration-300 ${isProjectDropdownOpen ? "rotate-180" : "rotate-0"}`}
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         stroke="currentColor"
@@ -232,11 +218,7 @@ const Dashboard = () => {
                     </svg>
                 </button>
 
-                <div
-                    className={`absolute left-0 mt-2 w-64 bg-white border border-gray-300 rounded-lg shadow-lg z-50 ${
-                        isProjectDropdownOpen ? "block" : "hidden"
-                    }`}
-                >
+                <div className={`absolute left-0 mt-2 w-64 bg-white border border-gray-300 rounded-lg shadow-lg z-50 ${isProjectDropdownOpen ? "block" : "hidden"}`}>
                     <a
                         href="#"
                         onClick={() => handleProjectClick(null, "All")}
@@ -259,7 +241,6 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            {/* Project Cards */}
             <div className="hidden md:flex flex-wrap gap-4 relative z-0 mb-6">
                 {[{ title: "Assigned Task", icon: i1, count: selectedProjectTaskCounts.assignedTask },
                   { title: "Task Complete", icon: i2, count: selectedProjectTaskCounts.taskComplete },
@@ -313,26 +294,27 @@ const Dashboard = () => {
                 </Slider>
             </div>
 
-            {/* Today Task, Activity, and Ongoing Projects Section */}
             <div className="flex flex-col md:flex-row mb-2 gap-4">
                 <div className="w-full md:w-3/5">
                     <Today_Task projects={projects} taskDetails={taskDetails} allTasks={allTasks} />
                 </div>
                 <div className="h-full md:w-2/5 flex-grow flex flex-col gap-2">
                     <div className="h-1/4">
-                        <Activity_Task 
-                            allTasks={allTasks}
-                            profilePicture={profilePicture}
-                            userName={userName}
-                            defaultProfilePictureUrl={defaultProfilePictureUrl}
-                        />
+                    <Activity_Task 
+    allTasks={allTasks} // Pass allTasks directly
+    profilePicture={profilePicture}
+    userName={userName}
+    defaultProfilePictureUrl={defaultProfilePictureUrl}
+/>
+
                     </div>
                     <div className="h-full mt-10">
-                        <Ongoing_Project 
-                            projects={projects}
-                            taskDetails={taskDetails}
-                            calculateProgress={calculateProgress} 
-                        />
+                    <Ongoing_Project 
+    projects={projects} 
+    taskDetails={taskDetails} 
+    calculateProgress={calculateProgress} 
+/>
+
                     </div>
                 </div>
             </div>
