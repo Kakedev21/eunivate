@@ -302,16 +302,23 @@ const handleSaveStatus = async () => {
       };
 
 
-      const handleAddObjective = () => {
-        if (newObjective) {
-            const updatedObjectives = [...task.objectives, { text: newObjective, done: false }];
-            const changes = { objectives: updatedObjectives };
-            onUpdateTask({ ...task, ...changes });
-            updateTaskInDatabase(changes);
-            setNewObjective('');
-            setIsAddingObjective(false);
-        }
-    };
+    const handleAddObjective = () => {
+  if (newObjective) {
+    // Use the existing objectives or an empty array
+    const updatedObjectives = [...(task.objectives || []), { text: newObjective, done: false }];
+    const changes = { objectives: updatedObjectives };
+
+    // Update task in the parent component and the backend
+    onUpdateTask({ ...task, objectives: updatedObjectives });
+    updateTaskInDatabase(changes);
+
+    // Clear the new objective input
+    setNewObjective('');
+    setIsAddingObjective(false);
+  }
+};
+
+      
     
 
     // const handleDeleteAttachment = (attachmentUrl) => {
@@ -356,46 +363,31 @@ const handleSaveStatus = async () => {
       setShowSaveAttachmentButton(false);
     };
     
-    const handleToggleObjective = async (index) => {
+    const handleToggleObjective = (index) => {
       const updatedObjectives = task.objectives.map((obj, i) => {
         if (i === index) {
-          return { ...obj, done: !obj.done };
+          return { ...obj, done: !obj.done }; // Toggle the "done" status
         }
         return obj;
       });
+      const changes = { objectives: updatedObjectives };
     
-      // Only send objectives to the backend
-      try {
-        const response = await axios.patch(`http://localhost:5000/api/users/sa-tasks/${task._id}/objectives`, {
-          objectives: updatedObjectives
-        });
-    
-        if (response.data.success) {
-          setUpdatedTask(response.data.data); // Update the task in the UI
-          onUpdateTask(response.data.data);   // Call the parent function to update the UI
-        }
-      } catch (error) {
-        console.error('Failed to update objectives:', error);
-      }
+      // Update task in the parent component and the backend
+      onUpdateTask({ ...task, objectives: updatedObjectives });
+      updateTaskInDatabase(changes);
     };
     
     
-    const handleRemoveObjective = async (objectiveToRemove) => {
-      // Filter out the objective you want to remove
+    const handleRemoveObjective = (objectiveToRemove) => {
+      // Remove the specified objective
       const updatedObjectives = task.objectives.filter((obj) => obj !== objectiveToRemove);
       const changes = { objectives: updatedObjectives };
-  
-      // Update the UI state
-      onUpdateTask({ ...task, ...changes });
-  
-      // Sync with backend (update task with new objectives array)
-      try {
-          await updateTaskInDatabase(changes);  // Send only the updated objectives to the backend
-          console.log('Objective removed successfully');
-      } catch (error) {
-          console.error('Failed to remove objective:', error);
-      }
-  };
+    
+      // Update task in the parent component and the backend
+      onUpdateTask({ ...task, objectives: updatedObjectives });
+      updateTaskInDatabase(changes);
+    };
+    
   
     
     

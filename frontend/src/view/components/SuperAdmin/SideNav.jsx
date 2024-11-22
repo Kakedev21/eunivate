@@ -1,150 +1,184 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
-import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios'; 
-import { useWorkspace } from './workspaceContext'; 
-import { useLocation } from 'react-router-dom'; 
+import { faPlus, faChevronDown, faChevronUp, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import axios from 'axios';
+import { useWorkspace } from './workspaceContext';
 import '../../components/SuperAdmin/Css/SideNav.css'; // Ensure this file exists
 
-import { 
-    dashboard_logo, 
-    dashboard_sidenav_icon, 
-    activity_red, 
-    dashboard_red, 
-    messages_red, 
-    people_red, 
-    project_red, 
-    settings_red, 
-    task_red,
-    activity_icon,
-    messages_icon,
-    people_icon,
-    project_icon,
-    settings_icon,
-    task_icon
-} from "../../../constants/assets";
+import {
+  dashboard_logo,
+  dashboard_sidenav_icon,
+  activity_red,
+  dashboard_red,
+  messages_red,
+  people_red,
+  project_red,
+  settings_red,
+  task_red,
+  activity_icon,
+  messages_icon,
+  people_icon,
+  project_icon,
+  settings_icon,
+  task_icon,
+} from '../../../constants/assets';
 
-const SideNav = ({ isNavOpen }) => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [workspaceTitle, setWorkspaceTitle] = useState('');
-    const [error, setError] = useState('');
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const [alertMessage, setAlertMessage] = useState('');  
-    const navigate = useNavigate();
-    const { selectedWorkspace, setSelectedWorkspace } = useWorkspace();
-    const [workspaces, setWorkspaces] = useState([]);
-    const location = useLocation(); // Use the useLocation hook
-    const handleWorkspaceSelect = (workspace) => {
-        setSelectedWorkspace(workspace);
-        setIsDropdownOpen(false);
+const handleDeleteWorkspace = async (workspaceId) => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const accessToken = user?.accessToken;
 
-        // Store workspace details in localStorage
-        localStorage.setItem('currentWorkspaceId', workspace._id);
-        localStorage.setItem('currentWorkspaceTitle', workspace.workspaceTitle);
+    if (!accessToken) {
+        alert('No access token found. Please log in again.');
+        return;
+    }
 
-        navigate(`/superadmin/dashboard?workspaceId=${workspace._id}&workspaceTitle=${workspace.workspaceTitle}`);
-    };
-
-    useEffect(() => {
-        const params = new URLSearchParams(location.search);
-        const workspaceId = params.get('workspaceId');
-        const workspaceTitle = params.get('workspaceTitle');
-
-        if (workspaceId && workspaceTitle) {
-            setSelectedWorkspace({ _id: workspaceId, workspaceTitle });
-        } else {
-            // Check if there's a workspace saved in localStorage
-            const storedWorkspaceId = localStorage.getItem('currentWorkspaceId');
-            const storedWorkspaceTitle = localStorage.getItem('currentWorkspaceTitle');
-
-            if (storedWorkspaceId && storedWorkspaceTitle) {
-                setSelectedWorkspace({ _id: storedWorkspaceId, workspaceTitle: storedWorkspaceTitle });
-            }
-        }
-
-        const fetchWorkspaces = async () => {
-            const user = JSON.parse(localStorage.getItem('user'));
-            if (!user || !user.accessToken) {
-                setError('User is not authenticated.');
-                return;
-            }
-
-            try {
-                const response = await axios.get('http://localhost:5000/api/users/workspaces', {
-                    headers: { Authorization: `Bearer ${user.accessToken}` },
-                });
-
-                if (response.status === 200) {
-                    setWorkspaces(response.data);
-                } else {
-                    setError('Failed to load workspaces');
-                }
-            } catch (err) {
-                setError('An error occurred while fetching workspaces.');
-            }
-        };
-
-        fetchWorkspaces();
-    }, [location.search, setSelectedWorkspace]);
-
-    const closeModal = () => {
-        setIsModalOpen(false);
-        setWorkspaceTitle('');
-        setError('');
-        setAlertMessage(''); 
-    };
-
-    const handleCreateWorkspace = async (e) => {
-        e.preventDefault();
-
-        if (!workspaceTitle.trim()) {
-            setError('Workspace title is required');
-            return;
-        }
-
-        const user = JSON.parse(localStorage.getItem('user'));
-        const accessToken = user ? user.accessToken : null;
-
-        if (!accessToken) {
-            setError('No access token found. Please log in again.');
-            return;
-        }
-
-        try {
-            const existingWorkspacesResponse = await axios.get('http://localhost:5000/api/users/workspaces', {
+    try {
+        const response = await axios.delete(
+            `http://localhost:5000/api/workspaces/${workspaceId}`,
+            {
                 headers: { Authorization: `Bearer ${accessToken}` },
-            });
-
-            const existingWorkspaces = existingWorkspacesResponse.data;
-            const isDuplicate = existingWorkspaces.some(workspace => workspace.workspaceTitle === workspaceTitle);
-
-            if (isDuplicate) {
-                alert('Workspace title already exists. Please choose a different title.');
-                return;
             }
+        );
 
-            const response = await axios.post(
-                'http://localhost:5000/api/users/workspace',
-                { workspaceTitle },
-                { headers: { Authorization: `Bearer ${accessToken}` } }
+        if (response.status === 200) {
+            alert('Workspace deleted successfully!');
+            setWorkspaces((prevWorkspaces) =>
+                prevWorkspaces.filter((workspace) => workspace._id !== workspaceId)
             );
 
-            if (response.status === 201) {
-                const newWorkspace = response.data;
-                localStorage.setItem('currentWorkspaceId', newWorkspace._id);
-
-                setAlertMessage('Workspace created successfully!');
-                closeModal();
-                setWorkspaces([...workspaces, newWorkspace]);
-
-                navigate(`/superadmin/dashboard?workspaceId=${newWorkspace._id}&workspaceTitle=${newWorkspace.workspaceTitle}`);
+            // Clear selected workspace if deleted
+            if (selectedWorkspace?._id === workspaceId) {
+                setSelectedWorkspace(null);
+                localStorage.removeItem('currentWorkspaceId');
+                localStorage.removeItem('currentWorkspaceTitle');
             }
-        } catch (err) {
-            console.error("Error creating workspace:", err.response?.data?.error || err.message);
-            setError(err.response?.data?.error || 'An error occurred while creating the workspace');
         }
+    } catch (error) {
+        console.error('Error deleting workspace:', error.response?.data?.error || error.message);
+        alert('Failed to delete workspace.');
+    }
+};
+
+
+
+const SideNav = ({ isNavOpen }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [workspaceTitle, setWorkspaceTitle] = useState('');
+  const [error, setError] = useState('');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [workspaces, setWorkspaces] = useState([]);
+
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { selectedWorkspace, setSelectedWorkspace } = useWorkspace();
+
+  const handleWorkspaceSelect = (workspace) => {
+    setSelectedWorkspace(workspace);
+    setIsDropdownOpen(false);
+
+    // Store workspace details in localStorage
+    localStorage.setItem('currentWorkspaceId', workspace._id);
+    localStorage.setItem('currentWorkspaceTitle', workspace.workspaceTitle);
+
+    navigate(`/superadmin/dashboard?workspaceId=${workspace._id}&workspaceTitle=${workspace.workspaceTitle}`);
+  };
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const workspaceId = params.get('workspaceId');
+    const workspaceTitle = params.get('workspaceTitle');
+
+    if (workspaceId && workspaceTitle) {
+      setSelectedWorkspace({ _id: workspaceId, workspaceTitle });
+    } else {
+      // Check if there's a workspace saved in localStorage
+      const storedWorkspaceId = localStorage.getItem('currentWorkspaceId');
+      const storedWorkspaceTitle = localStorage.getItem('currentWorkspaceTitle');
+
+      if (storedWorkspaceId && storedWorkspaceTitle) {
+        setSelectedWorkspace({ _id: storedWorkspaceId, workspaceTitle: storedWorkspaceTitle });
+      }
+    }
+
+    const fetchWorkspaces = async () => {
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (!user || !user.accessToken) {
+        setError('User is not authenticated.');
+        return;
+      }
+
+      try {
+        const response = await axios.get('http://localhost:5000/api/users/workspaces', {
+          headers: { Authorization: `Bearer ${user.accessToken}` },
+        });
+
+        if (response.status === 200) {
+          setWorkspaces(response.data);
+        } else {
+          setError('Failed to load workspaces');
+        }
+      } catch (err) {
+        setError();
+      }
     };
+
+    fetchWorkspaces();
+  }, [location.search, setSelectedWorkspace]);
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setWorkspaceTitle('');
+    setError('');
+    setAlertMessage('');
+  };
+
+  const handleCreateWorkspace = async (e) => {
+    e.preventDefault();
+
+    if (!workspaceTitle.trim()) {
+        setError('Workspace title is required');
+        return;
+    }
+
+    const user = JSON.parse(localStorage.getItem('user'));
+    const accessToken = user ? user.accessToken : null;
+
+    if (!accessToken) {
+        setError('No access token found. Please log in again.');
+        return;
+    }
+
+    try {
+        const response = await axios.post(
+            'http://localhost:5000/api/users/workspace',
+            { workspaceTitle },
+            { headers: { Authorization: `Bearer ${accessToken}` } }
+        );
+
+        if (response.status === 201) {
+            const newWorkspace = response.data;
+            localStorage.setItem('currentWorkspaceId', newWorkspace._id);
+
+            setAlertMessage('Workspace created successfully!');
+            closeModal();
+            setWorkspaces([...workspaces, newWorkspace]);
+
+            navigate(`/superadmin/dashboard?workspaceId=${newWorkspace._id}&workspaceTitle=${newWorkspace.workspaceTitle}`);
+        }
+    } catch (err) {
+        const errorMessage = err.response?.data?.error || 'An error occurred while creating the workspace';
+        
+        if (errorMessage.includes('duplicate key error')) {
+            alert('A workspace with this title already exists. Please choose a different title.');
+        } else {
+            console.error('Error creating workspace:', errorMessage);
+            setError(errorMessage);
+        }
+    }
+};
+
 
     return (
         <div
@@ -208,21 +242,34 @@ const SideNav = ({ isNavOpen }) => {
                     </button>
 
                     {isDropdownOpen && (
-    <ul className="workspaceList absolute z-10 bottom-full mb-2 bg-white text-black shadow max-h-48 overflow-y-scroll rounded hide-scrollbar">
-        {workspaces.length > 0 ? (
-            workspaces.map((workspace) => (
-                <li
-                    key={workspace._id}
-                    onClick={() => handleWorkspaceSelect(workspace)}
-                    className="p-2 hover:bg-gray-400 cursor-pointer"
-                >
-                    {workspace.workspaceTitle}
-                </li>
-            ))
-        ) : (
-            <li className="p-2 text-gray-500">No workspaces available</li>
-        )}
-    </ul>
+   <ul className="workspaceList absolute z-10 bottom-full mb-2 bg-white text-black shadow max-h-48 overflow-y-scroll rounded hide-scrollbar">
+   {workspaces.length > 0 ? (
+       workspaces.map((workspace) => (
+           <li
+               key={workspace._id}
+               className="flex items-center justify-between p-2 hover:bg-gray-400 cursor-pointer"
+           >
+               <span onClick={() => handleWorkspaceSelect(workspace)}>
+                   {workspace.workspaceTitle}
+               </span>
+               <button
+                   onClick={(e) => {
+                       e.stopPropagation(); // Prevent triggering workspace selection
+                       handleDeleteWorkspace(workspace._id);
+                   }}
+                   className="text-red-600 hover:text-red-800"
+                   aria-label="Delete Workspace"
+               >
+                   <FontAwesomeIcon icon={faTrash} />
+               </button>
+           </li>
+       ))
+   ) : (
+       <li className="p-2 text-gray-500">No workspaces available</li>
+   )}
+</ul>
+
+
 )}
 
                 </div>

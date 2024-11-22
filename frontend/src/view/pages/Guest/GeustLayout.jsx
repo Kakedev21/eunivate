@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
-import { useLocation } from 'react-router-dom';
 import { 
     dashboard_logo, 
     project_red, 
@@ -19,16 +18,14 @@ import { useWorkspace } from '../../components/SuperAdmin/workspaceContext';
 
 import '../../components/SuperAdmin/Css/SideNav.css'; 
 
-
 const GeustLayout = ({ isNavOpen }) => {
-    const { selectedWorkspace, setSelectedWorkspace } = useWorkspace(); // Ensure this is defined properly
+    const { selectedWorkspace, setSelectedWorkspace } = useWorkspace();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [workspaces, setWorkspaces] = useState([]);
     const [error, setError] = useState('');
     const navigate = useNavigate();
     const location = useLocation();
 
-    // Fetch the workspaces and set selected workspace
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         const workspaceId = params.get('workspaceId');
@@ -36,6 +33,15 @@ const GeustLayout = ({ isNavOpen }) => {
 
         if (workspaceId && workspaceTitle) {
             setSelectedWorkspace({ _id: workspaceId, workspaceTitle });
+            localStorage.setItem('currentWorkspaceId', workspaceId);
+            localStorage.setItem('currentWorkspaceTitle', workspaceTitle);
+        } else {
+            // Retrieve workspace from localStorage if available
+            const storedWorkspaceId = localStorage.getItem('currentWorkspaceId');
+            const storedWorkspaceTitle = localStorage.getItem('currentWorkspaceTitle');
+            if (storedWorkspaceId && storedWorkspaceTitle) {
+                setSelectedWorkspace({ _id: storedWorkspaceId, workspaceTitle: storedWorkspaceTitle });
+            }
         }
 
         const fetchWorkspaces = async () => {
@@ -66,6 +72,8 @@ const GeustLayout = ({ isNavOpen }) => {
     const handleWorkspaceSelect = (workspace) => {
         setSelectedWorkspace(workspace);
         setIsDropdownOpen(false);
+        localStorage.setItem('currentWorkspaceId', workspace._id);
+        localStorage.setItem('currentWorkspaceTitle', workspace.workspaceTitle);
         navigate(`/guest-dashboard/projectG?workspaceId=${workspace._id}&workspaceTitle=${workspace.workspaceTitle}`);
     };
 

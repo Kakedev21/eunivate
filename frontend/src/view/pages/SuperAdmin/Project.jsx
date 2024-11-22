@@ -268,6 +268,20 @@ const Project = () => {
     return totalTasks > 0 ? (doneTasks / totalTasks) * 100 : 0;
   };
 
+  const Tooltip = ({ children, title }) => {
+    return (
+      <div className="relative group">
+        {children}
+        <div
+          className="absolute hidden group-hover:flex bg-gray-500 text-white text-xs rounded-md p-2 whitespace-nowrap -top-10 left-1/2 transform -translate-x-1/2"
+          style={{ zIndex: 10 }}
+        >
+          {title}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="bg-gray-100 min-h-screen p-6">
       <ToastContainer />
@@ -428,16 +442,18 @@ const Project = () => {
         <p className="ml-2">
           {taskCounts[project._id] ? taskCounts[project._id].doneTasks : 'Loading...'}
         </p>
-        <div className="flex items-center justify-end ml-9 -space-x-4">
-          {project.invitedUsers && project.invitedUsers.slice(0, 3).map(user => (
-            <img
-              key={user._id}
-              src={user.profilePicture?.url || user.profilePicture} // Ensure it falls back to a default if no picture
-              alt={user.username || 'Profile Picture'}
-              className="w-8 h-8 rounded-full object-cover -ml-2 border-2 border-white"
-            />
-          ))}
-        </div>
+        <div className="flex items-center rounded justify-end ml-9 -space-x-3">
+          {project.invitedUsers && project.invitedUsers.slice(0, 3).map((user, index) => (
+            <Tooltip key={index} title={`${user.firstName} ${user.lastName}`}>
+              <img
+                src={user.profilePicture?.url || user.profilePicture} // Ensure it falls back to a default if no picture
+                alt={user.username || 'Profile Picture'}
+              className="w-6 h-6 rounded-full object-cover border border-gray-300"
+              />
+    </Tooltip>
+  ))}
+</div>
+
       </div>
 
       {/* Progress Bar */}
