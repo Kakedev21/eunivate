@@ -17,22 +17,23 @@ const About = () => {
         </div>
       </div>
       
-      {/* About Us Content */}
-      <div className={`${styles.paddingX} ${styles.flexCenter} py-16 ml-10`}>
-        <div className={`${styles.boxWidth}`}>
-          <About_Layout />
-        </div>
-      </div>
+{/* About Us Content */}
+<div className={`${styles.paddingX} ${styles.flexCenter} py-16 mx-auto`}>
+  <div className={`${styles.boxWidth}`}>
+    <About_Layout />
+  </div>
+</div>
+
       
         {/* Mission Content */}
-        <div className={`${styles.paddingX} ${styles.flexCenter} py-16 ml-10`}>
+        <div className={`${styles.paddingX} ${styles.flexCenter} py-16 mx-auto`}>
         <div className={`${styles.boxWidth}`}>
           <Mission />
         </div>
       </div>
 
       {/* Advantage Content */}
-      <div className={`${styles.paddingX} ${styles.flexCenter} py-16 ml-10`}>
+      <div className={`${styles.paddingX} ${styles.flexCenter} py-16 mx-auto`}>
         <div className={`${styles.boxWidth}`}>
           <Advantage />
         </div>
@@ -40,7 +41,7 @@ const About = () => {
 
 
       {/* CTA Content */}
-      <div className={`${styles.paddingX} ${styles.flexCenter} py-16 ml-10`}>
+      <div className={`${styles.paddingX} ${styles.flexCenter} py-16 mx-auto`}>
         <div className={`${styles.boxWidth}`}>
           <CTA />
         </div>
