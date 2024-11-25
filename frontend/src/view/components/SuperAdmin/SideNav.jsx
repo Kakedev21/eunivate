@@ -190,9 +190,11 @@ const SideNav = ({ isNavOpen }) => {
 
       if (response.status === 200) {
         alert("Workspace deleted successfully!");
+
         setWorkspaces((prevWorkspaces) =>
           prevWorkspaces.filter((w) => w._id !== workspace._id)
         );
+        window.location.reload();
 
         // Clear selected workspace if deleted
         if (selectedWorkspace?._id === workspace._id) {

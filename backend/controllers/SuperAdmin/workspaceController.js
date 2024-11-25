@@ -59,12 +59,10 @@ export const deleteWorkspace = async (req, res) => {
       return res.status(404).json({ message: "Workspace not found" });
     }
 
-    return res
-      .status(200)
-      .json({
-        message: "Workspace deleted successfully",
-        workspace: deletedWorkspace,
-      });
+    return res.status(200).json({
+      message: "Workspace deleted successfully",
+      workspace: deletedWorkspace,
+    });
   } catch (error) {
     console.error("Error deleting workspace:", error);
     return res
