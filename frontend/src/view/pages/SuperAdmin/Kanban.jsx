@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaPlus, FaCalendar, FaPaperclip, FaCheckCircle } from 'react-icons/fa';
+import { FaPlus, FaCalendar, FaPaperclip,FaTrashAlt , FaCheckCircle } from 'react-icons/fa';
 import { useDrag, useDrop, DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import Modal from './KanbanModals/Modal';
@@ -205,19 +205,29 @@ const Kanban = ({ projectId, projectName }) => {
           )}
         </div>
         <div className="mt-5 flex items-center space-x-3 overflow-x-auto">
-          <div className="flex items-center space-x-2 flex-shrink-0">
-            <FaCalendar className="text-gray-400" />
-            <p>{formatStartMonth(task.startDate)}</p>
-          </div>
-          <div className="flex items-center space-x-2 flex-shrink-0">
-            <FaPaperclip className="text-gray-400" />
-            <p>{task.attachment ? task.attachment.length : 0}</p>
-          </div>
-          <div className="flex items-center space-x-2 flex-shrink-0">
-            <FaCheckCircle className="text-gray-400" />
-            <p>{task.doneObjectivesCount || 0}</p>
-          </div>
-        </div>
+  <div className="flex items-center space-x-2 flex-shrink-0">
+    <FaCalendar className="text-gray-400" size={13} />
+    <p className="text-xs">{formatStartMonth(task.startDate)}</p>
+  </div>
+  <div className="flex items-center space-x-2 flex-shrink-0">
+    <FaPaperclip className="text-gray-400" size={13} />
+    <p className="text-sm">{task.attachment ? task.attachment.length : 0}</p>
+  </div>
+  <div className="flex items-center space-x-2 flex-shrink-0">
+    <FaCheckCircle className="text-gray-400" size={13} />
+    <p className="text-sm">{task.doneObjectivesCount || 0}</p>
+  </div>
+  <div className="flex items-center space-x-2 flex-shrink-0 cursor-pointer text-red-600">
+    <FaTrashAlt
+      size={13}
+      onClick={(e) => {
+        e.stopPropagation(); // Prevent triggering other events
+        handleDeleteTask(task._id);
+      }}
+    />
+  </div>
+</div>
+
       </div>
     );
   };
