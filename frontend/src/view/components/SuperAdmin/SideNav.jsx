@@ -182,7 +182,7 @@ const SideNav = ({ isNavOpen }) => {
 
     try {
       const response = await axios.delete(
-        `http://localhost:5000/api/users/workspaces/${workspace._id}`,
+        `https://eunivate-jys4.onrender.com/api/users/workspaces/${workspace._id}`,
         {
           headers: { Authorization: `Bearer ${accessToken}` },
         }
@@ -223,7 +223,7 @@ const SideNav = ({ isNavOpen }) => {
 
   //     try {
   //       const response = await axios.delete(
-  //         `http://localhost:5000/api/workspaces/${workspaceId}`,
+  //         `https://eunivate-jys4.onrender.com/api/workspaces/${workspaceId}`,
   //         {
   //           headers: { Authorization: `Bearer ${accessToken}` },
   //         }
