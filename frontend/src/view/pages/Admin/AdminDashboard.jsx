@@ -10,7 +10,7 @@ const AdminDashboard = () => {
     const [stats, setStats] = useState([]);
     const [selectedIds, setSelectedIds] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
-    const [selectAll, setSelectAll] = useState(false); // New state for "Select All" checkbox
+    const [selectAll, setSelectAll] = useState(false);
 
     useEffect(() => {
         const fetchQuotations = async () => {
@@ -49,11 +49,11 @@ const AdminDashboard = () => {
 
     const handleSelectAllChange = () => {
         if (!selectAll) {
-            setSelectedIds(emails.map(email => email.id)); // Select all
+            setSelectedIds(emails.map(email => email.id));
         } else {
-            setSelectedIds([]); // Deselect all
+            setSelectedIds([]);
         }
-        setSelectAll(!selectAll); // Toggle selectAll state
+        setSelectAll(!selectAll);
     };
 
     const handleDelete = async () => {
@@ -66,7 +66,7 @@ const AdminDashboard = () => {
             ));
             setEmails(emails.filter(email => !selectedIds.includes(email.id)));
             setSelectedIds([]);
-            setSelectAll(false); // Deselect all after delete
+            setSelectAll(false);
         } catch (error) {
             console.error('Failed to delete quotations', error);
         }
@@ -100,8 +100,6 @@ const AdminDashboard = () => {
         fetchStats();
     }, []);
 
-    const services = ['Service 1', 'Service 2', 'Service 3', 'Service 4', 'Service 5'];
-
     const filteredEmails = emails.filter(email =>
         email.sender.toLowerCase().includes(searchQuery.toLowerCase())
     );
@@ -119,17 +117,17 @@ const AdminDashboard = () => {
             </div>
 
             {/* Main Content Area */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+            <div className="grid grid-cols-1 gap-6 mt-8">
                 {/* Emails Section */}
-                <div className="md:col-span-2 bg-white rounded-lg shadow p-6">
+                <div className="w-full bg-white rounded-lg shadow p-6">
                     <div className="flex items-center mb-6">
                         {/* Select All Checkbox */}
                         <input
-    type="checkbox"
-    className="mr-3 w-4 h-4"  // Increase the size of the checkbox
-    checked={selectAll}
-    onChange={handleSelectAllChange}
-/>
+                            type="checkbox"
+                            className="mr-3 w-4 h-4"
+                            checked={selectAll}
+                            onChange={handleSelectAllChange}
+                        />
                         <input
                             type="text"
                             placeholder="Search quotation"
@@ -143,64 +141,29 @@ const AdminDashboard = () => {
                         </div>
                     </div>
                     {filteredEmails.map((email, index) => (
-    <div
-        key={index}
-        className={`flex items-center border-b border-gray-200 py-4 cursor-pointer ${selectedIds.includes(email.id) ? 'bg-gray-100' : ''}`}
-        onClick={() => handleEmailClick(email.id)}  // Add onClick handler
-    >
-        <input
-            type="checkbox"
-            className="mr-4"
-            checked={selectedIds.includes(email.id)}
-            onChange={(e) => {
-                e.stopPropagation();  // Prevent triggering the row click when checking the checkbox
-                handleCheckboxChange(email.id);
-            }}
-        />
-        <p className="flex-1 truncate text-gray-700 text-sm md:text-base">{email.sender}</p>
-        {email.status && (
-            <span className={`px-3 py-1 rounded-full text-white mr-4 ${email.status === 'New' ? 'bg-teal-400' : 'bg-red-400'}`}>
-                {email.status}
-            </span>
-        )}
-        <p className="flex-1 truncate text-gray-500 text-sm md:text-base">{email.subject}</p>
-        <p className="text-gray-500 text-sm md:text-base">{email.time}</p>
-    </div>
-))}
-
-                </div>
-
-                {/* Manage Services Section */}
-                <div className="bg-white rounded-lg shadow p-6">
-                    <div className="flex justify-between items-center mb-6">
-                        <h6 className="text-gray-700 font-semibold text-sm md:text-base">Manage Services</h6>
-                        <select className="p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-200">
-                            <option>Sort by</option>
-                        </select>
-                    </div>
-                    <table className="w-full">
-                        <thead>
-                            <tr className="text-left">
-                                <th className="pb-2 text-sm md:text-base">Name</th>
-                                <th className="pb-2 text-right text-sm md:text-base">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {services.map((service, index) => (
-                                <tr key={index} className="border-b border-gray-200">
-                                    <td className="py-2 text-sm md:text-base">{service}</td>
-                                    <td className="py-2 text-right space-x-2">
-                                        <button className="text-blue-500 hover:text-blue-700">
-                                            <FontAwesomeIcon icon={faEdit} />
-                                        </button>
-                                        <button className="text-red-500 hover:text-red-700">
-                                            <FontAwesomeIcon icon={faTrash} />
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                        <div
+                            key={index}
+                            className={`flex items-center border-b border-gray-200 py-4 cursor-pointer ${selectedIds.includes(email.id) ? 'bg-gray-100' : ''}`}
+                        >
+                            <input
+                                type="checkbox"
+                                className="mr-4"
+                                checked={selectedIds.includes(email.id)}
+                                onChange={(e) => {
+                                    e.stopPropagation();
+                                    handleCheckboxChange(email.id);
+                                }}
+                            />
+                            <p className="flex-1 truncate text-gray-700 text-sm md:text-base">{email.sender}</p>
+                            {email.status && (
+                                <span className={`px-3 py-1 rounded-full text-white mr-4 ${email.status === 'New' ? 'bg-teal-400' : 'bg-red-400'}`}>
+                                    {email.status}
+                                </span>
+                            )}
+                            <p className="flex-1 truncate text-gray-500 text-sm md:text-base">{email.subject}</p>
+                            <p className="text-gray-500 text-sm md:text-base">{email.time}</p>
+                        </div>
+                    ))}
                 </div>
             </div>
         </Layout>

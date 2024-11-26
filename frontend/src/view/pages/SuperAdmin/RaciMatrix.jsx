@@ -1,100 +1,181 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios'; // For fetching task data
+import React, { useState, useEffect } from "react";
+// Import Font Awesome icons
+import { FaChevronDown } from "react-icons/fa";
 
-const RaciMatrix = ({ projectId }) => {
-  const [tasks, setTasks] = useState([]);
+const RaciMatrix = ({ tasks }) => {
+  // State to track open dropdowns
+  const [openDropdown, setOpenDropdown] = useState(null);
 
+  // State to track selected members, initialized from local storage
+  const [selectedMembers, setSelectedMembers] = useState(() => {
+    const savedData = localStorage.getItem("selectedMembers");
+    return savedData ? JSON.parse(savedData) : {};
+  });
+
+  // Function to save selected members into local storage whenever it changes
   useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const response = await axios.get(`https://eunivate-jys4.onrender.com/api/users/sa-tasks/${projectId}`);
-        setTasks(response.data.data); // Fetch tasks and set state
-      } catch (error) {
-        console.error('Error fetching tasks:', error);
-      }
-    };
+    localStorage.setItem("selectedMembers", JSON.stringify(selectedMembers));
+  }, [selectedMembers]);
 
-    if (projectId) {
-      fetchTasks();
-    }
-  }, [projectId]);
+  // Function to toggle dropdown visibility
+  const toggleDropdown = (taskId, column) => {
+    const key = `${taskId}-${column}`;
+    setOpenDropdown((prev) => (prev === key ? null : key));
+  };
+
+  // Function to handle member selection
+  const selectMember = (taskId, column, member) => {
+    const key = `${taskId}-${column}`;
+    setSelectedMembers((prev) => ({ ...prev, [key]: member }));
+    setOpenDropdown(null); // Close the dropdown after selection
+  };
 
   return (
-    <div className="p-4 sm:p-8 bg-white shadow-lg rounded-lg">
+    <div className="p-4 bg-white shadow rounded-lg">
+      {tasks.length > 0 ? (
+        <div className="overflow-x-auto">
+          <table className="table-auto w-full border-collapse border border-gray-200">
+            <thead>
+              <tr className="bg-gray-50">
+                <th className="border border-gray-200 p-2 text-left text-sm font-medium text-gray-700">
+                  Task
+                </th>
+                <th className="border border-gray-200 p-2 text-left text-sm font-medium text-gray-700">
+                  Status
+                </th>
+                <th className="border border-gray-200 p-2 text-left text-sm font-medium text-gray-700">
+                  Due Date
+                </th>
+                <th className="border border-gray-200 p-2 text-left text-sm font-medium text-gray-700">
+                  Responsible
+                </th>
+                <th className="border border-gray-200 p-2 text-left text-sm font-medium text-gray-700">
+                  Accountable
+                </th>
+                <th className="border border-gray-200 p-2 text-left text-sm font-medium text-gray-700">
+                  Consulted
+                </th>
+                <th className="border border-gray-200 p-2 text-left text-sm font-medium text-gray-700">
+                  Informed
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {tasks.map((task) => (
+                <tr key={task._id} className="hover:bg-gray-100">
+                  {/* Task Name */}
+                  <td className="border border-gray-200 p-2 text-sm text-gray-800">
+                    <h3 className="font-semibold">{task.taskName}</h3>
+                  </td>
 
-      {/* Header Menu with Grid Borders and Gray Background */}
-      <div className="grid grid-cols-5 text-xs sm:text-sm font-semibold text-gray-700 mb-4">
-        <div className="p-2 text-left bg-gray-100 rounded-tl-lg">Task</div>
-        <div className="p-2 text-left bg-gray-100">Status</div>
-        <div className="p-2 text-left bg-gray-100">Due Date</div>
-        <div className="p-2 text-left bg-gray-100">Responsible</div>
-        <div className="p-2 text-left bg-gray-100 rounded-tr-lg">Accountable</div>
-      </div>
+                  {/* Status */}
+                  <td className="border border-gray-200 p-2 text-sm text-gray-800">
+                    <p>{task.status}</p>
+                  </td>
 
-      {/* Task List */}
-      <ul className="space-y-0">
-        {tasks.map((task) => (
-          <li
-            key={task.id}
-            className="grid grid-cols-5 text-xs sm:text-sm gap-2 border-b border-gray-200"
-          >
-            {/* Task Information */}
-            <div className="p-2 text-left">
-              <h3 className="font-medium">{task.taskName}</h3>
-            </div>
+                  {/* Due Date */}
+                  <td className="border border-gray-200 p-2 text-sm text-gray-800">
+                    <p>
+                      {task.dueDate
+                        ? new Intl.DateTimeFormat("en-US", {
+                            month: "short",
+                            day: "numeric",
+                          }).format(new Date(task.dueDate))
+                        : "No due date"}
+                    </p>
+                  </td>
 
-            {/* Task Status */}
-            <div className="p-2 text-left">
-              <p className="text-gray-600">{task.status}</p>
-            </div>
+                  {/* Columns for Responsible, Accountable, Consulted, and Informed */}
+                  {["Responsible", "Accountable", "Consulted", "Informed"].map(
+                    (column) => (
+                      <td
+                        key={column}
+                        className="border border-gray-200 p-2 text-sm text-gray-800"
+                      >
+                        <div className="flex justify-between items-center">
+                          {/* Selected member display */}
+                          {selectedMembers[`${task._id}-${column}`] ? (
+                            <div className="flex items-center space-x-2">
+                              <img
+                                src={
+                                  selectedMembers[`${task._id}-${column}`]
+                                    .profilePicture?.url ||
+                                  selectedMembers[`${task._id}-${column}`]
+                                    .profilePicture
+                                }
+                                alt={`${
+                                  selectedMembers[`${task._id}-${column}`]
+                                    .firstName
+                                } ${
+                                  selectedMembers[`${task._id}-${column}`]
+                                    .lastName
+                                }`}
+                                className="w-7 h-7 rounded-full object-cover"
+                              />
+                              <span>
+                                {`${
+                                  selectedMembers[`${task._id}-${column}`]
+                                    .firstName
+                                } ${
+                                  selectedMembers[`${task._id}-${column}`]
+                                    .lastName
+                                }`}
+                              </span>
+                            </div>
+                          ) : (
+                            <span className="text-gray-500">No selection</span>
+                          )}
 
-            {/* Task Due Date */}
-            <div className="p-2 text-left">
-              <p className="text-gray-600">
-                {new Date(task.dueDate).toLocaleDateString('en-GB', {
-                  day: 'numeric',
-                  month: 'short',
-                })}
-              </p>
-            </div>
+                          {/* Dropdown button */}
+                          <button
+                            onClick={() => toggleDropdown(task._id, column)}
+                            className="text-gray-500"
+                          >
+                            <FaChevronDown />
+                          </button>
+                        </div>
 
-            {/* Responsible Member */}
-            <div className="p-2 flex flex-col items-start">
-              <div className="flex items-center space-x-2">
-                {task.assignee && task.assignee.length > 0 && (
-                  <>
-                    <img
-                      src={task.assignee[0]?.profilePicture?.url || task.assignee[0]?.profilePicture || 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'} // Fallback to a default image URL if neither is available
-                      alt={task.assignee[0]?.name || 'Assignee'} // Fallback to 'Assignee' if name is missing
-                      className="w-8 h-8 rounded-full border-2"
-                      title={task.assignee[0]?.name || 'Assignee'} // Fallback to 'Assignee' if name is missing
-                    />
-
-                    <span className="text-xs sm:text-sm text-gray-800">{task.assignee[0]?.name}</span>
-                  </>
-                )}
-              </div>
-            </div>
-
-            {/* Accountable Member */}
-            <div className="p-2 flex flex-col items-start">
-              <div className="flex items-center space-x-2">
-                {task.assignee && task.assignee.length > 1 && (
-                  <>
-                    <img
-                      src={task.assignee[1]?.profilePicture?.url || 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'}
-                      alt={task.assignee[1]?.name}
-                      className="w-8 h-8 rounded-full border-2"
-                      title={task.assignee[1]?.name}
-                    />
-                    <span className="text-xs sm:text-sm text-gray-800">{task.assignee[1]?.name}</span>
-                  </>
-                )}
-              </div>
-            </div>
-          </li>
-        ))}
-      </ul>
+                        {/* Dropdown content */}
+                        {openDropdown === `${task._id}-${column}` && (
+                          <div className="mt-2 max-h-40 overflow-y-auto border border-gray-300 rounded shadow-lg bg-white">
+                            {task.assignee && task.assignee.length > 0 ? (
+                              task.assignee.map((member, index) => (
+                                <div
+                                  key={index}
+                                  onClick={() =>
+                                    selectMember(task._id, column, member)
+                                  }
+                                  className="flex items-center p-2 border-b last:border-b-0 cursor-pointer hover:bg-gray-100"
+                                >
+                                  <img
+                                    src={
+                                      member.profilePicture?.url ||
+                                      member.profilePicture
+                                    }
+                                    alt={`${member.firstName} ${member.lastName}`}
+                                    className="w-7 h-7 rounded-full object-cover mr-2"
+                                  />
+                                  <p>{`${member.firstName} ${member.lastName}`}</p>
+                                </div>
+                              ))
+                            ) : (
+                              <p className="text-gray-500 p-2">
+                                No members assigned
+                              </p>
+                            )}
+                          </div>
+                        )}
+                      </td>
+                    )
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <p className="text-gray-500">No tasks available in the RACI Matrix.</p>
+      )}
     </div>
   );
 };

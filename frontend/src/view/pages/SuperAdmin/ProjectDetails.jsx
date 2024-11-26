@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUserPlus, faPen } from "@fortawesome/free-solid-svg-icons";
+import { faUserPlus } from "@fortawesome/free-solid-svg-icons";
 import AdminNavbar from "../../components/SuperAdmin/AdminNavbar.jsx";
 import Kanban from "./Kanban";
 import List from "./List";
@@ -25,6 +25,7 @@ const ProjectDetails = () => {
   const [addText, setAddText] = useState("");
   const [project, setProject] = useState({});
   // const [isImageVisible, setIsImageVisible] = useState(false);
+  // const [projectData, setProjectData] = useState({ name: '', invitedUsers: [] });
   // const [isVisible, setIsVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [projectName, setProjectName] = useState(project.projectName || "");
@@ -112,7 +113,7 @@ const ProjectDetails = () => {
 
           // Include the workspaceId in the request if available
           const response = await axios.get(
-            "https://eunivate-jys4.onrender.com/api/users/invited",
+            "https://eunivate-jys4.onrender/api/users/invited",
             {
               headers: { Authorization: `Bearer ${accessToken}` },
               params: { workspaceId: project.workspaceId }, // Pass workspaceId as a query parameter
@@ -173,7 +174,7 @@ const ProjectDetails = () => {
       }
 
       const response = await axios.post(
-        "https://eunivate-jys4.onrender.com/api/users/add-member-to-project",
+        "https://eunivate-jys4.onrender/api/users/add-member-to-project",
         {
           projectId: project._id,
           users: userIds,
@@ -246,7 +247,7 @@ const ProjectDetails = () => {
       }
 
       const response = await axios.get(
-        `https://eunivate-jys4.onrender.com/api/users/sa-getnewproject/${projectId}`,
+        `https://eunivate-jys4.onrender/users/sa-getnewproject/${projectId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -286,7 +287,7 @@ const ProjectDetails = () => {
       }
 
       await axios.put(
-        `https://eunivate-jys4.onrender.com/api/users/sa-updateprojectname/${projectId}`,
+        `https://eunivate-jys4.onrender/api/users/sa-updateprojectname/${projectId}`,
         { projectName },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -351,12 +352,6 @@ const ProjectDetails = () => {
               <h2 className="text-3xl font-semibold mt-[-1rem]">
                 {project.projectName}
               </h2>
-              <FontAwesomeIcon
-                icon={faPen}
-                className="cursor-pointer mr-15 mt-[-2rem]"
-                size="sm"
-                onClick={() => console.log("Edit icon clicked")} // Add your edit handler here
-              />
               <FontAwesomeIcon
                 icon={faUserPlus}
                 className="cursor-pointer mt-[-1rem]"
@@ -518,7 +513,7 @@ const ProjectDetails = () => {
           />
         )}
         {selectedView === "GanttChart" && <GanttChart projectId={projectId} />}
-        {selectedView === "RaciMatrix" && <RaciMatrix projectId={projectId} />}
+        {selectedView === "RaciMatrix" && <RaciMatrix tasks={tasks} />}
       </div>
 
       {isUserModalOpen && (
