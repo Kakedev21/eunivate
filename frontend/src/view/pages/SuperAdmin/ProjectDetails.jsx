@@ -10,7 +10,6 @@ import Calendar from "./Calendar";
 import GanttChart from "./GanttChart";
 import RaciMatrix from "./RaciMatrix";
 import BarLoading from "./Loading Style/Fill Renamed Loading/Loader.jsx";
-import { apiUrl } from "../../../../../Api.js";
 
 const ProjectDetails = () => {
   const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
@@ -60,7 +59,7 @@ const ProjectDetails = () => {
         }
 
         const response = await axios.get(
-          `${apiUrl}/sa-getnewproject/${projectId}`,
+          `https://eunivate-jys4.onrender.com/sa-getnewproject/${projectId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -114,7 +113,7 @@ const ProjectDetails = () => {
 
           // Include the workspaceId in the request if available
           const response = await axios.get(
-            "https://eunivate-jys4.onrender/api/users/invited",
+            "https://eunivate-jys4.onrender.com/api/users/invited",
             {
               headers: { Authorization: `Bearer ${accessToken}` },
               params: { workspaceId: project.workspaceId }, // Pass workspaceId as a query parameter
@@ -175,7 +174,7 @@ const ProjectDetails = () => {
       }
 
       const response = await axios.post(
-        "https://eunivate-jys4.onrender/api/users/add-member-to-project",
+        "https://eunivate-jys4.onrender.com/api/users/add-member-to-project",
         {
           projectId: project._id,
           users: userIds,
@@ -248,7 +247,7 @@ const ProjectDetails = () => {
       }
 
       const response = await axios.get(
-        `https://eunivate-jys4.onrender/users/sa-getnewproject/${projectId}`,
+        `https://eunivate-jys4.onrender.com/users/sa-getnewproject/${projectId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -288,7 +287,7 @@ const ProjectDetails = () => {
       }
 
       await axios.put(
-        `https://eunivate-jys4.onrender/api/users/sa-updateprojectname/${projectId}`,
+        `https://eunivate-jys4.onrender.com/api/users/sa-updateprojectname/${projectId}`,
         { projectName },
         { headers: { Authorization: `Bearer ${token}` } }
       );
