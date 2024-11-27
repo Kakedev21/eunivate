@@ -113,7 +113,7 @@ const ProjectDetails = () => {
 
           // Include the workspaceId in the request if available
           const response = await axios.get(
-            "https://eunivate-jys4.onrender.com/api/users/invited",
+            'https://eunivate-jys4.onrender.com/api/users/invited',
             {
               headers: { Authorization: `Bearer ${accessToken}` },
               params: { workspaceId: project.workspaceId }, // Pass workspaceId as a query parameter

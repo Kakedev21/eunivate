@@ -76,7 +76,7 @@ io.on("connection", (socket) => {
 export { io };
 
 // Routes
-app.use("/api/users", userRoutes);
+app.use('/api/users', userRoutes);
 
 // Workspace
 app.use("/api", addNewWorkspace);
