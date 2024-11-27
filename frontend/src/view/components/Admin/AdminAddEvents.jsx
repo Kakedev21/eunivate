@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import Jumpdot from '../../pages/SuperAdmin/Loading Style/Dots Loading/Jumpdot';
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import Jumpdot from "../../pages/SuperAdmin/Loading Style/Dots Loading/Jumpdot";
 
 const AdminAddEvents = () => {
   const [selectedImage, setSelectedImage] = useState(null);
-  const [webinarName, setWebinarName] = useState('');
-  const [description, setDescription] = useState('');
-  const [dateAndTime, setDateAndTime] = useState('');
-  const [embeddedLink, setEmbeddedLink] = useState('');
+  const [webinarName, setWebinarName] = useState("");
+  const [description, setDescription] = useState("");
+  const [dateAndTime, setDateAndTime] = useState("");
+  const [embeddedLink, setEmbeddedLink] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -22,18 +22,18 @@ const AdminAddEvents = () => {
 
   const uploadImageToCloudinary = async (file) => {
     const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', 'EunivateImage');
-    formData.append('cloud_name', 'dzxzc7kwb');
+    formData.append("file", file);
+    formData.append("upload_preset", "EunivateImage");
+    formData.append("cloud_name", "dzxzc7kwb");
 
     try {
       const response = await axios.post(
-        'https://api.cloudinary.com/v1_1/dzxzc7kwb/image/upload',
+        "https://api.cloudinary.com/v1_1/dzxzc7kwb/image/upload",
         formData
       );
       return response.data.url;
     } catch (error) {
-      console.error('Error uploading image:', error);
+      console.error("Error uploading image:", error);
       throw error;
     }
   };
@@ -54,19 +54,23 @@ const AdminAddEvents = () => {
         description: description,
         dateAndTime: dateAndTime,
         embeddedLink: embeddedLink,
-        image: imageUrl ? { url: imageUrl, publicId: selectedImage.name } : null,
+        image: imageUrl
+          ? { url: imageUrl, publicId: selectedImage.name }
+          : null,
       };
 
-      const response = await axios.post('https://eunivate-jys4.onrender.com/api/users/addevent', eventData);
+      const response = await axios.post(
+        "https://eunivate-jys4.onrender.com/api/users/addevent",
+        eventData
+      );
 
       console.log(response.data);
       setLoading(false);
-      navigate('/events-admin');
-
+      navigate("/events-admin");
     } catch (error) {
       setLoading(false);
-      console.error('Error uploading event:', error);
-      setError('Failed to upload event. Please try again.');
+      console.error("Error uploading event:", error);
+      setError("Failed to upload event. Please try again.");
     }
   };
 
@@ -74,14 +78,19 @@ const AdminAddEvents = () => {
     <>
       {loading && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50">
-          <div className="bg-white p-8 rounded-lg text-center flex flex-col items-center"> 
+          <div className="bg-white p-8 rounded-lg text-center flex flex-col items-center">
             <Jumpdot />
-            <p className="mt-4 text-lg font-bold text-center">Adding: {webinarName}</p>
+            <p className="mt-4 text-lg font-bold text-center">
+              Adding: {webinarName}
+            </p>
           </div>
         </div>
       )}
 
-      <form onSubmit={handleFormSubmit} className="flex flex-col items-center justify-center p-8 rounded-lg bg-white shadow-lg w-[90%] max-w-4xl mx-auto mt-12">
+      <form
+        onSubmit={handleFormSubmit}
+        className="flex flex-col items-center justify-center p-8 rounded-lg bg-white shadow-lg w-[90%] max-w-4xl mx-auto mt-12"
+      >
         {/* Upload Image Section */}
         <div className="flex flex-col items-center mb-8 relative">
           <input
@@ -146,8 +155,12 @@ const AdminAddEvents = () => {
         {error && <p className="text-red-500 mb-4">{error}</p>}
 
         {/* Save Button */}
-        <button type="submit" className="w-48 h-12 rounded-full bg-red-800 text-white" disabled={loading}>
-          {loading ? 'Saving ...' : 'Save'}
+        <button
+          type="submit"
+          className="w-48 h-12 rounded-full bg-red-800 text-white"
+          disabled={loading}
+        >
+          {loading ? "Saving ..." : "Save"}
         </button>
       </form>
     </>

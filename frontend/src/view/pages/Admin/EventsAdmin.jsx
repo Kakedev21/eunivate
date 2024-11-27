@@ -1,15 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faEdit, faTrashAlt, faFilter } from '@fortawesome/free-solid-svg-icons';
-import Layout from '../../components/Admin/AdminContainer';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import EditEventModal from '../../components/Admin/EditEventsModal';
+import React, { useState, useEffect } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faSearch,
+  faEdit,
+  faTrashAlt,
+  faFilter,
+} from "@fortawesome/free-solid-svg-icons";
+import Layout from "../../components/Admin/AdminContainer";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import EditEventModal from "../../components/Admin/EditEventsModal";
 
 const EventsAdmin = () => {
   const [webinars, setWebinars] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortKey, setSortKey] = useState('webinarName');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortKey, setSortKey] = useState("webinarName");
   const [selectedWebinar, setSelectedWebinar] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
@@ -17,10 +22,12 @@ const EventsAdmin = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await axios.get('https://eunivate-jys4.onrender.com/api/users/events');
+        const response = await axios.get(
+          "https://eunivate-jys4.onrender.com/api/users/events"
+        );
         setWebinars(response.data);
       } catch (error) {
-        console.error('Error fetching events:', error);
+        console.error("Error fetching events:", error);
       }
     };
 
@@ -29,10 +36,12 @@ const EventsAdmin = () => {
 
   const handleDelete = async (eventId) => {
     try {
-      await axios.delete(`https://eunivate-jys4.onrender.com/api/users/events/${eventId}`);
-      setWebinars(webinars.filter(event => event._id !== eventId));
+      await axios.delete(
+        `https://eunivate-jys4.onrender.com/api/users/events/${eventId}`
+      );
+      setWebinars(webinars.filter((event) => event._id !== eventId));
     } catch (error) {
-      console.error('Error deleting event:', error);
+      console.error("Error deleting event:", error);
     }
   };
 
@@ -42,29 +51,31 @@ const EventsAdmin = () => {
   };
 
   const handleSave = (updatedWebinar) => {
-    setWebinars(webinars.map(webinar => 
-      webinar._id === updatedWebinar._id ? updatedWebinar : webinar
-    ));
+    setWebinars(
+      webinars.map((webinar) =>
+        webinar._id === updatedWebinar._id ? updatedWebinar : webinar
+      )
+    );
     setIsModalOpen(false);
   };
 
   const filteredWebinars = webinars
-  .filter(webinar =>
-    webinar.webinarName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    webinar.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    webinar.dateAndTime.toLowerCase().includes(searchTerm.toLowerCase())
-  )
-  .sort((a, b) => {
-    if (sortKey === 'webinarName') {
-      return a.webinarName.localeCompare(b.webinarName);
-    } else if (sortKey === 'dateAndTime') {
-      const dateA = new Date(a.dateAndTime);
-      const dateB = new Date(b.dateAndTime);
-      return dateA - dateB; // Ascending order
-    }
-    return 0;
-  });
-
+    .filter(
+      (webinar) =>
+        webinar.webinarName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        webinar.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        webinar.dateAndTime.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .sort((a, b) => {
+      if (sortKey === "webinarName") {
+        return a.webinarName.localeCompare(b.webinarName);
+      } else if (sortKey === "dateAndTime") {
+        const dateA = new Date(a.dateAndTime);
+        const dateB = new Date(b.dateAndTime);
+        return dateA - dateB; // Ascending order
+      }
+      return 0;
+    });
 
   return (
     <Layout>
@@ -78,7 +89,10 @@ const EventsAdmin = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+          <FontAwesomeIcon
+            icon={faSearch}
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+          />
         </div>
 
         <div className="flex items-center mb-4">
@@ -97,9 +111,9 @@ const EventsAdmin = () => {
         </div>
 
         <div className="mb-4">
-          <button 
+          <button
             className="bg-red-700 text-white py-2 px-4 rounded-lg w-full"
-            onClick={() => navigate('/admin-addevents')}
+            onClick={() => navigate("/admin-addevents")}
           >
             Add Events
           </button>
@@ -107,7 +121,10 @@ const EventsAdmin = () => {
 
         <div className="space-y-4">
           {filteredWebinars.map((webinar) => (
-            <div key={webinar._id} className="border rounded-lg shadow-lg p-4 bg-white">
+            <div
+              key={webinar._id}
+              className="border rounded-lg shadow-lg p-4 bg-white"
+            >
               {webinar.image && webinar.image.url ? (
                 <img
                   src={webinar.image.url}
@@ -118,14 +135,22 @@ const EventsAdmin = () => {
                 <p className="text-sm text-gray-500 mb-2">No image</p>
               )}
               <h3 className="text-lg font-semibold">{webinar.webinarName}</h3>
-              <p className="text-sm text-gray-600 mb-2 truncate">{webinar.description}</p>
-              <p className="text-xs text-gray-500 mb-2">{webinar.dateAndTime}</p>
+              <p className="text-sm text-gray-600 mb-2 truncate">
+                {webinar.description}
+              </p>
+              <p className="text-xs text-gray-500 mb-2">
+                {webinar.dateAndTime}
+              </p>
               <p className="text-xs text-blue-500 mb-2">
-                <a href={webinar.embeddedLink} target="_blank" rel="noopener noreferrer">
+                <a
+                  href={webinar.embeddedLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   {webinar.embeddedLink}
                 </a>
               </p>
-              
+
               <div className="flex justify-end space-x-2">
                 <button
                   className="text-gray-600 hover:text-gray-900"
@@ -144,7 +169,7 @@ const EventsAdmin = () => {
           ))}
         </div>
       </div>
-      
+
       {/* Desktop layout */}
       <div className="hidden md:flex items-center justify-between mb-6">
         <div className="relative w-3/5 flex-grow">
@@ -155,7 +180,10 @@ const EventsAdmin = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+          <FontAwesomeIcon
+            icon={faSearch}
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+          />
         </div>
         <div className="flex items-center ml-4">
           <label className="mr-2">Sort by</label>
@@ -171,9 +199,9 @@ const EventsAdmin = () => {
             <FontAwesomeIcon icon={faFilter} />
           </button>
         </div>
-        <button 
+        <button
           className="bg-red-700 text-white py-2 px-4 rounded-lg ml-4"
-          onClick={() => navigate('/admin-addevents')}
+          onClick={() => navigate("/admin-addevents")}
         >
           Add Events
         </button>
@@ -191,7 +219,7 @@ const EventsAdmin = () => {
               <th className="py-3 px-6 text-right">Action</th>
             </tr>
           </thead>
-          
+
           <tbody>
             {filteredWebinars.map((webinar) => (
               <tr key={webinar._id} className="border-b">
@@ -199,7 +227,11 @@ const EventsAdmin = () => {
                 <td className="py-4 px-6">{webinar.description}</td>
                 <td className="py-4 px-6">{webinar.dateAndTime}</td>
                 <td className="py-4 px-6">
-                  <a href={webinar.embeddedLink} target="_blank" rel="noopener noreferrer">
+                  <a
+                    href={webinar.embeddedLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     {webinar.embeddedLink}
                   </a>
                 </td>

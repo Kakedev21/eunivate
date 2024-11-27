@@ -1,79 +1,79 @@
-import React, { useState, useEffect, useContext } from 'react';
-import axios from 'axios';
-import { FaCalendar, FaCheckCircle, FaPlus,FaTrash  } from 'react-icons/fa';
-import { useNavigate, useOutletContext } from 'react-router-dom'; 
-import AdminNavbar from '../../components/SuperAdmin/AdminNavbar.jsx';
-import LoadingSpinner from './Loading Style/Fill File Loading/Loader.jsx';
-import ButtonSpinner from './Loading Style/Spinner Loading/ButtonSpinner.jsx';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { useWorkspace } from '../../components/SuperAdmin/workspaceContext.jsx';
+import React, { useState, useEffect, useContext } from "react";
+import axios from "axios";
+import { FaCalendar, FaCheckCircle, FaPlus, FaTrash } from "react-icons/fa";
+import { useNavigate, useOutletContext } from "react-router-dom";
+import AdminNavbar from "../../components/SuperAdmin/AdminNavbar.jsx";
+import LoadingSpinner from "./Loading Style/Fill File Loading/Loader.jsx";
+import ButtonSpinner from "./Loading Style/Spinner Loading/ButtonSpinner.jsx";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useWorkspace } from "../../components/SuperAdmin/workspaceContext.jsx";
 
 const Project = () => {
- 
   const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
-  const [projectName, setProjectName] = useState('');
-  const [team, setTeam] = useState('');
+  const [projectName, setProjectName] = useState("");
+  const [team, setTeam] = useState("");
   const [projects, setProjects] = useState([]);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [loadingProject, setLoadingProject] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
-  const [taskCounts, setTaskCounts] = useState({}); 
+  const [taskCounts, setTaskCounts] = useState({});
   const { selectedWorkspace } = useWorkspace();
-  const [workspaces, setWorkspaces] = useState([]); 
+  const [workspaces, setWorkspaces] = useState([]);
   const navigate = useNavigate();
   const { isNavOpen } = useOutletContext();
 
   useEffect(() => {
-
     const fetchProjects = async () => {
-      setLoading(true); 
+      setLoading(true);
       try {
-        const user = JSON.parse(localStorage.getItem('user'));
+        const user = JSON.parse(localStorage.getItem("user"));
         const accessToken = user ? user.accessToken : null;
-    
+
         if (!accessToken) {
-          setError('No access token found. Please log in again.');
+          setError("No access token found. Please log in again.");
           setLoading(false);
           return;
         }
-    
+
         // Get the workspaceId from the selectedWorkspace
         const workspaceId = selectedWorkspace ? selectedWorkspace._id : null;
-    
+
         if (!workspaceId) {
-          setError('No workspace selected. Please select a workspace.');
+          setError("No workspace selected. Please select a workspace.");
           setLoading(false);
           return;
         }
-    
+
         // Make the API call to fetch projects with the workspaceId as a query parameter
-        const response = await axios.get('https://eunivate-jys4.onrender.com/api/users/sa-getnewproject', {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-          params: {
-            workspaceId, // Pass the workspaceId as a query parameter
-          },
-        });
-    
+        const response = await axios.get(
+          "https://eunivate-jys4.onrender.com/api/users/sa-getnewproject",
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+            params: {
+              workspaceId, // Pass the workspaceId as a query parameter
+            },
+          }
+        );
+
         setProjects(response.data);
       } catch (error) {
-        console.error('Error fetching projects:', error);
-        setError('An error occurred while fetching projects.');
+        console.error("Error fetching projects:", error);
+        setError("An error occurred while fetching projects.");
       } finally {
         setLoading(false);
       }
     };
-    
+
     if (selectedWorkspace) {
       fetchProjects();
     }
-    
   }, [selectedWorkspace]);
 
   // Fetch task counts (total and done) for each project
@@ -82,15 +82,19 @@ const Project = () => {
       const counts = {};
       for (let project of projects) {
         try {
-          const response = await axios.get(`https://eunivate-jys4.onrender.com/api/users/sa-tasks/${project._id}`);
+          const response = await axios.get(
+            `https://eunivate-jys4.onrender.com/api/users/sa-tasks/${project._id}`
+          );
           const totalTasks = response.data.data.length;
-          const doneTasks = response.data.data.filter(task => task.status === 'Done').length;
+          const doneTasks = response.data.data.filter(
+            (task) => task.status === "Done"
+          ).length;
           counts[project._id] = {
             totalTasks,
             doneTasks,
           };
         } catch (error) {
-          console.error('Error fetching task counts:', error);
+          console.error("Error fetching task counts:", error);
         }
       }
       setTaskCounts(counts);
@@ -101,41 +105,44 @@ const Project = () => {
     }
   }, [projects]);
 
-
   useEffect(() => {
     const fetchWorkspaces = async () => {
-      const user = JSON.parse(localStorage.getItem('user'));
+      const user = JSON.parse(localStorage.getItem("user"));
       const accessToken = user ? user.accessToken : null;
 
       if (!accessToken) {
-        console.error('No access token found.');
+        console.error("No access token found.");
         return;
       }
 
       try {
-        const response = await axios.get('https://eunivate-jys4.onrender.com/api/users/workspaces', {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
+        const response = await axios.get(
+          "https://eunivate-jys4.onrender.com/api/users/workspaces",
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
 
-        setWorkspaces(response.data);  // Set the fetched workspaces to state
+        setWorkspaces(response.data); // Set the fetched workspaces to state
       } catch (error) {
-        console.error('Error fetching workspaces:', error);
+        console.error("Error fetching workspaces:", error);
       }
     };
 
     fetchWorkspaces();
   }, []);
 
-  const toggleAccountDropdown = () => setIsAccountDropdownOpen(!isAccountDropdownOpen);
+  const toggleAccountDropdown = () =>
+    setIsAccountDropdownOpen(!isAccountDropdownOpen);
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedImage(null);
     setImagePreview(null);
-    setProjectName('');
-    setError('');
+    setProjectName("");
+    setError("");
   };
 
   useEffect(() => {
@@ -158,113 +165,132 @@ const Project = () => {
 
   const handleSavethumbnail = async (file) => {
     const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', 'EunivateImage');
-    formData.append('cloud_name', 'dzxzc7kwb');
+    formData.append("file", file);
+    formData.append("upload_preset", "EunivateImage");
+    formData.append("cloud_name", "dzxzc7kwb");
 
     try {
       const response = await axios.post(
-        'https://api.cloudinary.com/v1_1/dzxzc7kwb/image/upload',
+        "https://api.cloudinary.com/v1_1/dzxzc7kwb/image/upload",
         formData
       );
-      return { publicId: response.data.public_id, url: response.data.secure_url };
+      return {
+        publicId: response.data.public_id,
+        url: response.data.secure_url,
+      };
     } catch (error) {
-      console.error('Error uploading image:', error);
+      console.error("Error uploading image:", error);
       throw error;
     }
   };
 
   const handleCreateProject = async () => {
     setLoading(true);
-    if (!imagePreview || !projectName || !team) {  // Ensure 'team' is selected
-      setError('Please fill out all fields including image, project name, and team.');
+    if (!imagePreview || !projectName || !team) {
+      // Ensure 'team' is selected
+      setError(
+        "Please fill out all fields including image, project name, and team."
+      );
       setLoading(false);
       return;
     }
-  
+
     if (!selectedWorkspace) {
       setLoading(false);
-      setError('No workspace selected. Please select a workspace to create a project.');
+      setError(
+        "No workspace selected. Please select a workspace to create a project."
+      );
       return;
     }
-  
-    const workspaceId = team;  // Use the selected team (workspace)
-    const user = JSON.parse(localStorage.getItem('user'));
+
+    const workspaceId = team; // Use the selected team (workspace)
+    const user = JSON.parse(localStorage.getItem("user"));
     const accessToken = user ? user.accessToken : null;
-  
+
     if (!accessToken) {
       setLoading(false);
-      setError('No access token found. Please log in again.');
+      setError("No access token found. Please log in again.");
       return;
     }
-  
+
     try {
       const thumbnail = await handleSavethumbnail(selectedImage);
       const newProject = {
         projectName,
         thumbnail,
-        workspaceId,  // Pass the selected workspaceId (team)
+        workspaceId, // Pass the selected workspaceId (team)
       };
-  
-      const response = await axios.post('https://eunivate-jys4.onrender.com/api/users/sa-newproject', newProject, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-  
+
+      const response = await axios.post(
+        "https://eunivate-jys4.onrender.com/api/users/sa-newproject",
+        newProject,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
       setProjects([...projects, response.data]);
       closeModal();
-      toast.success('Project created successfully!');
+      toast.success("Project created successfully!");
     } catch (error) {
       setLoading(false);
-      console.error('Error creating project:', error);
-      setError('An error occurred while creating the project.');
+      console.error("Error creating project:", error);
+      setError("An error occurred while creating the project.");
     } finally {
       setLoading(false);
     }
   };
-  
 
   const handleProjectClick = (project) => {
     setSelectedProject(project);
     setLoadingProject(true);
     setTimeout(() => {
-      navigate(`/superadmin/projects/${project._id}`, { state: { projectId: project._id } });
+      navigate(`/superadmin/projects/${project._id}`, {
+        state: { projectId: project._id },
+      });
       setLoadingProject(false);
     }, 3000);
   };
 
-
   const handleDeleteProject = async (projectId) => {
-    const confirmed = window.confirm("Are you sure you want to delete this project?");
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this project?"
+    );
     if (confirmed) {
       try {
-        const user = JSON.parse(localStorage.getItem('user'));
+        const user = JSON.parse(localStorage.getItem("user"));
         const accessToken = user ? user.accessToken : null;
-  
+
         if (!accessToken) {
-          setError('No access token found. Please log in again.');
+          setError("No access token found. Please log in again.");
           return;
         }
-  
-        await axios.delete(`https://eunivate-jys4.onrender.com/api/users/sa-project-delete/${projectId}`, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-  
-        setProjects(projects.filter(project => project._id !== projectId)); // Update the projects state
+
+        await axios.delete(
+          `https://eunivate-jys4.onrender.com/api/users/sa-project-delete/${projectId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+
+        setProjects(projects.filter((project) => project._id !== projectId)); // Update the projects state
         toast.success("Project deleted successfully!");
       } catch (error) {
-        console.error('Error deleting project:', error);
-        setError('An error occurred while deleting the project.');
+        console.error("Error deleting project:", error);
+        setError("An error occurred while deleting the project.");
       }
     }
   };
-  
 
   const calculateProgress = (projectId) => {
-    const { totalTasks, doneTasks } = taskCounts[projectId] || { totalTasks: 0, doneTasks: 0 };
+    const { totalTasks, doneTasks } = taskCounts[projectId] || {
+      totalTasks: 0,
+      doneTasks: 0,
+    };
     return totalTasks > 0 ? (doneTasks / totalTasks) * 100 : 0;
   };
 
@@ -288,14 +314,20 @@ const Project = () => {
 
       {loadingProject && (
         <div className="flex flex-col items-center">
-          <LoadingSpinner projectName={selectedProject ? selectedProject.projectName : ''} />
+          <LoadingSpinner
+            projectName={selectedProject ? selectedProject.projectName : ""}
+          />
         </div>
       )}
 
       <div className="w-full flex justify-between items-center mb-4">
         <div className="relative">
-          <h1 className={`text-2xl font-medium text-gray-800 hidden md:block ${isNavOpen ? 'hidden' : ''}`}>
-            Project 
+          <h1
+            className={`text-2xl font-medium text-gray-800 hidden md:block ${
+              isNavOpen ? "hidden" : ""
+            }`}
+          >
+            Project
           </h1>
         </div>
         <AdminNavbar
@@ -305,7 +337,11 @@ const Project = () => {
       </div>
 
       <div className="relative mt-10">
-        <div className={`absolute left-4 top-4 font-semibold text-2xl transform -translate-y-1/2 text-black md:hidden ${isNavOpen ? 'hidden' : ''}`}>
+        <div
+          className={`absolute left-4 top-4 font-semibold text-2xl transform -translate-y-1/2 text-black md:hidden ${
+            isNavOpen ? "hidden" : ""
+          }`}
+        >
           Project
         </div>
         <button
@@ -317,7 +353,7 @@ const Project = () => {
         </button>
       </div>
 
-        {/* <div>
+      {/* <div>
             <h1>Project Page</h1>
             {loading ? (
                 <p>Loading...</p> // Show loading state
@@ -334,17 +370,23 @@ const Project = () => {
             <button
               onClick={closeModal}
               className="absolute top-3 right-3 text-gray-600 hover:text-gray-800"
-            >
-              
-            </button>
+            ></button>
             <h2 className="text-xl font-semibold">New Project</h2>
             <p className="mt-4 text-gray-500">Thumbnail</p>
             <div className="mt-4 p-4 border-2 border-dashed border-gray-300 rounded-md flex items-center">
               <div className="flex-shrink-0 mr-4">
                 <label htmlFor="file-upload" className="cursor-pointer">
-                  <div className={`w-20 h-20 ${imagePreview ? 'bg-transparent' : 'bg-gray-200'} border-2 border-gray-300 rounded-md flex items-center justify-center`}>
+                  <div
+                    className={`w-20 h-20 ${
+                      imagePreview ? "bg-transparent" : "bg-gray-200"
+                    } border-2 border-gray-300 rounded-md flex items-center justify-center`}
+                  >
                     {imagePreview ? (
-                      <img src={imagePreview} alt="Thumbnail Preview" className="w-full h-full object-cover rounded-md" />
+                      <img
+                        src={imagePreview}
+                        alt="Thumbnail Preview"
+                        className="w-full h-full object-cover rounded-md"
+                      />
                     ) : (
                       <FaPlus size={20} className="text-gray-600" />
                     )}
@@ -367,113 +409,122 @@ const Project = () => {
               className="mt-2 w-full p-2 border border-gray-300 rounded-md text-gray-700"
               value={projectName}
               onChange={(e) => setProjectName(e.target.value)}
-                />
-              <p className="mt-4 text-gray-500 text-left">Team (Workspace)</p>
-              <div className="relative mt-2">
-                <select
-                  className="w-full p-2 border border-gray-300 rounded-md text-gray-700"
-                  defaultValue={selectedWorkspace._id}
-                  onChange={(e) => setTeam(e.target.value)}
-                >
-                 
-                  {workspaces.map((workspace) => (
-                    <option key={workspace._id} value={workspace._id}>
-                      {workspace.workspaceTitle}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
+            />
+            <p className="mt-4 text-gray-500 text-left">Team (Workspace)</p>
+            <div className="relative mt-2">
+              <select
+                className="w-full p-2 border border-gray-300 rounded-md text-gray-700"
+                defaultValue={selectedWorkspace._id}
+                onChange={(e) => setTeam(e.target.value)}
+              >
+                {workspaces.map((workspace) => (
+                  <option key={workspace._id} value={workspace._id}>
+                    {workspace.workspaceTitle}
+                  </option>
+                ))}
+              </select>
+            </div>
 
             <input
               type="hidden"
               name="workspaceId"
-              value={selectedWorkspace ? selectedWorkspace._id : ''}
-            />      
+              value={selectedWorkspace ? selectedWorkspace._id : ""}
+            />
 
             <div className="mt-6 flex flex-col justify-center">
-                <button
-                  onClick={handleCreateProject}
-                  className="bg-red-800 text-white px-8 py-3 rounded-md shadow hover:bg-red-900 w-full mb-2 flex items-center justify-center"
-                  disabled={loading}
-                >
-                  {loading ? <ButtonSpinner /> : 'Create Project'}
-                </button>
-                <button
-                  onClick={closeModal}
-                  className="bg-gray-500 text-white px-8 py-3 rounded-md shadow hover:bg-gray-600 w-full flex items-center justify-center"
-                >
-                  Close
-                </button>
+              <button
+                onClick={handleCreateProject}
+                className="bg-red-800 text-white px-8 py-3 rounded-md shadow hover:bg-red-900 w-full mb-2 flex items-center justify-center"
+                disabled={loading}
+              >
+                {loading ? <ButtonSpinner /> : "Create Project"}
+              </button>
+              <button
+                onClick={closeModal}
+                className="bg-gray-500 text-white px-8 py-3 rounded-md shadow hover:bg-gray-600 w-full flex items-center justify-center"
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>
       )}
 
-<div className={`mt-20 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 ${isNavOpen ? 'mt-28' : 'mt-20'}`}>
-  {projects.map((project) => (
-    <div
-      key={project._id}
-      className="bg-white p-4 rounded-md shadow-md border border-gray-200 mt-2 relative cursor-pointer w-full"
-      onClick={() => handleProjectClick(project)}
-    >
-      {/* Move the FaTrash icon to the top-right corner */}
-      <FaTrash 
-        className="absolute top-2 right-2 bg-white rounded-2xl text-3xl p-1 text-red-500 cursor-pointer"
-        onClick={(e) => {
-          e.stopPropagation(); // Prevent the parent onClick from being triggered
-          handleDeleteProject(project._id);
-        }}
-      />
-      
-      {project.thumbnail && (
-        <img
-          src={project.thumbnail.url}
-          alt={project.projectName}
-          className="w-full h-32 object-cover rounded-md"
-        />
-      )}
-      
-      <h3 className="text-lg font-semibold mt-2">{project.projectName}</h3>
-      <div className="flex items-center text-gray-500 mt-2">
-        <FaCalendar className="mr-2" />
-        <p>{new Date(project.createdAt).toLocaleDateString() || 'No date available'}</p>
-        <FaCheckCircle className="ml-5" />
-        <p className="ml-2">
-          {taskCounts[project._id] ? taskCounts[project._id].doneTasks : 'Loading...'}
-        </p>
-        <div className="flex items-center rounded justify-end ml-9 -space-x-3">
-          {project.invitedUsers && project.invitedUsers.slice(0, 3).map((user, index) => (
-            <Tooltip key={index} title={`${user.firstName} ${user.lastName}`}>
-              <img
-                src={user.profilePicture?.url || user.profilePicture} // Ensure it falls back to a default if no picture
-                alt={user.username || 'Profile Picture'}
-              className="w-6 h-6 rounded-full object-cover border border-gray-300"
-              />
-    </Tooltip>
-  ))}
-</div>
-
-      </div>
-
-      {/* Progress Bar */}
-      <div className="flex items-center mt-4">
-        <div className="w-full bg-gray-200 rounded-full h-2 relative">
+      <div
+        className={`mt-20 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 ${
+          isNavOpen ? "mt-28" : "mt-20"
+        }`}
+      >
+        {projects.map((project) => (
           <div
-            className="bg-green-500 h-2 rounded-full"
-            style={{ width: `${calculateProgress(project._id)}%` }} // Dynamically set progress width
-          ></div>
-        </div>
-        <p className="ml-2 text-gray-500">
-          {`${Math.floor(calculateProgress(project._id))}%`}
-        </p>
+            key={project._id}
+            className="bg-white p-4 rounded-md shadow-md border border-gray-200 mt-2 relative cursor-pointer w-full"
+            onClick={() => handleProjectClick(project)}
+          >
+            {/* Move the FaTrash icon to the top-right corner */}
+            <FaTrash
+              className="absolute top-2 right-2 bg-white rounded-2xl text-3xl p-1 text-red-500 cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation(); // Prevent the parent onClick from being triggered
+                handleDeleteProject(project._id);
+              }}
+            />
+
+            {project.thumbnail && (
+              <img
+                src={project.thumbnail.url}
+                alt={project.projectName}
+                className="w-full h-32 object-cover rounded-md"
+              />
+            )}
+
+            <h3 className="text-lg font-semibold mt-2">
+              {project.projectName}
+            </h3>
+            <div className="flex items-center text-gray-500 mt-2">
+              <FaCalendar className="mr-2" />
+              <p>
+                {new Date(project.createdAt).toLocaleDateString() ||
+                  "No date available"}
+              </p>
+              <FaCheckCircle className="ml-5" />
+              <p className="ml-2">
+                {taskCounts[project._id]
+                  ? taskCounts[project._id].doneTasks
+                  : "Loading..."}
+              </p>
+              <div className="flex items-center rounded justify-end ml-9 -space-x-3">
+                {project.invitedUsers &&
+                  project.invitedUsers.slice(0, 3).map((user, index) => (
+                    <Tooltip
+                      key={index}
+                      title={`${user.firstName} ${user.lastName}`}
+                    >
+                      <img
+                        src={user.profilePicture?.url || user.profilePicture} // Ensure it falls back to a default if no picture
+                        alt={user.username || "Profile Picture"}
+                        className="w-6 h-6 rounded-full object-cover border border-gray-300"
+                      />
+                    </Tooltip>
+                  ))}
+              </div>
+            </div>
+
+            {/* Progress Bar */}
+            <div className="flex items-center mt-4">
+              <div className="w-full bg-gray-200 rounded-full h-2 relative">
+                <div
+                  className="bg-green-500 h-2 rounded-full"
+                  style={{ width: `${calculateProgress(project._id)}%` }} // Dynamically set progress width
+                ></div>
+              </div>
+              <p className="ml-2 text-gray-500">
+                {`${Math.floor(calculateProgress(project._id))}%`}
+              </p>
+            </div>
+          </div>
+        ))}
       </div>
-    </div>
-  ))}
-</div>
-
-
-
     </div>
   );
 };

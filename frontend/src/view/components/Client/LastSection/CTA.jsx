@@ -1,18 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPhone, faEnvelope, faMapMarkerAlt } from "@fortawesome/free-solid-svg-icons";
-import { faTwitter, faInstagram, faDiscord } from "@fortawesome/free-brands-svg-icons";
-import ButtonCircle from '../../../pages/SuperAdmin/Loading Style/Circle Loading/ButtonCircle';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import {
+  faPhone,
+  faEnvelope,
+  faMapMarkerAlt,
+} from "@fortawesome/free-solid-svg-icons";
+import {
+  faTwitter,
+  faInstagram,
+  faDiscord,
+} from "@fortawesome/free-brands-svg-icons";
+import ButtonCircle from "../../../pages/SuperAdmin/Loading Style/Circle Loading/ButtonCircle";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Contact = () => {
-  const [selectedSubject, setSelectedSubject] = useState('demo_request');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [companyEmail, setCompanyEmail] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [message, setMessage] = useState('');
+  const [selectedSubject, setSelectedSubject] = useState("demo_request");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [companyEmail, setCompanyEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false); // Loading state
 
   const handleChange = (event) => {
@@ -21,10 +29,10 @@ const Contact = () => {
 
   const isFormValid = () => {
     return (
-      firstName.trim() !== '' &&
-      lastName.trim() !== '' &&
-      companyEmail.trim() !== '' &&
-      phoneNumber.trim() !== ''
+      firstName.trim() !== "" &&
+      lastName.trim() !== "" &&
+      companyEmail.trim() !== "" &&
+      phoneNumber.trim() !== ""
     );
   };
 
@@ -44,16 +52,19 @@ const Contact = () => {
     setLoading(true); // Start loading
 
     try {
-      const response = await fetch('https://eunivate-jys4.onrender.com/api/users/contactEunivate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(contactData),
-      });
+      const response = await fetch(
+        "https://eunivate-jys4.onrender.com/api/users/contactEunivate",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(contactData),
+        }
+      );
 
       if (response.ok) {
-        toast.success('Message sent successfully!', {
+        toast.success("Message sent successfully!", {
           position: "top-right",
           autoClose: 3000,
           hideProgressBar: false,
@@ -63,13 +74,13 @@ const Contact = () => {
           progress: undefined,
         });
 
-        setFirstName('');
-        setLastName('');
-        setCompanyEmail('');
-        setPhoneNumber('');
-        setMessage('');
+        setFirstName("");
+        setLastName("");
+        setCompanyEmail("");
+        setPhoneNumber("");
+        setMessage("");
       } else {
-        toast.error('Failed to send the message. Please try again.', {
+        toast.error("Failed to send the message. Please try again.", {
           position: "top-right",
           autoClose: 3000,
           hideProgressBar: false,
@@ -80,7 +91,7 @@ const Contact = () => {
         });
       }
     } catch (error) {
-      toast.error('An error occurred. Please try again later.', {
+      toast.error("An error occurred. Please try again later.", {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -127,9 +138,15 @@ const Contact = () => {
             </div>
 
             <div className="lg:w-1/2 w-full">
-              <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-xl">
+              <form
+                onSubmit={handleSubmit}
+                className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-xl"
+              >
                 <div className="flex flex-col text-left">
-                  <label htmlFor="first_name" className="block text-gray-400 text-sm font-bold mb-2">
+                  <label
+                    htmlFor="first_name"
+                    className="block text-gray-400 text-sm font-bold mb-2"
+                  >
                     First Name
                   </label>
                   <input
@@ -142,7 +159,10 @@ const Contact = () => {
                 </div>
 
                 <div className="flex flex-col text-left">
-                  <label htmlFor="last_name" className="block text-gray-700 text-sm font-bold mb-2">
+                  <label
+                    htmlFor="last_name"
+                    className="block text-gray-700 text-sm font-bold mb-2"
+                  >
                     Last Name
                   </label>
                   <input
@@ -155,7 +175,10 @@ const Contact = () => {
                 </div>
 
                 <div className="flex flex-col text-left">
-                  <label htmlFor="company_email" className="block text-gray-400 text-sm font-bold mb-2">
+                  <label
+                    htmlFor="company_email"
+                    className="block text-gray-400 text-sm font-bold mb-2"
+                  >
                     Company Email
                   </label>
                   <input
@@ -168,7 +191,10 @@ const Contact = () => {
                 </div>
 
                 <div className="flex flex-col text-left">
-                  <label htmlFor="phone_number" className="block text-gray-700 text-sm font-bold mb-2">
+                  <label
+                    htmlFor="phone_number"
+                    className="block text-gray-700 text-sm font-bold mb-2"
+                  >
                     Phone Number
                   </label>
                   <input
@@ -180,7 +206,7 @@ const Contact = () => {
                     inputMode="numeric"
                     className="appearance-none border-b-2 border-gray-400 w-full py-1 px-2 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
                     onInput={(e) => {
-                      e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                      e.target.value = e.target.value.replace(/[^0-9]/g, "");
                     }}
                   />
                 </div>
@@ -197,16 +223,23 @@ const Contact = () => {
                         name="subject"
                         value="demo_request"
                         className="hidden"
-                        checked={selectedSubject === 'demo_request'}
+                        checked={selectedSubject === "demo_request"}
                         onChange={handleChange}
                       />
                       <div
-                        className={`w-5 h-5 rounded-full border-2 border-black flex items-center justify-center cursor-pointer ${selectedSubject === 'demo_request' ? 'bg-black' : ''}`}
-                        onClick={() => setSelectedSubject('demo_request')}
+                        className={`w-5 h-5 rounded-full border-2 border-black flex items-center justify-center cursor-pointer ${
+                          selectedSubject === "demo_request" ? "bg-black" : ""
+                        }`}
+                        onClick={() => setSelectedSubject("demo_request")}
                       >
-                        {selectedSubject === 'demo_request' && <span className="text-white">✓</span>}
+                        {selectedSubject === "demo_request" && (
+                          <span className="text-white">✓</span>
+                        )}
                       </div>
-                      <label htmlFor="demo_request" className="ml-2 text-gray-700">
+                      <label
+                        htmlFor="demo_request"
+                        className="ml-2 text-gray-700"
+                      >
                         Demo Request
                       </label>
                     </div>
@@ -218,22 +251,34 @@ const Contact = () => {
                         name="subject"
                         value="general_inquiry"
                         className="hidden"
-                        checked={selectedSubject === 'general_inquiry'}
+                        checked={selectedSubject === "general_inquiry"}
                         onChange={handleChange}
                       />
                       <div
-                        className={`w-5 h-5 rounded-full border-2 border-black flex items-center justify-center cursor-pointer ${selectedSubject === 'general_inquiry' ? 'bg-black' : ''}`}
-                        onClick={() => setSelectedSubject('general_inquiry')}
+                        className={`w-5 h-5 rounded-full border-2 border-black flex items-center justify-center cursor-pointer ${
+                          selectedSubject === "general_inquiry"
+                            ? "bg-black"
+                            : ""
+                        }`}
+                        onClick={() => setSelectedSubject("general_inquiry")}
                       >
-                        {selectedSubject === 'general_inquiry' && <span className="text-white">✓</span>}
+                        {selectedSubject === "general_inquiry" && (
+                          <span className="text-white">✓</span>
+                        )}
                       </div>
-                      <label htmlFor="general_inquiry" className="ml-2 text-gray-700">
+                      <label
+                        htmlFor="general_inquiry"
+                        className="ml-2 text-gray-700"
+                      >
                         General Inquiry
                       </label>
                     </div>
                   </div>
 
-                  <label htmlFor="message" className="block text-gray-400 text-sm font-bold mb-2 mt-7">
+                  <label
+                    htmlFor="message"
+                    className="block text-gray-400 text-sm font-bold mb-2 mt-7"
+                  >
                     Message
                   </label>
                   <textarea
@@ -270,17 +315,29 @@ const Contact = () => {
           {/* Social Media Icons */}
           <div className="hidden lg:flex justify-start mt-8 space-x-4">
             <div className="w-9 h-9 flex items-center justify-center bg-black rounded-full hover:bg-gray-800 transition-colors">
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
+              <a
+                href="https://twitter.com"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <FontAwesomeIcon icon={faTwitter} className="text-white" />
               </a>
             </div>
             <div className="w-9 h-9 flex items-center justify-center bg-white rounded-full hover:bg-gray-100 transition-colors">
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
+              <a
+                href="https://instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <FontAwesomeIcon icon={faInstagram} className="text-black" />
               </a>
             </div>
             <div className="w-9 h-9 flex items-center justify-center bg-black rounded-full hover:bg-gray-800 transition-colors">
-              <a href="https://discord.com" target="_blank" rel="noopener noreferrer">
+              <a
+                href="https://discord.com"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <FontAwesomeIcon icon={faDiscord} className="text-white" />
               </a>
             </div>

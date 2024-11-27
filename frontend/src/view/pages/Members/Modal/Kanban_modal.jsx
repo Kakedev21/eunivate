@@ -1,32 +1,32 @@
-import React, { useState, useEffect, useRef } from 'react';
-import ReactDOM from 'react-dom';
-import { FaTimes, FaUser } from 'react-icons/fa';
-import axios from 'axios';
-import UserNameModal from '../../SuperAdmin/KanbanModals/UserNameModal';
-import ObjectiveList from '../../SuperAdmin/KanbanModals/ObjectiveList';
-import StatusDropdown from '../../SuperAdmin/KanbanModals/StatusDropdown';
-import PriorityDropdown from '../../SuperAdmin/KanbanModals/PriorityDropdown';
-import AttachmentSection from '../../SuperAdmin/KanbanModals/AttachmentSection';
-import Dates from '../../SuperAdmin/KanbanModals/Dates';
-import BarLoading from '../../SuperAdmin/Loading Style/Bar Loading/Barloader';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import React, { useState, useEffect, useRef } from "react";
+import ReactDOM from "react-dom";
+import { FaTimes, FaUser } from "react-icons/fa";
+import axios from "axios";
+import UserNameModal from "../../SuperAdmin/KanbanModals/UserNameModal";
+import ObjectiveList from "../../SuperAdmin/KanbanModals/ObjectiveList";
+import StatusDropdown from "../../SuperAdmin/KanbanModals/StatusDropdown";
+import PriorityDropdown from "../../SuperAdmin/KanbanModals/PriorityDropdown";
+import AttachmentSection from "../../SuperAdmin/KanbanModals/AttachmentSection";
+import Dates from "../../SuperAdmin/KanbanModals/Dates";
+import BarLoading from "../../SuperAdmin/Loading Style/Bar Loading/Barloader";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Kanban_modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
-  const [taskName, setTaskName] = useState('');
-  const [description, setDescription] = useState('');
+  const [taskName, setTaskName] = useState("");
+  const [description, setDescription] = useState("");
   const [objectives, setObjectives] = useState([]);
   const [selectedObjective, setSelectedObjective] = useState(null);
-  const [selectedName, setSelectedName] = useState('');
+  const [selectedName, setSelectedName] = useState("");
   const [membersList, setMembersList] = useState([]);
-  const [status, setStatus] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [dueDate, setDueDate] = useState('');
+  const [status, setStatus] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [dueDate, setDueDate] = useState("");
   const [loading, setLoading] = useState(false);
-  const [priority, setPriority] = useState('');
+  const [priority, setPriority] = useState("");
   const [isUserNameModalOpen, setIsUserNameModalOpen] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]);
-  
+
   const [isPriorityDropdownOpen, setIsPriorityDropdownOpen] = useState(false);
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
 
@@ -42,10 +42,10 @@ const Kanban_modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
@@ -58,44 +58,56 @@ const Kanban_modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
 
   const fetchProjectDetails = async () => {
     try {
-      const user = JSON.parse(localStorage.getItem('user'));
+      const user = JSON.parse(localStorage.getItem("user"));
       const token = user?.accessToken;
 
       if (!token) {
-        throw new Error('No access token found. Please log in again.');
+        throw new Error("No access token found. Please log in again.");
       }
 
-      const response = await axios.get(`https://eunivate-jys4.onrender.com/api/users/sa-getnewproject/${projectId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
+      const response = await axios.get(
+        `https://eunivate-jys4.onrender.com/api/users/sa-getnewproject/${projectId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-      });
+      );
       // Set project details logic here if needed
     } catch (error) {
-      console.error('Error fetching project details:', error);
+      console.error("Error fetching project details:", error);
     }
   };
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get(`https://eunivate-jys4.onrender.com/api/users/get-assignee?projectId=${projectId}`);
-      setMembersList(response.data.invitedUsers); 
+      const response = await axios.get(
+        `https://eunivate-jys4.onrender.com/api/users/get-assignee?projectId=${projectId}`
+      );
+      setMembersList(response.data.invitedUsers);
     } catch (error) {
-      console.error('Error fetching users:', error);
+      console.error("Error fetching users:", error);
     }
   };
 
   const handleSubmit = async () => {
     setLoading(true);
 
-    if (!taskName || !startDate || !dueDate || !status || !priority || !selectedName) {
-      toast.error('Please fill in all fields before submitting.');
+    if (
+      !taskName ||
+      !startDate ||
+      !dueDate ||
+      !status ||
+      !priority ||
+      !selectedName
+    ) {
+      toast.error("Please fill in all fields before submitting.");
       setLoading(false);
       return;
     }
 
     if (new Date(dueDate) < new Date(startDate)) {
-      toast.error('Due Date cannot be earlier than Start Date.');
+      toast.error("Due Date cannot be earlier than Start Date.");
       setLoading(false);
       return;
     }
@@ -113,27 +125,30 @@ const Kanban_modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
         project: projectId,
       };
 
-      const response = await axios.post('https://eunivate-jys4.onrender.com/api/users/sa-task', newTask);
+      const response = await axios.post(
+        "https://eunivate-jys4.onrender.com/api/users/sa-task",
+        newTask
+      );
       onTaskSubmit(response.data);
-      toast.success('Task submitted successfully!');
+      toast.success("Task submitted successfully!");
       resetForm();
       onClose();
     } catch (error) {
       setLoading(false);
-      console.error('Error saving task:', error);
-      toast.error('Failed to save task.');
+      console.error("Error saving task:", error);
+      toast.error("Failed to save task.");
     }
   };
 
   const resetForm = () => {
-    setTaskName('');
-    setDescription('');
+    setTaskName("");
+    setDescription("");
     setObjectives([]);
     setSelectedObjective(null);
-    setSelectedName('');
-    setStatus('');
-    setStartDate('');
-    setDueDate('');
+    setSelectedName("");
+    setStatus("");
+    setStartDate("");
+    setDueDate("");
     setSelectedFiles([]);
   };
 
@@ -142,8 +157,8 @@ const Kanban_modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
   };
 
   const handleNameSelect = (members) => {
-    const memberNames = members.map(member => member.username).join(', ');
-    setSelectedName(memberNames);  
+    const memberNames = members.map((member) => member.username).join(", ");
+    setSelectedName(memberNames);
   };
 
   const handleClickFileInput = () => {
@@ -159,11 +174,12 @@ const Kanban_modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
 
   return ReactDOM.createPortal(
     <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-end items-center z-50">
-      <div
-        className="bg-white p-6 w-96 max-h-[100vh] overflow-auto rounded-lg shadow-lg transform transition-all duration-500"
-      >
+      <div className="bg-white p-6 w-96 max-h-[100vh] overflow-auto rounded-lg shadow-lg transform transition-all duration-500">
         <div className="flex items-center justify-between mb-4">
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700"
+          >
             <FaTimes size={16} />
           </button>
         </div>
@@ -186,7 +202,7 @@ const Kanban_modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
           >
             <span>Assignee</span>
             <FaUser className="text-gray-500" />
-            <span>{selectedName || 'Assign to'}</span>
+            <span>{selectedName || "Assign to"}</span>
           </button>
         </div>
 
@@ -242,7 +258,7 @@ const Kanban_modal = ({ isOpen, onClose, projectId, onTaskSubmit }) => {
             className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
             disabled={loading}
           >
-            {loading ? <BarLoading /> : 'Submit'}
+            {loading ? <BarLoading /> : "Submit"}
           </button>
         </div>
 

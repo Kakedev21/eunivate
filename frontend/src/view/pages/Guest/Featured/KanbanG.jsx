@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { FaCalendar, FaPaperclip, FaCheckCircle } from 'react-icons/fa';
-import KanbanModalG from '../Modal/KanbanG';
-import TaskDetailModalG from '../EditableModals/TaskDetailModalG';
-import axios from 'axios';
-import { useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { FaCalendar, FaPaperclip, FaCheckCircle } from "react-icons/fa";
+import KanbanModalG from "../Modal/KanbanG";
+import TaskDetailModalG from "../EditableModals/TaskDetailModalG";
+import axios from "axios";
+import { useLocation } from "react-router-dom";
 
 const KanbanG = () => {
   const location = useLocation();
@@ -19,13 +19,15 @@ const KanbanG = () => {
     const fetchTasks = async () => {
       try {
         if (!projectId) {
-          console.error('Project ID is not defined');
+          console.error("Project ID is not defined");
           return;
         }
-        const response = await axios.get(`https://eunivate-jys4.onrender.com/api/users/sa-tasks/${projectId}`);
+        const response = await axios.get(
+          `https://eunivate-jys4.onrender.com/api/users/sa-tasks/${projectId}`
+        );
         setTasks(response.data.data);
       } catch (error) {
-        console.error('Error fetching tasks:', error);
+        console.error("Error fetching tasks:", error);
       }
     };
     if (!initialTasks || initialTasks.length === 0) {
@@ -72,44 +74,58 @@ const KanbanG = () => {
 
     const getPriorityBackgroundColor = (priority) => {
       switch (priority) {
-        case 'easy':
-          return 'bg-green-200 text-green-800';
-        case 'medium':
-          return 'bg-orange-200 text-orange-800';
-        case 'hard':
-          return 'bg-red-200 text-red-800';
+        case "easy":
+          return "bg-green-200 text-green-800";
+        case "medium":
+          return "bg-orange-200 text-orange-800";
+        case "hard":
+          return "bg-red-200 text-red-800";
         default:
-          return 'bg-gray-200 text-gray-800';
+          return "bg-gray-200 text-gray-800";
       }
     };
 
     const formatStartMonth = (startDate) => {
-      if (!startDate) return 'N/A';
+      if (!startDate) return "N/A";
       const date = new Date(startDate);
-      return date.toLocaleString('default', { month: 'short' });
+      return date.toLocaleString("default", { month: "short" });
     };
 
     return (
-      <div className="p-4 rounded-lg shadow-md bg-white relative" onClick={handleTaskClick}>
+      <div
+        className="p-4 rounded-lg shadow-md bg-white relative"
+        onClick={handleTaskClick}
+      >
         <div className="flex items-start justify-between">
-          <div className={`px-3 py-2 text-sm font-medium rounded-sm ${getPriorityBackgroundColor(task.priority)}`}>
+          <div
+            className={`px-3 py-2 text-sm font-medium rounded-sm ${getPriorityBackgroundColor(
+              task.priority
+            )}`}
+          >
             {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
           </div>
-          <div className='flex -space-x-3'>
-            {task.assignee && task.assignee.map((member, index) => (
-              <img
-                key={index}
-                src={member.profilePicture?.url || member.profilePicture || 'https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png'}
-                alt={member.name}
-                className="w-8 h-8 rounded-full border-2 border-white"
-                title={member.name}
-              />
-            ))}
+          <div className="flex -space-x-3">
+            {task.assignee &&
+              task.assignee.map((member, index) => (
+                <img
+                  key={index}
+                  src={
+                    member.profilePicture?.url ||
+                    member.profilePicture ||
+                    "https://www.imghost.net/ib/YgQep2KBICssXI1_1725211680.png"
+                  }
+                  alt={member.name}
+                  className="w-8 h-8 rounded-full border-2 border-white"
+                  title={member.name}
+                />
+              ))}
           </div>
         </div>
         <div className="mt-2">
           <h2 className="text-2xl font-semibold mb-2">{task.taskName}</h2>
-          <p className="text-lg text-gray-800 overflow-hidden text-ellipsis whitespace-nowrap">{task.description}</p>
+          <p className="text-lg text-gray-800 overflow-hidden text-ellipsis whitespace-nowrap">
+            {task.description}
+          </p>
           {task.attachment && task.attachment.length > 0 && (
             <div className="mt-4 flex overflow-x-auto space-x-2 py-2 justify-center">
               {task.attachment.map((attachment, index) => (
@@ -143,28 +159,28 @@ const KanbanG = () => {
 
   return (
     <div className="flex flex-wrap p-4">
-      {['Document', 'Todo', 'Ongoing', 'Done', 'Backlog'].map((status) => (
+      {["Document", "Todo", "Ongoing", "Done", "Backlog"].map((status) => (
         <Column key={status} status={status}>
           {tasks
-            .filter(task => task.status === status)
-            .map(task => (
+            .filter((task) => task.status === status)
+            .map((task) => (
               <TaskCard key={task._id} task={task} />
             ))}
         </Column>
       ))}
-      <KanbanModalG 
-        isOpen={isModalOpen} 
-        onClose={handleCloseModal} 
-        projectId={projectId} 
-        onTaskSubmit={setTasks} 
+      <KanbanModalG
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        projectId={projectId}
+        onTaskSubmit={setTasks}
       />
       <TaskDetailModalG
-        isOpen={isTaskDetailModalOpen} 
-        onClose={handleCloseTaskDetailModal} 
-        task={selectedTask} 
-        projectName={projectName} 
-        onUpdateTask={setTasks} 
-        projectId={projectId} 
+        isOpen={isTaskDetailModalOpen}
+        onClose={handleCloseTaskDetailModal}
+        task={selectedTask}
+        projectName={projectName}
+        onUpdateTask={setTasks}
+        projectId={projectId}
       />
     </div>
   );

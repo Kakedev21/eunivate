@@ -1,10 +1,15 @@
-import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faEdit, faTrashAlt, faFilter } from '@fortawesome/free-solid-svg-icons';
-import Layout from '../../components/Admin/AdminContainer';  
-import { useNavigate } from 'react-router-dom';
-import EditProductModal from '../../components/Admin/EditProductModal';
+import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faSearch,
+  faEdit,
+  faTrashAlt,
+  faFilter,
+} from "@fortawesome/free-solid-svg-icons";
+import Layout from "../../components/Admin/AdminContainer";
+import { useNavigate } from "react-router-dom";
+import EditProductModal from "../../components/Admin/EditProductModal";
 
 const Product = () => {
   const [products, setProducts] = useState([]);
@@ -12,8 +17,8 @@ const Product = () => {
   const [error, setError] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [sortCriteria, setSortCriteria] = useState('name');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [sortCriteria, setSortCriteria] = useState("name");
+  const [searchQuery, setSearchQuery] = useState("");
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [highlightedProductId, setHighlightedProductId] = useState(null); // State for highlighting
@@ -24,12 +29,14 @@ const Product = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('https://eunivate-jys4.onrender.com/api/users/products');
+        const response = await axios.get(
+          "https://eunivate-jys4.onrender.com/api/users/products"
+        );
         setProducts(response.data);
         setLoading(false);
       } catch (error) {
-        console.error('Error fetching products:', error);
-        setError('Failed to fetch products');
+        console.error("Error fetching products:", error);
+        setError("Failed to fetch products");
         setLoading(false);
       }
     };
@@ -39,11 +46,13 @@ const Product = () => {
 
   const handleDelete = async (productId) => {
     try {
-      await axios.delete(`https://eunivate-jys4.onrender.com/api/users/products/${productId}`);
-      setProducts(products.filter(product => product._id !== productId));
+      await axios.delete(
+        `https://eunivate-jys4.onrender.com/api/users/products/${productId}`
+      );
+      setProducts(products.filter((product) => product._id !== productId));
     } catch (error) {
-      console.error('Error deleting product:', error);
-      setError('Failed to delete product');
+      console.error("Error deleting product:", error);
+      setError("Failed to delete product");
     }
   };
 
@@ -53,22 +62,30 @@ const Product = () => {
   };
 
   const handleSave = (updatedProduct) => {
-    setProducts(products.map(product =>
-      product._id === updatedProduct._id ? updatedProduct : product
-    ));
+    setProducts(
+      products.map((product) =>
+        product._id === updatedProduct._id ? updatedProduct : product
+      )
+    );
   };
 
   // Sorting logic
   const sortProducts = (products, criteria) => {
     switch (criteria) {
-      case 'name':
-        return [...products].sort((a, b) => a.productName.localeCompare(b.productName));
-      case 'available':
-        return products.filter(product => product.availability === 'Available');
-      case 'pending':
-        return products.filter(product => product.availability === 'Pending');
-      case 'notAvailable':
-        return products.filter(product => product.availability === 'NotAvailable');
+      case "name":
+        return [...products].sort((a, b) =>
+          a.productName.localeCompare(b.productName)
+        );
+      case "available":
+        return products.filter(
+          (product) => product.availability === "Available"
+        );
+      case "pending":
+        return products.filter((product) => product.availability === "Pending");
+      case "notAvailable":
+        return products.filter(
+          (product) => product.availability === "NotAvailable"
+        );
       default:
         return products; // Show all products by default
     }
@@ -80,7 +97,7 @@ const Product = () => {
     setSearchQuery(query);
     if (query.length > 0) {
       setIsDropdownOpen(true); // Show dropdown when there's input
-      const filtered = products.filter(product =>
+      const filtered = products.filter((product) =>
         product.productName.toLowerCase().includes(query.toLowerCase())
       );
       setFilteredProducts(filtered); // Update filtered products
@@ -98,7 +115,7 @@ const Product = () => {
     // Scroll to the selected product
     const productRef = productRefs.current[product._id];
     if (productRef) {
-      productRef.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      productRef.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   };
 
@@ -125,7 +142,10 @@ const Product = () => {
               value={searchQuery}
               onChange={handleSearchChange}
             />
-            <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+            <FontAwesomeIcon
+              icon={faSearch}
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+            />
 
             {/* Dropdown for search suggestions */}
             {isDropdownOpen && (
@@ -149,7 +169,7 @@ const Product = () => {
 
           <div className="flex items-center mb-4 sm:mb-0">
             <label className="mr-2 text-sm">Sort by</label>
-            <select 
+            <select
               className="p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-700"
               value={sortCriteria}
               onChange={(e) => setSortCriteria(e.target.value)}
@@ -166,9 +186,9 @@ const Product = () => {
         </div>
 
         {/* Add Products Button */}
-        <button 
+        <button
           className="bg-red-700 text-white py-2 px-4 rounded-lg sm:ml-4 mt-4 sm:mt-0"
-          onClick={() => navigate('/admin-addproducts')}
+          onClick={() => navigate("/admin-addproducts")}
         >
           Add Products
         </button>
@@ -189,11 +209,17 @@ const Product = () => {
             {sortedProducts.map((product) => (
               <tr
                 key={product._id}
-                className={`border-b ${highlightedProductId === product._id ? 'bg-yellow-100' : ''}`} // Highlight if selected
-                ref={el => (productRefs.current[product._id] = el)} // Assign ref to product row
+                className={`border-b ${
+                  highlightedProductId === product._id ? "bg-yellow-100" : ""
+                }`} // Highlight if selected
+                ref={(el) => (productRefs.current[product._id] = el)} // Assign ref to product row
               >
-                <td className="py-4 px-6 text-sm sm:text-base">{product.productName}</td>
-                <td className="py-4 px-6 text-sm sm:text-base">{product.description}</td>
+                <td className="py-4 px-6 text-sm sm:text-base">
+                  {product.productName}
+                </td>
+                <td className="py-4 px-6 text-sm sm:text-base">
+                  {product.description}
+                </td>
                 <td className="py-4 px-6">
                   {product.image && product.image.url ? (
                     <img
@@ -208,11 +234,11 @@ const Product = () => {
                 <td className="py-4 px-6 text-sm sm:text-base">
                   <button
                     className={`py-2 px-4 rounded-lg ${
-                      product.availability === 'Available'
-                        ? 'bg-teal-100 text-teal-700'
-                        : product.availability === 'Pending'
-                        ? 'bg-orange-100 text-orange-700'
-                        : 'bg-gray-100 text-gray-700'
+                      product.availability === "Available"
+                        ? "bg-teal-100 text-teal-700"
+                        : product.availability === "Pending"
+                        ? "bg-orange-100 text-orange-700"
+                        : "bg-gray-100 text-gray-700"
                     }`}
                   >
                     {product.availability}
@@ -242,26 +268,32 @@ const Product = () => {
           {sortedProducts.map((product) => (
             <div
               key={product._id}
-              className={`border-b border-gray-200 p-4 ${highlightedProductId === product._id ? 'bg-yellow-100' : ''}`} // Highlight if selected
-              ref={el => (productRefs.current[product._id] = el)} // Assign ref to product
+              className={`border-b border-gray-200 p-4 ${
+                highlightedProductId === product._id ? "bg-yellow-100" : ""
+              }`} // Highlight if selected
+              ref={(el) => (productRefs.current[product._id] = el)} // Assign ref to product
             >
               <div className="flex flex-col items-start">
                 <img
-                  src={product.image && product.image.url ? product.image.url : ''}
+                  src={
+                    product.image && product.image.url ? product.image.url : ""
+                  }
                   alt={product.productName}
                   className="w-full h-32 object-cover rounded-lg"
                 />
                 <div className="mt-2 w-full">
-                  <h3 className="text-lg font-semibold truncate">{product.productName}</h3>
+                  <h3 className="text-lg font-semibold truncate">
+                    {product.productName}
+                  </h3>
                   <p className="text-sm mt-1">{product.description}</p>
                   <p className="text-sm mt-2">
                     <span
                       className={`py-1 px-2 rounded-lg ${
-                        product.availability === 'Available'
-                          ? 'bg-teal-100 text-teal-700'
-                          : product.availability === 'Pending'
-                          ? 'bg-orange-100 text-orange-700'
-                          : 'bg-gray-100 text-gray-700'
+                        product.availability === "Available"
+                          ? "bg-teal-100 text-teal-700"
+                          : product.availability === "Pending"
+                          ? "bg-orange-100 text-orange-700"
+                          : "bg-gray-100 text-gray-700"
                       }`}
                     >
                       {product.availability}

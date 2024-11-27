@@ -1,14 +1,14 @@
 // Other imports remain the same
-import React, { useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';  
-import Jumpdot from '../../pages/SuperAdmin/Loading Style/Dots Loading/Jumpdot';
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import Jumpdot from "../../pages/SuperAdmin/Loading Style/Dots Loading/Jumpdot";
 
 const AdminAddProduct = () => {
   const [selectedImage, setSelectedImage] = useState(null);
-  const [productName, setProductName] = useState('');
-  const [description, setDescription] = useState('');
-  const [availability, setAvailability] = useState('Available');
+  const [productName, setProductName] = useState("");
+  const [description, setDescription] = useState("");
+  const [availability, setAvailability] = useState("Available");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -22,18 +22,18 @@ const AdminAddProduct = () => {
 
   const uploadImageToCloudinary = async (file) => {
     const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', 'EunivateImage'); 
-    formData.append('cloud_name', 'dzxzc7kwb'); 
+    formData.append("file", file);
+    formData.append("upload_preset", "EunivateImage");
+    formData.append("cloud_name", "dzxzc7kwb");
 
     try {
       const response = await axios.post(
-        'https://api.cloudinary.com/v1_1/dzxzc7kwb/image/upload',
+        "https://api.cloudinary.com/v1_1/dzxzc7kwb/image/upload",
         formData
       );
       return response.data.url; // URL of the uploaded image
     } catch (error) {
-      console.error('Error uploading image:', error);
+      console.error("Error uploading image:", error);
       throw error;
     }
   };
@@ -41,7 +41,7 @@ const AdminAddProduct = () => {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError(null); 
+    setError(null);
 
     try {
       let imageUrl = null;
@@ -53,36 +53,44 @@ const AdminAddProduct = () => {
         productName: productName,
         description: description,
         availability: availability,
-        image: imageUrl ? { url: imageUrl, publicId: selectedImage.name } : null,
+        image: imageUrl
+          ? { url: imageUrl, publicId: selectedImage.name }
+          : null,
       };
 
       // Send the product data to the backend
-      const response = await axios.post('https://eunivate-jys4.onrender.com/api/users/addproduct', productData);
+      const response = await axios.post(
+        "https://eunivate-jys4.onrender.com/api/users/addproduct",
+        productData
+      );
 
       console.log(response.data);
       setLoading(false);
-      navigate('/products');
-
+      navigate("/products");
     } catch (error) {
       setLoading(false);
-      console.error('Error uploading product:', error);
-      setError('Failed to upload product. Please try again.'); 
+      console.error("Error uploading product:", error);
+      setError("Failed to upload product. Please try again.");
     }
   };
 
   return (
     <>
-     {loading && (
-  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50">
-    <div className="bg-white p-8 rounded-lg text-center flex flex-col items-center"> 
-      <Jumpdot />
-      <p className="mt-4 text-lg font-bold text-center">Adding: {productName}</p>
-    </div>
-  </div>
-)}
+      {loading && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50">
+          <div className="bg-white p-8 rounded-lg text-center flex flex-col items-center">
+            <Jumpdot />
+            <p className="mt-4 text-lg font-bold text-center">
+              Adding: {productName}
+            </p>
+          </div>
+        </div>
+      )}
 
-
-      <form onSubmit={handleFormSubmit} className="flex flex-col items-center justify-center p-6 rounded-lg bg-white shadow-lg max-w-md mx-auto mt-12">
+      <form
+        onSubmit={handleFormSubmit}
+        className="flex flex-col items-center justify-center p-6 rounded-lg bg-white shadow-lg max-w-md mx-auto mt-12"
+      >
         {/* Upload Image Section */}
         <div className="flex flex-col items-center mb-6 relative">
           <input
@@ -138,7 +146,7 @@ const AdminAddProduct = () => {
                 name="availability"
                 value="Available"
                 className="hidden peer"
-                checked={availability === 'Available'}
+                checked={availability === "Available"}
                 onChange={(e) => setAvailability(e.target.value)}
               />
               <span className="peer-checked:bg-teal-600 peer-checked:text-white peer-checked:border-teal-600 bg-teal-100 text-teal-700 border-2 border-teal-600 rounded-full px-4 py-2 font-bold transition-all">
@@ -151,7 +159,7 @@ const AdminAddProduct = () => {
                 name="availability"
                 value="Pending"
                 className="hidden peer"
-                checked={availability === 'Pending'}
+                checked={availability === "Pending"}
                 onChange={(e) => setAvailability(e.target.value)}
               />
               <span className="peer-checked:bg-orange-500 peer-checked:text-white peer-checked:border-orange-500 bg-orange-100 text-orange-600 border-2 border-orange-500 rounded-full px-4 py-2 font-bold transition-all">
@@ -164,7 +172,7 @@ const AdminAddProduct = () => {
                 name="availability"
                 value="NotAvailable"
                 className="hidden peer"
-                checked={availability === 'NotAvailable'}
+                checked={availability === "NotAvailable"}
                 onChange={(e) => setAvailability(e.target.value)}
               />
               <span className="peer-checked:bg-gray-500 peer-checked:text-white peer-checked:border-gray-500 bg-gray-200 text-gray-600 border-2 border-gray-500 rounded-full px-4 py-2 font-bold transition-all">
@@ -179,7 +187,10 @@ const AdminAddProduct = () => {
 
         {/* Save Button */}
         <div className="flex flex-col items-center">
-          <button type="submit" className="w-48 h-12 rounded-full bg-red-800 text-white">
+          <button
+            type="submit"
+            className="w-48 h-12 rounded-full bg-red-800 text-white"
+          >
             Save
           </button>
         </div>

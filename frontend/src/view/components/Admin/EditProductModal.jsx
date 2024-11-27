@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { FaTimes } from 'react-icons/fa';
+import React, { useState } from "react";
+import axios from "axios";
+import { FaTimes } from "react-icons/fa";
 
 const EditProductModal = ({ product, onClose, onSave }) => {
   const [productName, setProductName] = useState(product.productName);
   const [description, setDescription] = useState(product.description);
   const [availability, setAvailability] = useState(product.availability);
   const [image, setImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState(product.image?.url || ''); 
+  const [imagePreview, setImagePreview] = useState(product.image?.url || "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -15,25 +15,25 @@ const EditProductModal = ({ product, onClose, onSave }) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setImage(file);
-      setImagePreview(URL.createObjectURL(file)); 
+      setImagePreview(URL.createObjectURL(file));
     }
   };
 
   const uploadImageToCloudinary = async (file) => {
     const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', 'EunivateImage');
-    formData.append('cloud_name', 'dzxzc7kwb');
+    formData.append("file", file);
+    formData.append("upload_preset", "EunivateImage");
+    formData.append("cloud_name", "dzxzc7kwb");
 
     try {
       const response = await axios.post(
-        'https://api.cloudinary.com/v1_1/dzxzc7kwb/image/upload',
+        "https://api.cloudinary.com/v1_1/dzxzc7kwb/image/upload",
         formData
       );
       return response.data.url;
     } catch (error) {
-      console.error('Error uploading image:', error);
-      setError('Failed to upload image');
+      console.error("Error uploading image:", error);
+      setError("Failed to upload image");
       throw error;
     }
   };
@@ -70,8 +70,8 @@ const EditProductModal = ({ product, onClose, onSave }) => {
       onSave(response.data);
       onClose(); // Close the modal after saving
     } catch (error) {
-      console.error('Error updating product', error);
-      setError('Failed to update product');
+      console.error("Error updating product", error);
+      setError("Failed to update product");
       setLoading(false);
     }
   };
@@ -152,7 +152,7 @@ const EditProductModal = ({ product, onClose, onSave }) => {
             onClick={handleSave}
             disabled={loading}
           >
-            {loading ? 'Saving...' : 'Save'}
+            {loading ? "Saving..." : "Save"}
           </button>
         </div>
       </div>

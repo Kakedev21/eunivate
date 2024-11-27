@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 const EventsPage = () => {
   const [webinars, setWebinars] = useState([]);
@@ -9,12 +9,14 @@ const EventsPage = () => {
   useEffect(() => {
     const fetchWebinars = async () => {
       try {
-        const response = await axios.get('https://eunivate-jys4.onrender.com/api/users/events');
+        const response = await axios.get(
+          "https://eunivate-jys4.onrender.com/api/users/events"
+        );
         setWebinars(response.data);
         setLoading(false);
       } catch (error) {
-        console.error('Error fetching webinars:', error);
-        setError('Failed to fetch webinars');
+        console.error("Error fetching webinars:", error);
+        setError("Failed to fetch webinars");
         setLoading(false);
       }
     };
@@ -40,32 +42,40 @@ const EventsPage = () => {
       {/* Webinar Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {webinars.map((webinar) => (
-          <a 
-            key={webinar._id} 
-            href={webinar.embeddedLink} 
-            target="_blank" 
-            rel="noopener noreferrer" 
+          <a
+            key={webinar._id}
+            href={webinar.embeddedLink}
+            target="_blank"
+            rel="noopener noreferrer"
             className="bg-white shadow-lg rounded-lg overflow-hidden transform transition duration-200 hover:shadow-xl"
           >
             {webinar.image && webinar.image.url ? (
-              <img 
-                src={webinar.image.url} 
-                alt={webinar.webinarName} 
+              <img
+                src={webinar.image.url}
+                alt={webinar.webinarName}
                 className="w-full h-48 object-cover"
               />
             ) : (
-              <img 
-                src="https://via.placeholder.com/400" 
-                alt="Placeholder" 
+              <img
+                src="https://via.placeholder.com/400"
+                alt="Placeholder"
                 className="w-full h-48 object-cover"
               />
             )}
             <div className="p-4">
-              <h2 className="text-lg font-semibold text-gray-700">{webinar.webinarName}</h2>
+              <h2 className="text-lg font-semibold text-gray-700">
+                {webinar.webinarName}
+              </h2>
               <p className="text-gray-500 mt-2">{webinar.description}</p>
-              <p className="text-xs text-gray-500 mt-2">{webinar.dateAndTime}</p>
+              <p className="text-xs text-gray-500 mt-2">
+                {webinar.dateAndTime}
+              </p>
               <p className="text-xs text-blue-500 mt-2">
-                <a href={webinar.embeddedLink} target="_blank" rel="noopener noreferrer">
+                <a
+                  href={webinar.embeddedLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   {webinar.embeddedLink}
                 </a>
               </p>

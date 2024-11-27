@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { FaPlus, FaCalendar, FaPaperclip, FaCheckCircle } from 'react-icons/fa';
-import { useDrag, useDrop, DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
-import ModalMem from '../KanbanModals/ModalMem';
-import TaskDetailModalMem from '../EditableModals/TaskDetailModalMem';
-import axios from 'axios';
-import { useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { FaPlus, FaCalendar, FaPaperclip, FaCheckCircle } from "react-icons/fa";
+import { useDrag, useDrop, DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import ModalMem from "../KanbanModals/ModalMem";
+import TaskDetailModalMem from "../EditableModals/TaskDetailModalMem";
+import axios from "axios";
+import { useLocation } from "react-router-dom";
 
 const ItemType = {
-  TASK: 'task',
+  TASK: "task",
 };
 
 const Kanban_mem = () => {
@@ -21,12 +21,14 @@ const Kanban_mem = () => {
 
   useEffect(() => {
     const fetchTasks = async () => {
-      if (!projectId) return console.error('Project ID is not defined');
+      if (!projectId) return console.error("Project ID is not defined");
       try {
-        const response = await axios.get(`https://eunivate-jys4.onrender.com/api/users/sa-tasks/${projectId}`);
+        const response = await axios.get(
+          `https://eunivate-jys4.onrender.com/api/users/sa-tasks/${projectId}`
+        );
         setTasks(response.data.data); // Update the tasks state with fetched data
       } catch (error) {
-        console.error('Error fetching tasks:', error);
+        console.error("Error fetching tasks:", error);
       }
     };
 
@@ -46,56 +48,61 @@ const Kanban_mem = () => {
     setSelectedTask(null);
   };
 
-
   const updateTaskStatus = async (taskId, newStatus, modifiedBy) => {
     try {
       // Capture the user details
-      const user = JSON.parse(localStorage.getItem('user'));
+      const user = JSON.parse(localStorage.getItem("user"));
       const modifiedUser = {
         username: `${user.firstName} ${user.lastName}`,
-        profilePicture: user.profilePicture?.url || user.profilePicture || 'default_image_url.png',
+        profilePicture:
+          user.profilePicture?.url ||
+          user.profilePicture ||
+          "default_image_url.png",
       };
-  
+
       // Update the task status on the server and include the history entry
-      await axios.patch(`https://eunivate-jys4.onrender.com/api/users/sa-tasks/${taskId}`, {
-        status: newStatus,
-        modifiedBy: modifiedBy,
-        history: [
-          ...(tasks.find(task => task._id === taskId).history || []), // Include existing history
-          {
-            modifiedBy: modifiedUser,
-            modifiedAt: new Date().toISOString(),
-            changes: JSON.stringify({ status: newStatus }),
-          },
-        ],
-      });
+      await axios.patch(
+        `https://eunivate-jys4.onrender.com/api/users/sa-tasks/${taskId}`,
+        {
+          status: newStatus,
+          modifiedBy: modifiedBy,
+          history: [
+            ...(tasks.find((task) => task._id === taskId).history || []), // Include existing history
+            {
+              modifiedBy: modifiedUser,
+              modifiedAt: new Date().toISOString(),
+              changes: JSON.stringify({ status: newStatus }),
+            },
+          ],
+        }
+      );
     } catch (error) {
-      console.error('Error updating task status:', error);
+      console.error("Error updating task status:", error);
     }
   };
-  
+
   const moveTask = (taskId, newStatus) => {
-    const updatedTask = tasks.find(task => task._id === taskId);
+    const updatedTask = tasks.find((task) => task._id === taskId);
     if (updatedTask) {
       updatedTask.status = newStatus;
-      const user = JSON.parse(localStorage.getItem('user'));
+      const user = JSON.parse(localStorage.getItem("user"));
       const currentUserId = user?._id;
       setTasks([...tasks]);
-      updateTaskStatus(taskId, newStatus,currentUserId);
+      updateTaskStatus(taskId, newStatus, currentUserId);
     }
   };
 
-
   const handleTaskSubmit = (newTask) => {
-    setTasks(prevTasks => [...prevTasks, newTask]);
+    setTasks((prevTasks) => [...prevTasks, newTask]);
   };
 
   const handleUpdateTask = (updatedTask) => {
-    const updatedTasks = tasks.map(task => 
+    const updatedTasks = tasks.map((task) =>
       task._id === updatedTask._id ? updatedTask : task
     );
     setTasks(updatedTasks);
-    if (selectedTask && selectedTask._id === updatedTask._id) setSelectedTask(updatedTask);
+    if (selectedTask && selectedTask._id === updatedTask._id)
+      setSelectedTask(updatedTask);
   };
 
   const Column = ({ status, children }) => {
@@ -111,7 +118,7 @@ const Kanban_mem = () => {
           <button
             onClick={handleOpenModal}
             className="text-gray-600 p-0 flex items-center justify-center"
-            style={{ width: '30px', height: '30px' }}
+            style={{ width: "30px", height: "30px" }}
           >
             <FaPlus size={16} />
           </button>
@@ -131,23 +138,23 @@ const Kanban_mem = () => {
 
     const getPriorityBackgroundColor = (priority) => {
       switch (priority) {
-        case 'easy':
-          return 'bg-green-200 text-green-800';
-        case 'medium':
-          return 'bg-orange-200 text-orange-800';
-        case 'hard':
-          return 'bg-red-200 text-red-800';
+        case "easy":
+          return "bg-green-200 text-green-800";
+        case "medium":
+          return "bg-orange-200 text-orange-800";
+        case "hard":
+          return "bg-red-200 text-red-800";
         default:
-          return 'bg-gray-200 text-gray-800';
+          return "bg-gray-200 text-gray-800";
       }
     };
 
     const formatStartMonth = (startDate) => {
-      if (!startDate) return 'N/A';
+      if (!startDate) return "N/A";
       const date = new Date(startDate);
-      return date.toLocaleString('default', { month: 'short' });
+      return date.toLocaleString("default", { month: "short" });
     };
-    
+
     const Tooltip = ({ children, title }) => {
       return (
         <div className="relative group">
@@ -162,28 +169,45 @@ const Kanban_mem = () => {
       );
     };
     return (
-      <div ref={drag} className="p-4 rounded-lg shadow-md bg-white relative" onClick={handleTaskClick}>
+      <div
+        ref={drag}
+        className="p-4 rounded-lg shadow-md bg-white relative"
+        onClick={handleTaskClick}
+      >
         <div className="flex items-start justify-between">
-          <div className={`px-3 py-2 text-sm font-medium rounded-sm ${getPriorityBackgroundColor(task.priority)}`}>
+          <div
+            className={`px-3 py-2 text-sm font-medium rounded-sm ${getPriorityBackgroundColor(
+              task.priority
+            )}`}
+          >
             {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
           </div>
-          <div className='flex -space-x-3'>
+          <div className="flex -space-x-3">
             {task.assignee?.map((member, index) => (
-               <Tooltip key={index} title={`${member.firstName} ${member.lastName}`}>
-              <img
+              <Tooltip
                 key={index}
-                src={member.profilePicture?.url || member.profilePicture || 'default_image_url.png'}
-                alt={member.name}
-                className="w-8 h-8 rounded-full border-2 border-white"
-                title={member.name}
-              />
+                title={`${member.firstName} ${member.lastName}`}
+              >
+                <img
+                  key={index}
+                  src={
+                    member.profilePicture?.url ||
+                    member.profilePicture ||
+                    "default_image_url.png"
+                  }
+                  alt={member.name}
+                  className="w-8 h-8 rounded-full border-2 border-white"
+                  title={member.name}
+                />
               </Tooltip>
             ))}
           </div>
         </div>
         <div className="mt-2">
           <h2 className="text-2xl font-semibold mb-2">{task.taskName}</h2>
-          <p className="text-lg text-gray-800 overflow-hidden text-ellipsis whitespace-nowrap">{task.description}</p>
+          <p className="text-lg text-gray-800 overflow-hidden text-ellipsis whitespace-nowrap">
+            {task.description}
+          </p>
           {task.attachment?.length > 0 && (
             <div className="mt-4 flex overflow-x-auto space-x-2 py-2 justify-center">
               {task.attachment.map((attachment, index) => (
@@ -218,29 +242,29 @@ const Kanban_mem = () => {
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="flex flex-wrap p-4">
-        {['Document', 'Todo', 'Ongoing', 'Done', 'Backlog'].map((status) => (
+        {["Document", "Todo", "Ongoing", "Done", "Backlog"].map((status) => (
           <Column key={status} status={status}>
             {tasks
-              .filter(task => task.status === status)
-              .map(task => (
+              .filter((task) => task.status === status)
+              .map((task) => (
                 <TaskCard key={task._id} task={task} />
               ))}
           </Column>
         ))}
       </div>
-      <ModalMem 
-        isOpen={isModalOpen} 
-        onClose={handleCloseModal} 
-        projectId={projectId} 
-        onTaskSubmit={handleTaskSubmit} 
+      <ModalMem
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        projectId={projectId}
+        onTaskSubmit={handleTaskSubmit}
       />
       <TaskDetailModalMem
-        isOpen={isTaskDetailModalOpen} 
-        onClose={handleCloseTaskDetailModal} 
-        task={selectedTask} 
-        projectName={projectName} 
-        onUpdateTask={handleUpdateTask} 
-        projectId={projectId} 
+        isOpen={isTaskDetailModalOpen}
+        onClose={handleCloseTaskDetailModal}
+        task={selectedTask}
+        projectName={projectName}
+        onUpdateTask={handleUpdateTask}
+        projectId={projectId}
       />
     </DndProvider>
   );

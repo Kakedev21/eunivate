@@ -1,15 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faEdit, faTrashAlt, faFilter } from '@fortawesome/free-solid-svg-icons';
-import Layout from '../../components/Admin/AdminContainer';  
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import EditProjectModal from '../../components/Admin/EditProjectModal.jsx';
+import React, { useState, useEffect } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faSearch,
+  faEdit,
+  faTrashAlt,
+  faFilter,
+} from "@fortawesome/free-solid-svg-icons";
+import Layout from "../../components/Admin/AdminContainer";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import EditProjectModal from "../../components/Admin/EditProjectModal.jsx";
 
 const Projects = () => {
   const [projects, setProjects] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortKey, setSortKey] = useState('projectName');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortKey, setSortKey] = useState("projectName");
   const [selectedProject, setSelectedProject] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const navigate = useNavigate();
@@ -18,10 +23,12 @@ const Projects = () => {
     // Fetch projects from the backend
     const fetchProjects = async () => {
       try {
-        const response = await axios.get('https://eunivate-jys4.onrender.com/api/users/projects');
+        const response = await axios.get(
+          "https://eunivate-jys4.onrender.com/api/users/projects"
+        );
         setProjects(response.data);
       } catch (error) {
-        console.error('Error fetching projects:', error);
+        console.error("Error fetching projects:", error);
       }
     };
 
@@ -30,10 +37,12 @@ const Projects = () => {
 
   const handleDelete = async (projectId) => {
     try {
-      await axios.delete('https://eunivate-jys4.onrender.com/api/users/projects/${projectId}');
-      setProjects(projects.filter(project => project._id !== projectId));
+      await axios.delete(
+        "https://eunivate-jys4.onrender.com/api/users/projects/${projectId}"
+      );
+      setProjects(projects.filter((project) => project._id !== projectId));
     } catch (error) {
-      console.error('Error deleting project:', error);
+      console.error("Error deleting project:", error);
     }
   };
 
@@ -43,15 +52,20 @@ const Projects = () => {
   };
 
   const handleEditSave = (updatedProject) => {
-    setProjects(projects.map(project => project._id === updatedProject._id ? updatedProject : project));
+    setProjects(
+      projects.map((project) =>
+        project._id === updatedProject._id ? updatedProject : project
+      )
+    );
     setIsEditModalOpen(false);
   };
 
   const filteredProjects = projects
-    .filter(project =>
-      project.projectName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      project.teamMembers.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      project.adviser.toLowerCase().includes(searchTerm.toLowerCase())
+    .filter(
+      (project) =>
+        project.projectName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        project.teamMembers.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        project.adviser.toLowerCase().includes(searchTerm.toLowerCase())
     )
     .sort((a, b) => {
       if (a[sortKey] < b[sortKey]) return -1;
@@ -71,7 +85,10 @@ const Projects = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+          <FontAwesomeIcon
+            icon={faSearch}
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+          />
         </div>
 
         <div className="flex items-center mb-4 sm:mb-0">
@@ -91,9 +108,9 @@ const Projects = () => {
         </div>
 
         <div className="mb-4">
-          <button 
+          <button
             className="bg-red-700 text-white py-2 px-4 rounded-lg w-full"
-            onClick={() => navigate('/admin-addprojects')}
+            onClick={() => navigate("/admin-addprojects")}
           >
             Add Project
           </button>
@@ -110,7 +127,10 @@ const Projects = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+          <FontAwesomeIcon
+            icon={faSearch}
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+          />
         </div>
         <div className="flex items-center ml-4">
           <label className="mr-2">Sort by</label>
@@ -127,9 +147,9 @@ const Projects = () => {
             <FontAwesomeIcon icon={faFilter} />
           </button>
         </div>
-        <button 
+        <button
           className="bg-red-700 text-white py-2 px-4 rounded-lg ml-4"
-          onClick={() => navigate('/admin-addprojects')}
+          onClick={() => navigate("/admin-addprojects")}
         >
           Add Project
         </button>
@@ -138,10 +158,13 @@ const Projects = () => {
       {/* Card Layout for Mobile */}
       <div className="block md:hidden">
         {filteredProjects.map((project, index) => (
-          <div key={index} className="border-b border-gray-200 mb-4 p-4 rounded-lg shadow-md bg-white">
+          <div
+            key={index}
+            className="border-b border-gray-200 mb-4 p-4 rounded-lg shadow-md bg-white"
+          >
             <div className="flex items-center mb-4">
               <img
-                src={project.image?.url || 'placeholder.png'}
+                src={project.image?.url || "placeholder.png"}
                 alt="Project"
                 className="w-16 h-16 object-cover rounded-lg mr-4"
               />
@@ -191,16 +214,16 @@ const Projects = () => {
                 <td className="py-4 px-6">{project.adviser}</td>
                 <td className="py-4 px-6">
                   <img
-                    src={project.image?.url || 'placeholder.png'}
+                    src={project.image?.url || "placeholder.png"}
                     alt="Project"
                     className="w-12 h-12 object-cover rounded-lg"
                   />
                 </td>
                 <td className="py-4 px-6 text-right">
-                  <button 
+                  <button
                     className="mr-2 text-gray-600 hover:text-gray-900"
                     onClick={() => handleEdit(project)}
-                    >
+                  >
                     <FontAwesomeIcon icon={faEdit} />
                   </button>
                   <button
@@ -228,4 +251,3 @@ const Projects = () => {
 };
 
 export default Projects;
-

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { FaTimes } from 'react-icons/fa';
+import React, { useState } from "react";
+import axios from "axios";
+import { FaTimes } from "react-icons/fa";
 
 const EditProjectModal = ({ project, onClose, onSave }) => {
   const [projectName, setProjectName] = useState(project.projectName);
@@ -8,7 +8,7 @@ const EditProjectModal = ({ project, onClose, onSave }) => {
   const [adviser, setAdviser] = useState(project.adviser);
   const [description, setDescription] = useState(project.description);
   const [image, setImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState(project.image?.url || ''); 
+  const [imagePreview, setImagePreview] = useState(project.image?.url || "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -16,25 +16,25 @@ const EditProjectModal = ({ project, onClose, onSave }) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setImage(file);
-      setImagePreview(URL.createObjectURL(file)); 
+      setImagePreview(URL.createObjectURL(file));
     }
   };
 
   const uploadImageToCloudinary = async (file) => {
     const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', 'EunivateImage');
-    formData.append('cloud_name', 'dzxzc7kwb');
+    formData.append("file", file);
+    formData.append("upload_preset", "EunivateImage");
+    formData.append("cloud_name", "dzxzc7kwb");
 
     try {
       const response = await axios.post(
-        'https://api.cloudinary.com/v1_1/dzxzc7kwb/image/upload',
+        "https://api.cloudinary.com/v1_1/dzxzc7kwb/image/upload",
         formData
       );
       return response.data.url;
     } catch (error) {
-      console.error('Error uploading image:', error);
-      setError('Failed to upload image');
+      console.error("Error uploading image:", error);
+      setError("Failed to upload image");
       throw error;
     }
   };
@@ -72,8 +72,8 @@ const EditProjectModal = ({ project, onClose, onSave }) => {
       onSave(response.data);
       onClose(); // Close the modal after saving
     } catch (error) {
-      console.error('Error updating project', error);
-      setError('Failed to update project');
+      console.error("Error updating project", error);
+      setError("Failed to update project");
       setLoading(false);
     }
   };
@@ -160,7 +160,7 @@ const EditProjectModal = ({ project, onClose, onSave }) => {
             onClick={handleSave}
             disabled={loading}
           >
-            {loading ? 'Saving...' : 'Save'}
+            {loading ? "Saving..." : "Save"}
           </button>
         </div>
       </div>

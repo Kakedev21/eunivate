@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Loginback } from '../../../constants/assets';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import React, { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { Loginback } from "../../../constants/assets";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 
 const ResetPassword = () => {
   const { token } = useParams(); // Get token from URL
   const navigate = useNavigate();
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [showPassword, setShowPassword] = useState(false); // State for password visibility
   const [showConfirmPassword, setShowConfirmPassword] = useState(false); // State for confirm password visibility
 
@@ -31,29 +31,35 @@ const ResetPassword = () => {
     }
 
     try {
-      const response = await fetch(`https://eunivate-jys4.onrender.com/api/users/reset-password/${token}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ password }),
-      });
+      const response = await fetch(
+        `https://eunivate-jys4.onrender.com/api/users/reset-password/${token}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ password }),
+        }
+      );
 
       const data = await response.json();
 
       if (response.ok) {
         setSuccess("Password reset successfully!");
-        setTimeout(() => navigate('/login'), 3000); // Redirect to login page
+        setTimeout(() => navigate("/login"), 3000); // Redirect to login page
       } else {
-        setError(data.message || 'Something went wrong');
+        setError(data.message || "Something went wrong");
       }
     } catch (err) {
-      setError('An error occurred');
+      setError("An error occurred");
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100" style={{ backgroundImage: `url(${Loginback})` }}>
+    <div
+      className="flex items-center justify-center min-h-screen bg-gray-100"
+      style={{ backgroundImage: `url(${Loginback})` }}
+    >
       <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
         <h2 className="text-2xl font-bold text-center mb-6">Reset Password</h2>
 
@@ -65,7 +71,7 @@ const ResetPassword = () => {
             <label className="block text-gray-700 mb-2">New Password</label>
             <div className="relative">
               <input
-                type={showPassword ? 'text' : 'password'} // Toggle input type based on state
+                type={showPassword ? "text" : "password"} // Toggle input type based on state
                 placeholder="Enter new password"
                 className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 pr-10"
                 value={password}
@@ -82,10 +88,12 @@ const ResetPassword = () => {
           </div>
 
           <div className="mb-4 relative">
-            <label className="block text-gray-700 mb-2">Confirm New Password</label>
+            <label className="block text-gray-700 mb-2">
+              Confirm New Password
+            </label>
             <div className="relative">
               <input
-                type={showConfirmPassword ? 'text' : 'password'} // Toggle input type based on state
+                type={showConfirmPassword ? "text" : "password"} // Toggle input type based on state
                 placeholder="Confirm new password"
                 className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 pr-10"
                 value={confirmPassword}
@@ -96,7 +104,9 @@ const ResetPassword = () => {
                 onClick={toggleConfirmPasswordVisibility}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"
               >
-                <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye} />
+                <FontAwesomeIcon
+                  icon={showConfirmPassword ? faEyeSlash : faEye}
+                />
               </span>
             </div>
           </div>

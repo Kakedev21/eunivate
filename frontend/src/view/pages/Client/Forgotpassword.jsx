@@ -1,37 +1,40 @@
-import React, { useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEnvelope, faArrowLeft } from '@fortawesome/free-solid-svg-icons';  // Add faArrowLeft here
-import { Loginback } from '../../../constants/assets';
+import React, { useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEnvelope, faArrowLeft } from "@fortawesome/free-solid-svg-icons"; // Add faArrowLeft here
+import { Loginback } from "../../../constants/assets";
 
 const ForgotPassword = () => {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [error, setError] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    if (email === '') {
-      setError('We cannot find your email.');
+
+    if (email === "") {
+      setError("We cannot find your email.");
     } else {
       setError(null);
       try {
-        const response = await fetch('https://eunivate-jys4.onrender.com/api/users/forgot-password', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ email }),
-        });
-  
+        const response = await fetch(
+          "https://eunivate-jys4.onrender.com/api/users/forgot-password",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email }),
+          }
+        );
+
         const data = await response.json();
         if (response.ok) {
           setError(null);
-          alert('Password reset link sent to your email');
+          alert("Password reset link sent to your email");
         } else {
-          setError(data.message || 'Something went wrong');
+          setError(data.message || "Something went wrong");
         }
       } catch (err) {
-        setError('An error occurred');
+        setError("An error occurred");
       }
     }
   };
@@ -42,8 +45,14 @@ const ForgotPassword = () => {
     >
       <div className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full">
         <div className="text-center mb-6">
-          <FontAwesomeIcon icon={faEnvelope} size="3x" className="text-yellow-500" />
-          <h2 className="text-2xl font-bold text-gray-800 mt-4">Forgot Password</h2>
+          <FontAwesomeIcon
+            icon={faEnvelope}
+            size="3x"
+            className="text-yellow-500"
+          />
+          <h2 className="text-2xl font-bold text-gray-800 mt-4">
+            Forgot Password
+          </h2>
           <p className="text-gray-500 mt-2">
             Enter your email and we'll send you a link to reset your password.
           </p>
@@ -51,7 +60,10 @@ const ForgotPassword = () => {
 
         <form onSubmit={handleSubmit}>
           <div className="mb-4 relative">
-            <FontAwesomeIcon icon={faEnvelope} className="absolute left-3 top-4 text-gray-500" />
+            <FontAwesomeIcon
+              icon={faEnvelope}
+              className="absolute left-3 top-4 text-gray-500"
+            />
             <input
               type="email"
               placeholder="Enter your email"
@@ -71,7 +83,10 @@ const ForgotPassword = () => {
         </form>
 
         <div className="text-center mt-6">
-          <a href="/login" className="text-sm text-gray-700 hover:text-red-600 transition duration-300">
+          <a
+            href="/login"
+            className="text-sm text-gray-700 hover:text-red-600 transition duration-300"
+          >
             <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
             Back to Login
           </a>
