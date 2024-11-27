@@ -11,6 +11,8 @@ import GanttChart from "./GanttChart";
 import RaciMatrix from "./RaciMatrix";
 import BarLoading from "./Loading Style/Fill Renamed Loading/Loader.jsx";
 
+const apiUrl = "https://eunivate-jys4.onrender.com";
+
 const ProjectDetails = () => {
   const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
   const [selectedView, setSelectedView] = useState("Kanban");
@@ -40,7 +42,7 @@ const ProjectDetails = () => {
     const fetchTasks = async () => {
       // Existing fetch logic
       const response = await axios.get(
-        `https://eunivate-jys4.onrender.com/api/users/sa-tasks/${projectId}`
+        `${apiUrl}/api/users/sa-tasks/${projectId}`
       );
       setTasks(response.data.data);
     };
