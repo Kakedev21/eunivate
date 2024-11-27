@@ -10,6 +10,7 @@ import Calendar from "./Calendar";
 import GanttChart from "./GanttChart";
 import RaciMatrix from "./RaciMatrix";
 import BarLoading from "./Loading Style/Fill Renamed Loading/Loader.jsx";
+import { apiUrl } from "../../../../../Api.js";
 
 const ProjectDetails = () => {
   const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
@@ -59,7 +60,7 @@ const ProjectDetails = () => {
         }
 
         const response = await axios.get(
-          `https://eunivate-jys4.onrender.com/api/users/sa-getnewproject/${projectId}`,
+          `${apiUrl}/sa-getnewproject/${projectId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
