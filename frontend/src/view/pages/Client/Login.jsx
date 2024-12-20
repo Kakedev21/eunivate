@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Loginback } from "../../../constants/assets";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -28,7 +29,7 @@ const Login = () => {
     setLoading(true);
     try {
       const response = await axios.post(
-        "https://eunivate-jys4.onrender.com/api/users/login",
+        "http://localhost:5000/api/users/login",
         {
           email,
           password,
@@ -38,81 +39,74 @@ const Login = () => {
       const data = response.data;
 
       if (response.status === 200) {
-        if (data.twoFactorEnabled) {
-          localStorage.setItem(
-            "user",
-            JSON.stringify({
-              userId: data._id,
-              email: data.email,
-              accessToken: data.accessToken,
-            })
-          );
-          navigate("/verify-2fa-pending");
-        } else {
-          const {
+        toast.success("Login successful!");
+
+        const {
+          _id,
+          firstName,
+          lastName,
+          email,
+          role,
+          username,
+          phoneNumber,
+          profilePicture,
+          accessToken,
+        } = data;
+
+        localStorage.setItem(
+          "user",
+          JSON.stringify({
             _id,
             firstName,
             lastName,
-            email,
-            role,
             username,
+            email,
             phoneNumber,
             profilePicture,
+            role,
             accessToken,
-            twoFactorToken,
-          } = data;
+          })
+        );
 
+        if (rememberMe) {
+          const newCreds = { email, password };
+          const updatedCreds = [
+            ...savedCredentials.filter((cred) => cred.email !== email),
+            newCreds,
+          ];
           localStorage.setItem(
-            "user",
-            JSON.stringify({
-              _id,
-              firstName,
-              lastName,
-              username,
-              email,
-              phoneNumber,
-              profilePicture,
-              role,
-              twoFactorToken,
-              accessToken,
-            })
+            "savedCredentials",
+            JSON.stringify(updatedCreds)
           );
+        }
 
-          if (rememberMe) {
-            const newCreds = { email, password };
-            const updatedCreds = [
-              ...savedCredentials.filter((cred) => cred.email !== email),
-              newCreds,
-            ];
-            localStorage.setItem(
-              "savedCredentials",
-              JSON.stringify(updatedCreds)
-            );
-          }
-
-          const roleLowerCase = role.toLowerCase();
-          if (roleLowerCase === "superadmin") {
-            navigate("/superadmin/dashboard");
-          } else if (roleLowerCase === "admin") {
-            navigate("/admin");
-          } else if (roleLowerCase === "member") {
-            navigate("/member-dashboard");
-          } else if (roleLowerCase === "guest") {
-            navigate("/guest-dashboard"); // New route for guest accounts
-          } else if (roleLowerCase === "user") {
-            navigate("/");
-          } else {
-            console.error("Unknown role:", role);
-          }
+        const roleLowerCase = role.toLowerCase();
+        if (roleLowerCase === "superadmin") {
+          navigate("/superadmin/dashboard");
+        } else if (roleLowerCase === "admin") {
+          navigate("/admin");
+        } else if (roleLowerCase === "member") {
+          navigate("/member-dashboard");
+        } else if (roleLowerCase === "guest") {
+          navigate("/guest-dashboard");
+        } else if (roleLowerCase === "user") {
+          navigate("/");
+        } else {
+          console.error("Unknown role:", role);
         }
       }
     } catch (error) {
       setLoading(false);
       if (error.response && error.response.status === 400) {
+        toast.error("Invalid email or password.");
         setError("Invalid email or password.");
       } else if (error.response && error.response.status === 404) {
+        toast.error("Email not found.");
         setError("Email not found.");
       } else {
+        toast.error(
+          "An error occurred while trying to log in. Please try again later."
+        );
         setError(
           "An error occurred while trying to log in. Please try again later."
         );

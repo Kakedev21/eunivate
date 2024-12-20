@@ -16,7 +16,12 @@ const ItemType = {
   TASK: "task",
 };
 
-const Kanban = ({ projectId, projectName }) => {
+const Kanban = ({
+  projectId,
+  projectName,
+  setTasks: updateParentTasks,
+  members,
+}) => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [isTaskDetailModalOpen, setTaskDetailModalOpen] = useState(false);
   const [tasks, setTasks] = useState([]);
@@ -30,7 +35,7 @@ const Kanban = ({ projectId, projectName }) => {
           return;
         }
         const response = await axios.get(
-          `https://eunivate-jys4.onrender.com/api/users/sa-tasks/${projectId}`
+          `http://localhost:5000/api/users/sa-tasks/${projectId}`
         );
         setTasks(response.data.data);
       } catch (error) {
@@ -64,38 +69,105 @@ const Kanban = ({ projectId, projectName }) => {
       const user = JSON.parse(localStorage.getItem("user"));
       const modifiedUser = {
         username: `${user.firstName} ${user.lastName}`,
-        profilePicture:
-          user.profilePicture?.url ||
-          user.profilePicture ||
-          defaultProfilePictureUrl,
+        profilePicture: user.profilePicture?.url || user.profilePicture,
       };
 
       // Update the task status on the server
-      await axios.patch(
-        `https://eunivate-jys4.onrender.com/api/users/sa-tasks/${taskId}`,
-        {
-          status: newStatus,
-          modifiedBy: modifiedBy,
-          history: {
-            modifiedBy: modifiedUser,
-            modifiedAt: new Date().toISOString(),
-            changes: JSON.stringify({ status: newStatus }),
-          },
-        }
-      );
+      await axios.patch(`http://localhost:5000/api/users/sa-tasks/${taskId}`, {
+        status: newStatus,
+        modifiedBy: modifiedBy,
+        history: {
+          modifiedBy: modifiedUser,
+          modifiedAt: new Date().toISOString(),
+          changes: JSON.stringify({ status: newStatus }),
+        },
+      });
+
+      console.log(`Task ${taskId} status updated to ${newStatus}`);
     } catch (error) {
       console.error("Error updating task status:", error);
+      throw error; // Propagate error to handle it in moveTask
     }
   };
 
-  const moveTask = (taskId, newStatus) => {
-    const updatedTask = tasks.find((task) => task._id === taskId);
-    if (updatedTask) {
-      updatedTask.status = newStatus;
+  const moveTask = async (taskId, newStatus) => {
+    try {
+      const updatedTask = tasks.find((task) => task._id === taskId);
+      if (!updatedTask) return;
+
+      // Create new array with updated status
+      const updatedTasks = tasks.map((task) =>
+        task._id === taskId ? { ...task, status: newStatus } : task
+      );
+
+      // Update local state
+      setTasks(updatedTasks);
+
+      // Get current user
       const user = JSON.parse(localStorage.getItem("user"));
-      const currentUserId = user?._id;
-      setTasks([...tasks]);
-      updateTaskStatus(taskId, newStatus, currentUserId);
+
+      // Update task status on server first
+      await updateTaskStatus(taskId, newStatus, user._id);
+
+      // Calculate completion after successful status update
+      const totalTasks = updatedTasks.length;
+      const completedTasks = updatedTasks.filter(
+        (task) => task.status === "Done" || task.status === "Changelog"
+      ).length;
+
+      // Update parent component's tasks
+      updateParentTasks(updatedTasks);
+
+      // Check if project is complete and create notifications
+      if (completedTasks === totalTasks) {
+        console.log("All tasks completed, creating notifications...");
+
+        const config = {
+          headers: {
+            Authorization: `Bearer ${user.accessToken}`,
+            "Content-Type": "application/json",
+          },
+        };
+
+        // Get all project members including admin
+        const allRecipients = [
+          { _id: user._id }, // Current user (admin)
+          ...members, // Project members
+        ];
+
+        console.log("Sending notifications to:", allRecipients);
+
+        // Create notifications for all members
+        for (const recipient of allRecipients) {
+          try {
+            const notificationData = {
+              recipient: recipient._id,
+              type: "project",
+              title: "Project Completed",
+              message: `Project "${projectName}" has been completed!`,
+              relatedItem: projectId,
+              itemModel: "Project",
+            };
+
+            const response = await axios.post(
+              "http://localhost:5000/api/users/create-notification",
+              notificationData,
+              config
+            );
+            console.log(
+              `Notification created for ${recipient._id}:`,
+              response.data
+            );
+          } catch (error) {
+            console.error(
+              `Error creating notification for ${recipient._id}:`,
+              error
+            );
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error in moveTask:", error);
     }
   };
 
@@ -133,13 +205,45 @@ const Kanban = ({ projectId, projectName }) => {
   };
 
   const Column = ({ status, children }) => {
-    const [, drop] = useDrop({
+    const [{ isOver, canDrop }, drop] = useDrop({
       accept: ItemType.TASK,
       drop: (item) => moveTask(item.id, status),
+      canDrop: (item) => {
+        const taskItem = tasks.find((task) => task._id === item.id);
+        if (!taskItem) return false;
+
+        // Get current task status
+        const currentStatus = taskItem.status;
+
+        // Rules for Done and Changelog
+        if (currentStatus === "Done") {
+          // Tasks in Done can only move to Changelog
+          return status === "Changelog";
+        }
+
+        if (currentStatus === "Changelog") {
+          // Tasks in Changelog can only move to Done
+          return status === "Done";
+        }
+
+        // Tasks in other statuses (Backlog/Todo/Ongoing)
+        if (currentStatus !== "Done" && currentStatus !== "Changelog") {
+          // Can move freely between Backlog/Todo/Ongoing or to Done
+          return status !== "Changelog";
+        }
+
+        return false;
+      },
+      collect: (monitor) => ({
+        isOver: monitor.isOver(),
+        canDrop: monitor.canDrop(),
+      }),
     });
 
+    const backgroundColor = isOver && canDrop ? "bg-gray-100" : "";
+
     return (
-      <div ref={drop} className="w-full sm:w-1/5 p-2">
+      <div ref={drop} className={`w-full sm:w-1/5 p-2 ${backgroundColor}`}>
         <div className="flex items-center justify-between mb-2">
           <h2 className="text-base text-gray-600 font-bold">{status}</h2>
           <button
@@ -278,7 +382,7 @@ const Kanban = ({ projectId, projectName }) => {
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="flex flex-wrap p-4">
-        {["Document", "Todo", "Ongoing", "Done", "Backlog"].map((status) => (
+        {["Backlog", "Todo", "Ongoing", "Done", "Changelog"].map((status) => (
           <Column key={status} status={status}>
             {tasks
               .filter((task) => task.status === status)

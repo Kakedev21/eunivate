@@ -294,6 +294,8 @@ const Project = () => {
     return totalTasks > 0 ? (doneTasks / totalTasks) * 100 : 0;
   };
 
+  console.log("ASD", selectedWorkspace);
+
   const Tooltip = ({ children, title }) => {
     return (
       <div className="relative group">
@@ -414,11 +416,11 @@ const Project = () => {
             <div className="relative mt-2">
               <select
                 className="w-full p-2 border border-gray-300 rounded-md text-gray-700"
-                defaultValue={selectedWorkspace._id}
+                defaultValue={selectedWorkspace?._id}
                 onChange={(e) => setTeam(e.target.value)}
               >
                 {workspaces.map((workspace) => (
-                  <option key={workspace._id} value={workspace._id}>
+                  <option key={workspace?._id} value={workspace?._id}>
                     {workspace.workspaceTitle}
                   </option>
                 ))}

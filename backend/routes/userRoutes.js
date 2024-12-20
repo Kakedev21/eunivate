@@ -44,6 +44,15 @@ import {
   updateProduct,
 } from "../controllers/AdminControllers/addProductsController.js";
 import {
+  createNotification,
+  deleteNotification,
+  deleteReadNotifications,
+  getUnreadCount,
+  getUserNotifications,
+  markAllAsRead,
+  markAsRead,
+} from "../controllers/SuperAdmin/notificationController.js";
+import {
   updateProject,
   deleteProject,
   getProjects,
@@ -129,6 +138,15 @@ router.get("/sa-getnewproject/:id", protect, getProjectById);
 router.get("/findByUsername/:username", findUserByUsername);
 router.put("/sa-updateprojectname/:projectId", saUpdateProject);
 router.delete("/sa-project-delete/:projectId", deleteSaNewProject);
+
+//Notification
+router.post("/create-notification", createNotification);
+router.delete("/delete-notification/:id", deleteNotification);
+router.delete("/delete-read-notifications", deleteReadNotifications);
+router.get("/unread-count", protect, getUnreadCount);
+router.get("/user-notifications", protect, getUserNotifications);
+router.put("/mark-all-as-read", markAllAsRead);
+router.put("/mark-as-read/:id", protect, markAsRead);
 
 //Workspace
 router.post("/workspace", protect, addNewWorkspace);

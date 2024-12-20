@@ -69,11 +69,9 @@ export const getAllProjects = async (req, res) => {
     return res.status(200).json(uniqueProjects);
   } catch (error) {
     console.error("Error in fetching projects:", error.message);
-    return res
-      .status(500)
-      .json({
-        error: error.message || "An error occurred while fetching the projects",
-      });
+    return res.status(500).json({
+      error: error.message || "An error occurred while fetching the projects",
+    });
   }
 };
 
@@ -84,7 +82,7 @@ export const getProjectById = async (req, res) => {
 
     // Fetch project by ID from the database
     const project = await SaNewProject.findById(projectId)
-      .populate("invitedUsers", "username profilePicture") // Populate invitedUsers with username and profilePicture
+      .populate("invitedUsers", "username profilePicture email") // Populate invitedUsers with username and profilePicture
       .exec();
 
     // Check if project exists
@@ -95,11 +93,9 @@ export const getProjectById = async (req, res) => {
     return res.status(200).json(project);
   } catch (error) {
     console.error("Error in fetching project:", error.message);
-    return res
-      .status(500)
-      .json({
-        error: error.message || "An error occurred while fetching the project",
-      });
+    return res.status(500).json({
+      error: error.message || "An error occurred while fetching the project",
+    });
   }
 };
 
@@ -130,11 +126,9 @@ export const inviteUsersToProject = async (req, res) => {
 
     // Check if current user is the owner
     if (!req.user || project.owner.toString() !== req.user._id.toString()) {
-      return res
-        .status(403)
-        .json({
-          message: "You do not have permission to invite users to this project",
-        });
+      return res.status(403).json({
+        message: "You do not have permission to invite users to this project",
+      });
     }
 
     // Add user IDs directly to the invitedUsers array
@@ -152,11 +146,9 @@ export const inviteUsersToProject = async (req, res) => {
     return res.status(200).json(project);
   } catch (error) {
     console.error("Error in inviting users:", error.message);
-    return res
-      .status(500)
-      .json({
-        error: error.message || "An error occurred while inviting users",
-      });
+    return res.status(500).json({
+      error: error.message || "An error occurred while inviting users",
+    });
   }
 };
 

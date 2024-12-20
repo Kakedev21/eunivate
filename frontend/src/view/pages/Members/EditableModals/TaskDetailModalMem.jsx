@@ -641,7 +641,7 @@ const TaskDetailModalMem = ({
             </button>
             {showStatusDropdown && (
               <div className="absolute top-full right-0 bg-white border left-0 border-gray-300 rounded shadow-lg mt-1 w-48 z-10">
-                {["Document", "Todo", "Ongoing", "Done", "Backlog"].map(
+                {["Backlog", "Todo", "Ongoing", "Done", "ChangeLog"].map(
                   (item) => (
                     <button
                       key={item}

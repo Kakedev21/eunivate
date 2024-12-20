@@ -30,6 +30,8 @@ const ProjectDetails = () => {
   const [loading, setLoading] = useState(false);
   const [projectName, setProjectName] = useState(project.projectName || "");
   const [tasks, setTasks] = useState([]);
+  const [projectComplete, setProjectComplete] = useState(0);
+  const [notificationSent, setNotificationSent] = useState(false);
 
   const modalRef = useRef(null);
   const location = useLocation();
@@ -38,13 +40,20 @@ const ProjectDetails = () => {
 
   useEffect(() => {
     const fetchTasks = async () => {
-      // Existing fetch logic
-      const response = await axios.get(
-        `https://eunivate-jys4.onrender.com/api/users/sa-tasks/${projectId}`
-      );
-      setTasks(response.data.data);
+      try {
+        const response = await axios.get(
+          `https://eunivate-jys4.onrender.com/api/users/sa-tasks/${projectId}`
+        );
+        console.log("Fetched tasks:", response.data.data);
+        setTasks(response.data.data);
+      } catch (error) {
+        console.error("Error fetching tasks:", error);
+      }
     };
-    fetchTasks();
+
+    if (projectId) {
+      fetchTasks();
+    }
   }, [projectId]);
 
   useEffect(() => {
@@ -59,14 +68,17 @@ const ProjectDetails = () => {
         }
 
         const response = await axios.get(
-          `https://eunivate-jys4.onrender.com/api/users/sa-getnewproject/${projectId}`,
+          `http://localhost:5000/api/users/sa-getnewproject/${projectId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
 
+        console.log("response.data", response.data.invitedUsers);
+
         setProject(response.data);
         setAddedMembers(response.data.invitedUsers);
+        setNotificationSent(response.data.completionNotificationSent || false);
       } catch (error) {
         console.error("Error fetching project details:", error);
         setError("Error fetching project details.");
@@ -303,6 +315,37 @@ const ProjectDetails = () => {
     }
   };
 
+  const handleTaskStatusChange = (updatedTasks) => {
+    setTasks(updatedTasks); // This will trigger the useEffect that calculates completion
+  };
+
+  useEffect(() => {
+    const calculateProjectComplete = () => {
+      if (!tasks || tasks.length === 0) {
+        setProjectComplete(0);
+        return;
+      }
+
+      const totalTasks = tasks.length;
+      const completedTasks = tasks.filter(
+        (task) => task.status === "Done" || task.status === "Changelog"
+      ).length;
+
+      const completion = Math.round((completedTasks / totalTasks) * 100);
+      console.log("Project completion:", completion, "%");
+      console.log(
+        "Completed tasks:",
+        completedTasks,
+        "Total tasks:",
+        totalTasks
+      );
+
+      setProjectComplete(completion);
+    };
+
+    calculateProjectComplete();
+  }, [tasks]); // Recalculate whenever tasks change
+
   return (
     <div className="bg-gray-100 min-h-screen p-6">
       <div className="w-full flex justify-between items-center mb-16">
@@ -352,6 +395,9 @@ const ProjectDetails = () => {
               <h2 className="text-3xl font-semibold mt-[-1rem]">
                 {project.projectName}
               </h2>
+              <span className="text-gray-600 text-sm">
+                ({projectComplete}% Complete)
+              </span>
               <FontAwesomeIcon
                 icon={faUserPlus}
                 className="cursor-pointer mt-[-1rem]"
@@ -500,8 +546,8 @@ const ProjectDetails = () => {
           <Kanban
             projectId={projectId}
             projectName={project.projectName}
-            setTasks={setTasks}
-            members={addedMembers} // Pass members to Kanban
+            setTasks={handleTaskStatusChange}
+            members={addedMembers}
           />
         )}
         {selectedView === "List" && <List tasks={tasks} />}{" "}

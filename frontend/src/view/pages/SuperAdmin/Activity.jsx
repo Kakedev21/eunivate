@@ -182,13 +182,29 @@ const Activity = () => {
     return changesByUser;
   };
 
+  const handlePrint = () => {
+    const printContent = document.getElementById("printable-content");
+    const originalContents = document.body.innerHTML;
+
+    document.body.innerHTML = printContent.innerHTML;
+    window.print();
+    document.body.innerHTML = originalContents;
+    window.location.reload(); // Reload to restore event handlers
+  };
+
   return (
     <div className="bg-gray-100 min-h-screen p-6">
       <div className="w-full flex justify-between items-center mb-4">
-        <div className="relative">
+        <div className="relative flex items-center gap-4">
           <h1 className="text-lg md:text-2xl font-medium text-gray-800 hidden md:block">
             Activity
           </h1>
+          <button
+            onClick={handlePrint}
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >
+            Print Activity
+          </button>
         </div>
         <AdminNavbar
           isAccountDropdownOpen={isAccountDropdownOpen}
@@ -196,7 +212,10 @@ const Activity = () => {
         />
       </div>
 
-      <div className="bg-white p-4 md:p-6 border border-gray-300 rounded-lg shadow-sm">
+      <div
+        id="printable-content"
+        className="bg-white p-4 md:p-6 border border-gray-300 rounded-lg shadow-sm"
+      >
         {projects.length > 0 ? (
           projects.map((project) => (
             <div key={project._id} className="mb-6">

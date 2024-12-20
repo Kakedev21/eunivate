@@ -15,6 +15,7 @@ import { useWorkspace } from "../../components/SuperAdmin/workspaceContext";
 const Dashboard = () => {
   const [isProjectDropdownOpen, setIsProjectDropdownOpen] = useState(false);
   const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
+  const [invitedUsers, setInvitedUsers] = useState([]);
   const [projects, setProjects] = useState([]);
   const [taskDetails, setTaskDetails] = useState({});
   const [allTasks, setAllTasks] = useState([]);
@@ -197,6 +198,14 @@ const Dashboard = () => {
 
     fetchProjects();
   }, [selectedWorkspace]);
+
+  useEffect(() => {
+    const fetchInvitedUsers = async () => {
+      const response = await axios.get("/api/users/get-assignee");
+      setInvitedUsers(response.data);
+    };
+    fetchInvitedUsers();
+  }, []);
 
   const toggleProjectDropdown = () =>
     setIsProjectDropdownOpen(!isProjectDropdownOpen);

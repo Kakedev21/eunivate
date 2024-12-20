@@ -5,6 +5,13 @@ import {
   faChevronDown,
   faChevronUp,
   faTrash,
+  faCaretDown,
+  faCaretUp,
+  faBox, // for Products
+  faCartPlus, // for Add Product
+  faFolderPlus, // for Add Project
+  faCalendarPlus, // for Add Event
+  faCalendar, // for Events Admin
 } from "@fortawesome/free-solid-svg-icons";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
@@ -36,6 +43,7 @@ const SideNav = ({ isNavOpen }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [workspaces, setWorkspaces] = useState([]);
+  const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -212,145 +220,196 @@ const SideNav = ({ isNavOpen }) => {
     }
   };
 
-  //   const handleDeleteWorkspace = async (workspaceId) => {
-  //     const user = JSON.parse(localStorage.getItem("user"));
-  //     const accessToken = user?.accessToken;
+  const mainNavItems = [
+    {
+      to: "dashboard",
+      text: "Dashboard",
+      icon: dashboard_sidenav_icon,
+      hoverIcon: dashboard_red,
+    },
+    {
+      to: "project",
+      text: "Project",
+      icon: project_icon,
+      hoverIcon: project_red,
+    },
+    {
+      to: "task",
+      text: "My Task",
+      icon: task_icon,
+      hoverIcon: task_red,
+    },
+    {
+      to: "activity",
+      text: "Activity",
+      icon: activity_icon,
+      hoverIcon: activity_red,
+    },
+    {
+      to: "people",
+      text: "People",
+      icon: people_icon,
+      hoverIcon: people_red,
+    },
+    {
+      to: "messages",
+      text: "Messages",
+      icon: messages_icon,
+      hoverIcon: messages_red,
+    },
+    {
+      to: "settings",
+      text: "Settings",
+      icon: settings_icon,
+      hoverIcon: settings_red,
+    },
+  ];
 
-  //     if (!accessToken) {
-  //       alert("No access token found. Please log in again.");
-  //       return;
-  //     }
-
-  //     try {
-  //       const response = await axios.delete(
-  //         `https://eunivate-jys4.onrender.com/api/workspaces/${workspaceId}`,
-  //         {
-  //           headers: { Authorization: `Bearer ${accessToken}` },
-  //         }
-  //       );
-
-  //       if (response.status === 200) {
-  //         alert("Workspace deleted successfully!");
-  //         setWorkspaces((prevWorkspaces) =>
-  //           prevWorkspaces.filter((workspace) => workspace._id !== workspaceId)
-  //         );
-
-  //         // Clear selected workspace if deleted
-  //         if (selectedWorkspace?._id === workspaceId) {
-  //           setSelectedWorkspace(null);
-  //           localStorage.removeItem("currentWorkspaceId");
-  //           localStorage.removeItem("currentWorkspaceTitle");
-  //         }
-  //       }
-  //     } catch (error) {
-  //       console.error(
-  //         "Error deleting workspace:",
-  //         error.response?.data?.error || error.message
-  //       );
-  //       alert("Failed to delete workspace.");
-  //     }
-  //   };
+  const adminNavItems = [
+    {
+      to: "products",
+      text: "Products",
+      icon: faBox,
+    },
+    {
+      to: "admin-products/add",
+      text: "Add Product",
+      icon: faCartPlus,
+    },
+    {
+      to: "admin-projects/add",
+      text: "Add Project",
+      icon: faFolderPlus,
+    },
+    {
+      to: "admin-events/add",
+      text: "Add Event",
+      icon: faCalendarPlus,
+    },
+    {
+      to: "events-admin",
+      text: "Events Admin",
+      icon: faCalendar,
+    },
+  ];
 
   return (
     <div
-      className={`side-nav-admin fixed top-0 left-0 h-full bg-red-750 shadow-lg transition-transform transform ${
+      className={`side-nav-admin h-full bg-red-750 shadow-lg transition-transform transform ${
         isNavOpen ? "translate-x-0" : "-translate-x-full"
-      } lg:translate-x-0 lg:w-[250px] z-30 w-[250px]`}
+      } lg:translate-x-0 lg:w-[250px] z-30 w-[250px] flex flex-col`}
     >
+      {/* Logo section */}
       <div className="dashboard-logo flex items-center p-4">
         <img src={dashboard_logo} alt="EUnivate Logo" className="h-7 mr-3" />
         <h2 className="text-lg font-bold text-white mt-3">EUnivate</h2>
       </div>
 
-      <ul className="list-none p-0">
-        {[
-          {
-            to: "dashboard",
-            text: "Dashboard",
-            icon: dashboard_sidenav_icon,
-            hoverIcon: dashboard_red,
-          },
-          {
-            to: "project",
-            text: "Project",
-            icon: project_icon,
-            hoverIcon: project_red,
-          },
-          { to: "task", text: "My Task", icon: task_icon, hoverIcon: task_red },
-          {
-            to: "activity",
-            text: "Activity",
-            icon: activity_icon,
-            hoverIcon: activity_red,
-          },
-          {
-            to: "people",
-            text: "People",
-            icon: people_icon,
-            hoverIcon: people_red,
-          },
-          {
-            to: "messages",
-            text: "Messages",
-            icon: messages_icon,
-            hoverIcon: messages_red,
-          },
-          {
-            to: "settings",
-            text: "Settings",
-            icon: settings_icon,
-            hoverIcon: settings_red,
-          },
-        ].map((item, index) => (
-          <li className="mb-2" key={index}>
-            <Link
-              to={item.to}
-              className="group relative flex items-center p-2 bg-red-750 hover:bg-red-700 rounded-md transition-all"
-            >
-              <img
-                src={item.icon}
-                alt={`${item.text} Icon`}
-                className="absolute h-5 group-hover:hidden"
-              />
-              <img
-                src={item.hoverIcon}
-                alt={`${item.text} Icon Red`}
-                className="absolute h-5 hidden group-hover:block -translate-y-1"
-              />
-              <span className="ml-10 text-red-750 group-hover:text-red-750">
-                {item.text}
-              </span>
-            </Link>
-          </li>
-        ))}
-      </ul>
+      {/* Main navigation section - make it scrollable if needed */}
+      <div className="flex-1 overflow-y-auto">
+        <ul className="list-none p-0">
+          {/* Main nav items */}
+          {mainNavItems.map((item, index) => (
+            <li className="mb-2" key={index}>
+              <Link
+                to={item.to}
+                className="group relative flex items-center p-2 bg-red-750 hover:bg-red-700 rounded-md transition-all"
+              >
+                <img
+                  src={item.icon}
+                  alt={`${item.text} Icon`}
+                  className="absolute h-5 group-hover:hidden"
+                />
+                <img
+                  src={item.hoverIcon}
+                  alt={`${item.text} Icon Red`}
+                  className="absolute h-5 hidden group-hover:block -translate-y-1"
+                />
+                <span className="ml-10 text-red-750 group-hover:text-red-750">
+                  {item.text}
+                </span>
+              </Link>
+            </li>
+          ))}
 
-      <div className="absolute bottom-0 left-0 w-full p-4 text-white text-center">
-        <p className="font-size">
+          {/* Admin controls section */}
+          <li className="mb-2">
+            <button
+              onClick={() => setIsAdminMenuOpen(!isAdminMenuOpen)}
+              className="w-full group relative flex items-center justify-between p-2 bg-red-750 hover:bg-red-700 rounded-md transition-all"
+            >
+              <div className="flex items-center">
+                <img
+                  src={settings_icon}
+                  alt="Admin Icon"
+                  className="absolute h-5 group-hover:hidden"
+                />
+                <img
+                  src={settings_red}
+                  alt="Admin Icon Red"
+                  className="absolute h-5 hidden group-hover:block -translate-y-1"
+                />
+                <span className="ml-10 text-red-750 group-hover:text-red-750">
+                  Admin Controls
+                </span>
+              </div>
+              <FontAwesomeIcon
+                icon={isAdminMenuOpen ? faCaretUp : faCaretDown}
+                className="text-red-750 group-hover:text-red-750 mr-2"
+              />
+            </button>
+
+            {isAdminMenuOpen && (
+              <ul className="ml-4 mt-2">
+                {adminNavItems.map((item, index) => (
+                  <li className="mb-2" key={index}>
+                    <Link
+                      to={item.to}
+                      className="group relative flex items-center p-2 bg-red-750 hover:bg-red-700 rounded-md transition-all"
+                    >
+                      <FontAwesomeIcon
+                        icon={item.icon}
+                        className="absolute h-5 text-red-750 group-hover:text-red-700"
+                      />
+                      <span className="ml-10 text-red-750 group-hover:text-red-750">
+                        {item.text}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </li>
+        </ul>
+      </div>
+
+      {/* Workspace section - will stay at bottom */}
+      <div className="mt-auto p-4 text-white bg-red-750">
+        <p className="font-size mb-2">
           Workspace
           <button onClick={() => setIsModalOpen(true)}>
-            <FontAwesomeIcon icon={faPlus} className="faPlusWorkspace" />
+            <FontAwesomeIcon icon={faPlus} className="faPlusWorkspace ml-2" />
           </button>
         </p>
 
-        <div className="workspaceSelect relative inline-block">
+        <div className="workspaceSelect relative">
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="workspaceDropdown flex items-center justify-between bg-transparent text-white"
+            className="workspaceDropdown flex items-center justify-between bg-transparent text-white w-full"
           >
-            <span>
+            <span className="truncate">
               {selectedWorkspace
                 ? selectedWorkspace.workspaceTitle
                 : "Select Workspace"}
             </span>
             <FontAwesomeIcon
               icon={isDropdownOpen ? faChevronUp : faChevronDown}
-              className="faChevronWS"
+              className="faChevronWS ml-2"
             />
           </button>
 
           {isDropdownOpen && (
-            <ul className="workspaceList absolute z-10 bottom-full mb-2 bg-white text-black shadow max-h-48 overflow-y-scroll rounded hide-scrollbar">
+            <ul className="workspaceList absolute z-[100] bottom-full mb-2 bg-white text-black shadow max-h-48 overflow-y-auto rounded w-full">
               {workspaces.length > 0 ? (
                 workspaces.map(
                   (workspace) => (
@@ -387,58 +446,6 @@ const SideNav = ({ isNavOpen }) => {
           )}
         </div>
       </div>
-
-      {/* Modal for adding a new workspace */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-gray-800 bg-opacity-50 flex ">
-          <div
-            className="addWorkspaceModal ml-1 bg-white p-2 rounded-md shadow-lg absolute bottom-20 h-50 w-60 z-60"
-            role="dialog"
-            aria-modal="true"
-          >
-            {/* Close Button */}
-            <button
-              onClick={closeModal}
-              className="absolute top-1 right-3 text-gray-600 hover:text-gray-800 text-2xl font-bold"
-              aria-label="Close Modal"
-            >
-              &times;
-            </button>
-
-            {/* Error Message */}
-            {error && <p className="text-red-500 mb-2">{error}</p>}
-
-            {/* Workspace Creation Form */}
-            <form onSubmit={handleCreateWorkspace}>
-              <label className="block m-1 text-gray-700">Add Workspace</label>
-              <input
-                type="text"
-                placeholder="Enter workspace title"
-                className="mt-1 w-full p-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring focus:border-blue-300"
-                value={workspaceTitle}
-                onChange={(e) => setWorkspaceTitle(e.target.value)}
-                required
-              />
-
-              <div className="mt-4 flex justify-end">
-                <button
-                  type="button"
-                  onClick={closeModal}
-                  className="mr-10 px-5 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-6 py-2 bg-red-800 text-white rounded-md hover:bg-red-900"
-                >
-                  Create
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
