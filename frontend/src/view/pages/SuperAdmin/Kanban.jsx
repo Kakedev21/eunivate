@@ -35,7 +35,7 @@ const Kanban = ({
           return;
         }
         const response = await axios.get(
-          `http://localhost:5000/api/users/sa-tasks/${projectId}`
+          `https://eunivate-r6ql.onrender.com/api/users/sa-tasks/${projectId}`
         );
         setTasks(response.data.data);
       } catch (error) {
@@ -73,15 +73,18 @@ const Kanban = ({
       };
 
       // Update the task status on the server
-      await axios.patch(`http://localhost:5000/api/users/sa-tasks/${taskId}`, {
-        status: newStatus,
-        modifiedBy: modifiedBy,
-        history: {
-          modifiedBy: modifiedUser,
-          modifiedAt: new Date().toISOString(),
-          changes: JSON.stringify({ status: newStatus }),
-        },
-      });
+      await axios.patch(
+        `https://eunivate-r6ql.onrender.com/api/users/sa-tasks/${taskId}`,
+        {
+          status: newStatus,
+          modifiedBy: modifiedBy,
+          history: {
+            modifiedBy: modifiedUser,
+            modifiedAt: new Date().toISOString(),
+            changes: JSON.stringify({ status: newStatus }),
+          },
+        }
+      );
 
       console.log(`Task ${taskId} status updated to ${newStatus}`);
     } catch (error) {
@@ -150,7 +153,7 @@ const Kanban = ({
             };
 
             const response = await axios.post(
-              "http://localhost:5000/api/users/create-notification",
+              "https://eunivate-r6ql.onrender.com/api/users/create-notification",
               notificationData,
               config
             );

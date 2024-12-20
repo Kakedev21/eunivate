@@ -68,7 +68,7 @@ const ProjectDetails = () => {
         }
 
         const response = await axios.get(
-          `http://localhost:5000/api/users/sa-getnewproject/${projectId}`,
+          `https://eunivate-r6ql.onrender.com/api/users/sa-getnewproject/${projectId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }

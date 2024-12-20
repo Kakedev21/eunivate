@@ -75,14 +75,14 @@ const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
 
         // First, get user notifications
         const notificationsRes = await axios.get(
-          "http://localhost:5000/api/users/user-notifications",
+          "https://eunivate-r6ql.onrender.com/api/users/user-notifications",
           config
         );
         console.log("Notifications response:", notificationsRes);
 
         // Then, get unread count
         const unreadCountRes = await axios.get(
-          "http://localhost:5000/api/users/unread-count",
+          "https://eunivate-r6ql.onrender.com/api/users/unread-count",
           config
         );
         console.log("Unread count response:", unreadCountRes);
@@ -139,7 +139,7 @@ const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
       };
 
       const response = await axios.put(
-        `http://localhost:5000/api/users/mark-as-read/${notificationId}`,
+        `https://eunivate-r6ql.onrender.com/api/users/mark-as-read/${notificationId}`,
         {},
         config
       );
@@ -215,7 +215,7 @@ const AdminNavbar = ({ isAccountDropdownOpen, toggleAccountDropdown }) => {
       if (!notification.read) {
         const user = JSON.parse(localStorage.getItem("user"));
         await axios.put(
-          `http://localhost:5000/api/users/mark-as-read/${notification._id}`,
+          `https://eunivate-r6ql.onrender.com/api/users/mark-as-read/${notification._id}`,
           {},
           {
             headers: { Authorization: `Bearer ${user.accessToken}` },

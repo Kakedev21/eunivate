@@ -1,9 +1,6 @@
 /** @type {import('tailwindcss').Config} */
-  module.exports = {
-  content: [
-    "./index.html", 
-    "./src/**/*.{js,jsx}"
-  ],
+module.exports = {
+  content: ["./index.html", "./src/**/*.{js,jsx}"],
   mode: "jit",
   theme: {
     extend: {
@@ -13,7 +10,7 @@
         neutral: "#686D76",
         warn: "#FF8343",
         action: "#F9E400",
-        danger: "#A02334"
+        danger: "#A02334",
       },
       fontFamily: {
         roboto: ["Roboto", "sans-serif"],
@@ -32,4 +29,4 @@
     },
   },
   plugins: [],
-}
+};
